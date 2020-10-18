@@ -110,6 +110,9 @@ enum class StatusRegisterFlags : std::uint8_t
 class CPU
 {
 public:
+    using AddressModeFunction = std::uint8_t (CPU::*)();
+    using InstructionTable = std::array<Instruction, 256>;
+
     CPU(Bus* bus);
 
     void reset();
@@ -119,7 +122,7 @@ public:
     bool last_instruction_complete();
 
 private:
-    StatusRegisterFlags get_flag(StatusRegisterFlags flag);
+    bool get_flag(StatusRegisterFlags flag);
     void set_flag(StatusRegisterFlags flag, bool value);
 
     std::uint8_t read_from_memory(std::uint16_t address);
@@ -128,10 +131,8 @@ private:
     //The read location could be a memory address or part of the instruction
     std::uint8_t fetch();
     
-    using InstructionTable = std::array<Instruction, 256>;
     constexpr InstructionTable generate_instruction_table() const;
 
-    using AddressModeFunction = std::uint8_t (CPU::*)();
     // clang-format off
     template<AddressModeFunction AddressMode> std::uint8_t instruction_adc();
     template<AddressModeFunction AddressMode> std::uint8_t instruction_and();
@@ -189,6 +190,12 @@ private:
     template<AddressModeFunction AddressMode> std::uint8_t instruction_txa();
     template<AddressModeFunction AddressMode> std::uint8_t instruction_txs();
     template<AddressModeFunction AddressMode> std::uint8_t instruction_tya();
+
+    template <CPU::AddressModeFunction AddressMode, StatusRegisterFlags flag, bool set> std::uint8_t instruction_branch();
+    template <CPU::AddressModeFunction AddressMode> std::uint8_t instruction_modify_register(std::uint8_t& target_register, std::int8_t value);
+    template <CPU::AddressModeFunction AddressMode> std::uint8_t instruction_transfer(std::uint8_t& source, std::uint8_t& target);
+    template <CPU::AddressModeFunction AddressMode> std::uint8_t instruction_load_register(std::uint8_t& target_register);
+    template <CPU::AddressModeFunction AddressMode> std::uint8_t instruction_compare(std::uint8_t& target_register);
     // clang-format on
 
     std::uint8_t address_mode_implied();
@@ -223,7 +230,7 @@ private:
     std::uint16_t address_absolute; //All used memory addresses end up in here
     std::uint16_t address_relative; //Represents the absolute address following a branch
     std::uint8_t opcode; //Instruction byte
-    std::uint8_t remaining_cycles;; //For the last executed instruction
+    std::uint8_t remaining_cycles; //For the last executed instruction
     std::uint32_t clock_count = 0; //Number of clock cycles executed
 
     InstructionTable instruction_table;
@@ -234,174 +241,678 @@ std::uint8_t CPU::instruction_adc()
 {
     std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
 
-    program_counter++;
+    fetch();
 
-    //todo
+    std::uint16_t add = static_cast<std::uint16_t>(register_accumulator) + static_cast<std::uint16_t>(fetched) + static_cast<std::uint16_t>(get_flag(StatusRegisterFlags::Carry));
+    const bool over_a_byte = add > 255;
+    const bool byte_is_zero = (add & 0x00FF) == 0;
+    const bool negative = add & 0x80;
+    //yikes, serious magic here that I don't understand
+    const bool overflow = (~(static_cast<std::uint16_t>(register_accumulator) ^ static_cast<std::uint16_t>(fetched) & (static_cast<std::uint16_t>(register_accumulator) ^ add)) & 0x0080);
+    set_flag(StatusRegisterFlags::Carry, over_a_byte);
+    set_flag(StatusRegisterFlags::Zero, byte_is_zero);
+    set_flag(StatusRegisterFlags::Negative, negative);
+    set_flag(StatusRegisterFlags::Overflow, overflow);
 
-    return 0;
+    register_accumulator = add & 0x00FF;
+
+    return 1 + extra_cycles_from_addressing;
 }
 
 template<CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_and(){ return 0; }
+std::uint8_t CPU::instruction_and()
+{
+    std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
+
+    fetch();
+    register_accumulator = register_accumulator & fetched;
+    set_flag(StatusRegisterFlags::Zero, register_accumulator == 0);
+    set_flag(StatusRegisterFlags::Negative, register_accumulator & 0x80);
+    return 1 + extra_cycles_from_addressing;
+}
 
 template<CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_asl(){ return 0; }
+std::uint8_t CPU::instruction_asl()
+{
+    std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
+
+    fetch();
+    auto result = static_cast<std::uint16_t>(fetched) << 1;
+    const bool carry = (result & 0xFF00) > 0;
+    set_flag(StatusRegisterFlags::Carry, carry);
+    set_flag(StatusRegisterFlags::Zero, register_accumulator == 0);
+    set_flag(StatusRegisterFlags::Negative, register_accumulator & 0x80);
+
+    if constexpr (AddressMode == &CPU::address_mode_implied)
+        register_accumulator = result & 0x00FF;
+    else
+        write_to_memory(address_absolute, result & 0x00FF);
+
+    return extra_cycles_from_addressing;
+}
+
+template <CPU::AddressModeFunction AddressMode, StatusRegisterFlags flag, bool set>
+std::uint8_t CPU::instruction_branch()
+{
+    std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
+
+    if (get_flag(flag) == set)
+        return extra_cycles_from_addressing;
+
+    clock_count++;
+    address_absolute = program_counter + address_relative;
+    std::uint16_t address_absolute_page = address_absolute & 0xFF00;
+    std::uint16_t program_counter_page = program_counter & 0xFF00;
+
+    //different page costs a cycle
+    if (address_absolute_page != program_counter_page)
+        clock_count++;
+
+    program_counter = address_absolute;
+    return extra_cycles_from_addressing;
+}
 
 template<CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_bcc(){ return 0; }
+std::uint8_t CPU::instruction_bcc()
+{
+    return instruction_branch<AddressMode, StatusRegisterFlags::Carry, true>();
+}
 
 template<CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_bcs(){ return 0; }
+std::uint8_t CPU::instruction_bcs()
+{
+    return instruction_branch<AddressMode, StatusRegisterFlags::Carry, false>();
+}
 
 template<CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_beq(){ return 0; }
+std::uint8_t CPU::instruction_beq()
+{
+    return instruction_branch<AddressMode, StatusRegisterFlags::Zero, true>();
+}
 
 template<CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_bit(){ return 0; }
+std::uint8_t CPU::instruction_bit()
+{
+    std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
+
+    fetch();
+
+    auto result = register_accumulator & fetched;
+
+    const bool byte_is_zero = (result & 0x00FF) == 0;
+    const bool overflow = fetched & (1 << 6);
+    const bool negative = fetched & (1 << 7);
+    set_flag(StatusRegisterFlags::Zero, byte_is_zero);
+    set_flag(StatusRegisterFlags::Overflow, overflow);
+    set_flag(StatusRegisterFlags::Negative, negative);
+
+    return extra_cycles_from_addressing;
+}
 
 template<CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_bmi(){ return 0; }
+std::uint8_t CPU::instruction_bmi()
+{
+    return instruction_branch<AddressMode, StatusRegisterFlags::Negative, true>();
+}
 
 template<CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_bne(){ return 0; }
+std::uint8_t CPU::instruction_bne()
+{
+    return instruction_branch<AddressMode, StatusRegisterFlags::Zero, false>();
+}
 
 template<CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_bpl(){ return 0; }
+std::uint8_t CPU::instruction_bpl()
+{
+    return instruction_branch<AddressMode, StatusRegisterFlags::Negative, false>();
+}
 
 template<CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_brk(){ return 0; }
+std::uint8_t CPU::instruction_brk()
+{
+    constexpr auto stack_address = 0x0100;
+
+    std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
+
+    program_counter++;
+
+    set_flag(StatusRegisterFlags::DisableInterrupts, true);
+
+    auto program_counter_low_byte = program_counter & 0x00FF;
+    auto program_counter_high_byte = (program_counter >> 8) & 0x00FF;
+    write_to_memory(stack_address + stack_pointer, program_counter_high_byte);
+    stack_pointer++;
+    write_to_memory(stack_address + stack_pointer, program_counter_low_byte);
+    stack_pointer++;
+
+    set_flag(StatusRegisterFlags::Break, true);
+    write_to_memory(stack_address + stack_pointer, register_status);
+    stack_pointer--;
+    set_flag(StatusRegisterFlags::Break, false);
+
+    //todo: magic address
+    std::uint16_t low_byte = read_from_memory(0xFFFE);
+    std::uint16_t high_byte = read_from_memory(0xFFFF);
+    high_byte = high_byte << 8;
+    program_counter = high_byte | low_byte;
+
+    return extra_cycles_from_addressing;
+}
 
 template<CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_bvc(){ return 0; }
+std::uint8_t CPU::instruction_bvc()
+{
+    return instruction_branch<AddressMode, StatusRegisterFlags::Overflow, false>();
+}
 
 template<CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_bvs(){ return 0; }
+std::uint8_t CPU::instruction_bvs()
+{
+    return instruction_branch<AddressMode, StatusRegisterFlags::Overflow, true>();
+}
 
 template<CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_clc(){ return 0; }
+std::uint8_t CPU::instruction_clc()
+{
+    std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
+    set_flag(StatusRegisterFlags::Carry, false);
+    return extra_cycles_from_addressing;
+}
 
 template<CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_cld(){ return 0; }
+std::uint8_t CPU::instruction_cld()
+{
+    std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
+    set_flag(StatusRegisterFlags::DecimalMode, false);
+    return extra_cycles_from_addressing;
+}
 
 template<CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_cli(){ return 0; }
+std::uint8_t CPU::instruction_cli()
+{
+    std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
+    set_flag(StatusRegisterFlags::DisableInterrupts, false);
+    return extra_cycles_from_addressing;
+}
 
 template<CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_clv(){ return 0; }
+std::uint8_t CPU::instruction_clv()
+{
+    std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
+    set_flag(StatusRegisterFlags::Overflow, false);
+    return extra_cycles_from_addressing;
+}
+
+template <CPU::AddressModeFunction AddressMode>
+std::uint8_t CPU::instruction_compare(std::uint8_t& target_register)
+{
+    std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
+
+    fetch();
+
+    auto result = static_cast<std::uint16_t>(target_register) - static_cast<std::uint16_t>(fetched);
+    set_flag(StatusRegisterFlags::Carry, target_register >= fetched);
+    set_flag(StatusRegisterFlags::Zero, (result & 0x00FF) == 0x0000);
+    set_flag(StatusRegisterFlags::Negative, result & 0x0080);
+
+    return extra_cycles_from_addressing;
+}
 
 template<CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_cmp(){ return 0; }
+std::uint8_t CPU::instruction_cmp()
+{
+    return instruction_compare<AddressMode>(register_accumulator);
+}
 
 template<CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_cpx(){ return 0; }
+std::uint8_t CPU::instruction_cpx()
+{
+    return instruction_compare<AddressMode>(register_x);
+}
 
 template<CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_cpy(){ return 0; }
+std::uint8_t CPU::instruction_cpy()
+{
+    return instruction_compare<AddressMode>(register_y);
+}
 
 template<CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_dec(){ return 0; }
+std::uint8_t CPU::instruction_dec()
+{
+    std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
+
+    fetch();
+
+    auto result = fetched - 1;
+    write_to_memory(address_absolute, result & 0x00FF);
+    set_flag(StatusRegisterFlags::Zero, (result & 0x00FF) == 0);
+    set_flag(StatusRegisterFlags::Negative, result & 0x0080);
+
+    return extra_cycles_from_addressing;
+}
+
+template <CPU::AddressModeFunction AddressMode>
+std::uint8_t CPU::instruction_modify_register(std::uint8_t& target_register, std::int8_t value)
+{
+    std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
+
+    target_register += value;
+    set_flag(StatusRegisterFlags::Zero, target_register == 0);
+    set_flag(StatusRegisterFlags::Negative, target_register & 0x80);
+
+    return extra_cycles_from_addressing;
+}
 
 template<CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_dex(){ return 0; }
+std::uint8_t CPU::instruction_dex()
+{
+    return instruction_modify_register<AddressMode>(register_x, -1);
+}
 
 template<CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_dey(){ return 0; }
+std::uint8_t CPU::instruction_dey()
+{
+    return instruction_modify_register<AddressMode>(register_y, -1);
+}
 
 template<CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_eor(){ return 0; }
+std::uint8_t CPU::instruction_eor()
+{
+    std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
+
+    fetch();
+
+    register_accumulator = register_accumulator ^ fetched;
+    set_flag(StatusRegisterFlags::Zero, register_accumulator == 0);
+    set_flag(StatusRegisterFlags::Negative, register_accumulator & 0x80);
+
+    return 1 + extra_cycles_from_addressing;
+}
 
 template<CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_inc(){ return 0; }
+std::uint8_t CPU::instruction_inc()
+{
+    std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
+
+    fetch();
+
+    auto result = fetched + 1;
+    write_to_memory(address_absolute, result & 0x00FF);
+    set_flag(StatusRegisterFlags::Zero, (result & 0x00FF) == 0);
+    set_flag(StatusRegisterFlags::Negative, result & 0x0080);
+
+    return extra_cycles_from_addressing;
+}
 
 template<CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_inx(){ return 0; }
+std::uint8_t CPU::instruction_inx()
+{
+    return instruction_modify_register<AddressMode>(register_x, 1);
+}
 
 template<CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_iny(){ return 0; }
+std::uint8_t CPU::instruction_iny()
+{
+    return instruction_modify_register<AddressMode>(register_y, 1);
+}
 
 template<CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_jmp(){ return 0; }
+std::uint8_t CPU::instruction_jmp()
+{
+    std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
+    program_counter = address_absolute;
+    return extra_cycles_from_addressing;
+}
 
 template<CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_jsr(){ return 0; }
+std::uint8_t CPU::instruction_jsr()
+{
+    std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
+
+    program_counter--;
+
+    constexpr auto stack_address = 0x0100;
+    auto program_counter_low_byte = program_counter & 0x00FF;
+    auto program_counter_high_byte = (program_counter >> 8) & 0x00FF;
+    write_to_memory(stack_address + stack_pointer, program_counter_high_byte);
+    stack_pointer--;
+    write_to_memory(stack_address + stack_pointer, program_counter_low_byte);
+    stack_pointer--;
+
+    program_counter = address_absolute;
+
+    return extra_cycles_from_addressing;
+}
+
+template <CPU::AddressModeFunction AddressMode>
+std::uint8_t CPU::instruction_load_register(std::uint8_t& target_register)
+{
+    std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
+
+    fetch();
+    target_register = fetched;
+    set_flag(StatusRegisterFlags::Zero, target_register == 0);
+    set_flag(StatusRegisterFlags::Negative, target_register & 0x80);
+
+    return 1 + extra_cycles_from_addressing;
+}
+
+//todo: do this within the instruction table instead? or is that too noisy
+template<CPU::AddressModeFunction AddressMode>
+std::uint8_t CPU::instruction_lda()
+{
+    return instruction_load_register<AddressMode>(register_accumulator);
+}
 
 template<CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_lda(){ return 0; }
+std::uint8_t CPU::instruction_ldx()
+{
+    return instruction_load_register<AddressMode>(register_x);
+}
 
 template<CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_ldx(){ return 0; }
+std::uint8_t CPU::instruction_ldy()
+{
+    return instruction_load_register<AddressMode>(register_y);
+}
 
 template<CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_ldy(){ return 0; }
+std::uint8_t CPU::instruction_lsr()
+{
+    std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
+
+    fetch();
+    set_flag(StatusRegisterFlags::Carry, fetched & 0x0001);
+
+    std::uint16_t result = fetched >> 1;
+
+    set_flag(StatusRegisterFlags::Zero, (result & 0x00FF) == 0);
+    set_flag(StatusRegisterFlags::Negative, result & 0x0080);
+
+    if constexpr (AddressMode == &CPU::address_mode_implied)
+        register_accumulator = result & 0x00FF;
+    else
+        write_to_memory(address_absolute, result & 0x00FF);
+
+    return extra_cycles_from_addressing;
+}
+
+//todo: make better
+template<CPU::AddressModeFunction AddressMode>
+std::uint8_t CPU::instruction_nop()
+{
+    std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
+
+    switch (opcode)
+    {
+        case 0x1C:
+        case 0x3C:
+        case 0x5C:
+        case 0x7C:
+        case 0xDC:
+        case 0xFC:
+            return 1 + extra_cycles_from_addressing;
+    }
+
+    return extra_cycles_from_addressing;
+}
 
 template<CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_lsr(){ return 0; }
+std::uint8_t CPU::instruction_ora()
+{
+    std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
+
+    fetch();
+    register_accumulator = register_accumulator & fetched;
+    set_flag(StatusRegisterFlags::Zero, register_accumulator == 0);
+    set_flag(StatusRegisterFlags::Negative, register_accumulator & 0x80);
+
+    return 1 + extra_cycles_from_addressing;
+}
 
 template<CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_nop(){ return 0; }
+std::uint8_t CPU::instruction_pha()
+{
+    std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
+
+    constexpr auto stack_address = 0x0100;
+    write_to_memory(stack_address + stack_pointer, register_accumulator);
+    stack_pointer--;
+
+    return extra_cycles_from_addressing;
+}
 
 template<CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_ora(){ return 0; }
+std::uint8_t CPU::instruction_php()
+{
+    std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
+
+    constexpr auto stack_address = 0x0100;
+    write_to_memory(stack_address + stack_pointer, register_status | static_cast<std::uint8_t>(StatusRegisterFlags::Break) | static_cast<std::uint8_t>(StatusRegisterFlags::Unused));
+    set_flag(StatusRegisterFlags::Break, false);
+    set_flag(StatusRegisterFlags::Unused, false);
+    stack_pointer--;
+
+    return extra_cycles_from_addressing;
+}
 
 template<CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_pha(){ return 0; }
+std::uint8_t CPU::instruction_pla()
+{
+    std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
+
+    constexpr auto stack_address = 0x0100;
+    stack_pointer++;
+    register_accumulator = read_from_memory(stack_address + stack_pointer);
+    set_flag(StatusRegisterFlags::Zero, register_accumulator == 0);
+    set_flag(StatusRegisterFlags::Negative, register_accumulator & 0x80);
+
+    return extra_cycles_from_addressing;
+}
 
 template<CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_php(){ return 0; }
+std::uint8_t CPU::instruction_plp()
+{
+    std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
+
+    constexpr auto stack_address = 0x0100;
+    stack_pointer++;
+    register_status = read_from_memory(stack_address + stack_pointer);
+    set_flag(StatusRegisterFlags::Unused, true);
+
+    return extra_cycles_from_addressing;
+}
 
 template<CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_pla(){ return 0; }
+std::uint8_t CPU::instruction_rol()
+{
+    std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
+
+    fetch();
+
+    std::uint16_t result = static_cast<std::uint16_t>(fetched << 1) | static_cast<std::uint16_t>(get_flag(StatusRegisterFlags::Carry));
+    set_flag(StatusRegisterFlags::Carry, result & 0xFF00);
+    set_flag(StatusRegisterFlags::Zero, (result & 0x00FF) == 0);
+    set_flag(StatusRegisterFlags::Negative, result & 0x0080 == 0);
+    if constexpr (AddressMode == &CPU::address_mode_implied)
+        register_accumulator = result & 0x00FF;
+    else
+        write_to_memory(address_absolute, result & 0x00FF);
+
+    return extra_cycles_from_addressing;
+}
 
 template<CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_plp(){ return 0; }
+std::uint8_t CPU::instruction_ror()
+{
+    std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
+
+    fetch();
+
+    std::uint16_t result = static_cast<std::uint16_t>(static_cast<std::uint16_t>(get_flag(StatusRegisterFlags::Carry)) << 7) | static_cast<std::uint16_t>(fetched >> 1);
+    set_flag(StatusRegisterFlags::Carry, fetched & 0x01);
+    set_flag(StatusRegisterFlags::Zero, (result & 0x00FF) == 0);
+    set_flag(StatusRegisterFlags::Negative, result & 0x0080);
+    if constexpr (AddressMode == &CPU::address_mode_implied)
+        register_accumulator = result & 0x00FF;
+    else
+        write_to_memory(address_absolute, result & 0x00FF);
+
+    return extra_cycles_from_addressing;
+}
 
 template<CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_rol(){ return 0; }
+std::uint8_t CPU::instruction_rti()
+{
+    std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
+
+    constexpr auto stack_address = 0x0100;
+
+    stack_pointer++;
+    register_status = read_from_memory(stack_address + stack_pointer);
+    register_status = register_status & ~static_cast<std::uint8_t>(StatusRegisterFlags::Break);
+    register_status = register_status & ~static_cast<std::uint8_t>(StatusRegisterFlags::Unused);
+
+    stack_pointer++;
+    program_counter = static_cast<std::uint16_t>(read_from_memory(stack_address + stack_pointer));
+    stack_pointer++;
+    program_counter = program_counter | (static_cast<std::uint16_t>(read_from_memory(stack_address + stack_pointer)) << 8);
+
+    return extra_cycles_from_addressing;
+}
 
 template<CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_ror(){ return 0; }
+std::uint8_t CPU::instruction_rts()
+{
+    std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
+
+    constexpr auto stack_address = 0x0100;
+
+    stack_pointer++;
+    program_counter = static_cast<std::uint16_t>(read_from_memory(stack_address + stack_pointer));
+    stack_pointer++;
+    program_counter = program_counter | (static_cast<std::uint16_t>(read_from_memory(stack_address + stack_pointer)) << 8);
+
+    program_counter++;
+    return extra_cycles_from_addressing;
+}
 
 template<CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_rti(){ return 0; }
+std::uint8_t CPU::instruction_sbc()
+{
+    std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
+
+    fetch();
+    std::uint16_t result = static_cast<std::uint16_t>(fetched) & 0x00FF;
+
+    //same as ADC
+    std::uint16_t add = static_cast<std::uint16_t>(register_accumulator) + static_cast<std::uint16_t>(result) + static_cast<std::uint16_t>(get_flag(StatusRegisterFlags::Carry));
+    const bool over_a_byte = add > 255;
+    const bool byte_is_zero = (add & 0x00FF) == 0;
+    const bool negative = add & 0x80;
+    //yikes, serious magic here that I don't understand
+    const bool overflow = (add ^ static_cast<std::uint16_t>(register_accumulator) & (add ^ result) & 0x0080);
+    set_flag(StatusRegisterFlags::Carry, over_a_byte);
+    set_flag(StatusRegisterFlags::Zero, byte_is_zero);
+    set_flag(StatusRegisterFlags::Negative, negative);
+    set_flag(StatusRegisterFlags::Overflow, overflow);
+
+    register_accumulator = add & 0x00FF;
+    return 1 + extra_cycles_from_addressing;
+}
 
 template<CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_rts(){ return 0; }
+std::uint8_t CPU::instruction_sec()
+{
+    std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
+    set_flag(StatusRegisterFlags::Carry, true);
+    return extra_cycles_from_addressing;
+}
 
 template<CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_sbc(){ return 0; }
+std::uint8_t CPU::instruction_sed()
+{
+    std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
+    set_flag(StatusRegisterFlags::DecimalMode, true);
+    return extra_cycles_from_addressing;
+}
 
 template<CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_sec(){ return 0; }
+std::uint8_t CPU::instruction_sei()
+{
+    std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
+    set_flag(StatusRegisterFlags::DisableInterrupts, true);
+    return extra_cycles_from_addressing;
+}
 
 template<CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_sed(){ return 0; }
+std::uint8_t CPU::instruction_sta()
+{
+    std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
+    write_to_memory(address_absolute, register_accumulator);
+    return extra_cycles_from_addressing;
+}
 
 template<CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_sei(){ return 0; }
+std::uint8_t CPU::instruction_stx()
+{
+    std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
+    write_to_memory(address_absolute, register_x);
+    return extra_cycles_from_addressing;
+}
 
 template<CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_sta(){ return 0; }
+std::uint8_t CPU::instruction_sty()
+{
+    std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
+    write_to_memory(address_absolute, register_y);
+    return extra_cycles_from_addressing;
+}
+
+template <CPU::AddressModeFunction AddressMode>
+std::uint8_t CPU::instruction_transfer(std::uint8_t& source, std::uint8_t& target)
+{
+    std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
+
+    target = source;
+    set_flag(StatusRegisterFlags::Zero, target == 0);
+    set_flag(StatusRegisterFlags::Negative, target & 0x80);
+
+    return extra_cycles_from_addressing;
+}
 
 template<CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_stx(){ return 0; }
+std::uint8_t CPU::instruction_tax()
+{
+    return instruction_transfer<AddressMode>(register_accumulator, register_x);
+}
 
 template<CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_sty(){ return 0; }
+std::uint8_t CPU::instruction_tay()
+{
+    return instruction_transfer<AddressMode>(register_accumulator, register_y);
+}
 
 template<CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_tax(){ return 0; }
+std::uint8_t CPU::instruction_tsx()
+{
+    return instruction_transfer<AddressMode>(stack_pointer, register_x);
+}
 
 template<CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_tay(){ return 0; }
+std::uint8_t CPU::instruction_txa()
+{
+    return instruction_transfer<AddressMode>(register_x, register_accumulator);
+}
 
 template<CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_tsx(){ return 0; }
+std::uint8_t CPU::instruction_txs()
+{
+    return instruction_transfer<AddressMode>(register_x, stack_pointer);
+}
 
 template<CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_txa(){ return 0; }
-
-template<CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_txs(){ return 0; }
-
-template<CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_tya(){ return 0; }
+std::uint8_t CPU::instruction_tya()
+{
+    return instruction_transfer<AddressMode>(register_y, register_accumulator);
+}

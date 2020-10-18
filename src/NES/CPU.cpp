@@ -392,9 +392,9 @@ std::uint8_t CPU::unofficial_opcode()
     return 0;
 }
 
-StatusRegisterFlags CPU::get_flag(StatusRegisterFlags flag)
+bool CPU::get_flag(StatusRegisterFlags flag)
 {
-    return StatusRegisterFlags();
+    return (register_status & static_cast<std::uint8_t>(flag)) != 0;
 }
 
 void CPU::set_flag(StatusRegisterFlags flag, bool value)
