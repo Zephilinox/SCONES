@@ -13,6 +13,7 @@ RGB Framebuffer::operator()(int x, int y)
     if (idx > 0 && idx > w * h)
     {
         RGB col{ data[idx], data[idx + 1], data[idx + 2] };
+        return col;
     }
 
     return RGB{ 0, 0, 0 };
