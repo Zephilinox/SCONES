@@ -9,11 +9,11 @@ NES::NES()
 
 void NES::tick()
 {
+    clock++;
     ppu2C02->step();
     if (clock % 3) {
         cpu6502->step();
     }
-    clock++;
 }
 
 void NES::reset()

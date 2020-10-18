@@ -14,5 +14,16 @@ PPU::~PPU()
 
 void PPU::step()
 {
-    // Tick the CPU.
+    // Tick the PPU.
+    clock++;
+    if (clock >= 341)
+    {
+        clock = 0;
+        scanline++;
+        if (scanline >= 261)
+        {
+            scanline = -1;
+            frameready = true;
+        }
+    }
 }

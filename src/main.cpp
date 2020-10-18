@@ -5,7 +5,13 @@
 int main()
 {
     NES nes;
-    nes.tick();
     std::cout << "hello\n";
+
+    for (int i = 0; i < 1000; i++)
+    {
+        nes.tick();
+        std::cout << "ticking";
+    }
+
     return 0;
 }
