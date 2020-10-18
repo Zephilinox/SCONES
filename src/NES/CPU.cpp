@@ -188,6 +188,27 @@ CPU::CPU(Bus* bus)
 
 }
 
+void CPU::reset()
+{
+}
+
+void CPU::interrupt_request()
+{
+}
+
+void CPU::force_interrupt_request()
+{
+}
+
+void CPU::step()
+{
+}
+
+bool CPU::last_instruction_complete()
+{
+    return false;
+}
+
 std::uint8_t CPU::address_mode_implied()
 {
     fetched = register_accumulator;
@@ -196,6 +217,8 @@ std::uint8_t CPU::address_mode_implied()
 
 std::uint8_t CPU::address_mode_immidiate()
 {
+    address_absolute = program_counter;
+    program_counter++;
     return 0;
 }
 
@@ -211,31 +234,79 @@ std::uint8_t CPU::address_mode_relative()
 
 std::uint8_t CPU::address_mode_zero_page()
 {
+    address_absolute = read_from_memory(program_counter);
+    program_counter++;
+    //we only need the first byte
+    address_absolute = address_absolute & 0x00FF;
     return 0;
 }
 
 std::uint8_t CPU::address_mode_zero_page_y()
 {
+    address_absolute = read_from_memory(program_counter) + register_y;
+    program_counter++;
+    //we only need the first byte
+    address_absolute = address_absolute & 0x00FF;
     return 0;
 }
 
 std::uint8_t CPU::address_mode_zero_page_x()
 {
+    address_absolute = read_from_memory(program_counter) + register_x;
+    program_counter++;
+    //we only need the first byte
+    address_absolute = address_absolute & 0x00FF;
     return 0;
 }
 
+// Load a 16-bit address
 std::uint8_t CPU::address_mode_absolute()
 {
+    std::uint16_t offset = read_from_memory(program_counter);
+    program_counter++;
+    std::uint16_t page = read_from_memory(program_counter);
+    page = page << 8;
+    program_counter++;
+
+    address_absolute = page | offset;
     return 0;
 }
 
 std::uint8_t CPU::address_mode_absolute_x()
 {
+    const std::uint16_t offset = read_from_memory(program_counter);
+    program_counter++;
+    std::uint16_t page = read_from_memory(program_counter);
+    page = page << 8;
+    program_counter++;
+
+    address_absolute = page | offset;
+    address_absolute += register_x;
+
+    //new page, costs a cycle
+    const auto address_absolute_page = address_absolute & 0xFF00;
+    if (address_absolute_page == page)
+        return 1;
+    
     return 0;
 }
 
 std::uint8_t CPU::address_mode_absolute_y()
 {
+    const std::uint16_t offset = read_from_memory(program_counter);
+    program_counter++;
+    std::uint16_t page = read_from_memory(program_counter);
+    page = page << 8;
+    program_counter++;
+
+    address_absolute = page | offset;
+    address_absolute += register_y;
+
+    //new page, costs a cycle
+    const auto address_absolute_page = address_absolute & 0xFF00;
+    if (address_absolute_page == page)
+        return 1;
+
     return 0;
 }
 
@@ -257,4 +328,27 @@ std::uint8_t CPU::address_mode_indirect_y()
 std::uint8_t CPU::unofficial_opcode()
 {
     return 0;
+}
+
+StatusRegisterFlags CPU::get_flag(StatusRegisterFlags flag)
+{
+    return StatusRegisterFlags();
+}
+
+void CPU::set_flag(StatusRegisterFlags flag, bool value)
+{
+}
+
+std::uint8_t CPU::read_from_memory(std::uint16_t address)
+{
+    return std::uint8_t();
+}
+
+void CPU::write_to_memory(std::uint16_t address, std::uint8_t data)
+{
+}
+
+std::uint8_t CPU::fetch()
+{
+    return std::uint8_t();
 }
