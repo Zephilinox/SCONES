@@ -3,6 +3,8 @@
 #include <cstdint>
 #include <memory>
 
+#include "Framebuffer.h"
+
 class Bus;
 
 constexpr std::uint32_t PPU_MAX_ADDRESSABLE_MEMEORY = 16 * 1024;
@@ -20,12 +22,15 @@ constexpr std::uint8_t PPU_ADRESS_VRAM_IO_REG = 0x2007;
 class PPU
 {
 public:
-    PPU(Bus* bus);
+    PPU(Bus* bus, Framebuffer* fbuffer);
     ~PPU(); 
 
     void step();
 
 private:
     Bus* addBus = nullptr;
+    Framebuffer* fb = nullptr;
     std::unique_ptr<std::uint8_t[]> vram;
+
+    std::uint32_t clock = 0;
 };

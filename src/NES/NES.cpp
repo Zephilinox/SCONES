@@ -2,7 +2,8 @@
 
 NES::NES()
     : cpu6502(std::make_unique<CPU>(&addressBus))
-    , ppu2C02(std::make_unique<PPU>(&addressBus))
+    , fb(std::make_unique<Framebuffer>(256, 240))
+    , ppu2C02(std::make_unique<PPU>(&addressBus, fb.get()))
 {
 }
 
