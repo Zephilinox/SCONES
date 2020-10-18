@@ -1,5 +1,8 @@
 #include "CPU.hpp"
 
+//LIBS
+#include <spdlog/spdlog.h>
+
 constexpr CPU::InstructionTable CPU::generate_instruction_table() const
 {
     InstructionTable instruction_table{};
@@ -211,7 +214,6 @@ bool CPU::last_instruction_complete()
 
 std::uint8_t CPU::address_mode_implied()
 {
-    fetched = register_accumulator;
     return 0;
 }
 
@@ -224,11 +226,21 @@ std::uint8_t CPU::address_mode_immidiate()
 
 std::uint8_t CPU::address_mode_accumulator()
 {
+    fetched = register_accumulator;
     return 0;
 }
 
 std::uint8_t CPU::address_mode_relative()
 {
+    address_relative = read_from_memory(program_counter);
+    program_counter++;
+
+    //can only branch within 256 instructions of the address read from memory
+    //todo: understand what is going on here better
+    const std::uint16_t address_relative_ignore_sign_bit = address_relative & 0x80; // -128 to 127
+    if (address_relative_ignore_sign_bit) //without the sign bit of the lower byte, we're non-zero
+        address_relative |= 0xFF00; //set upper half to 1's?
+
     return 0;
 }
 
@@ -262,7 +274,7 @@ std::uint8_t CPU::address_mode_zero_page_x()
 // Load a 16-bit address
 std::uint8_t CPU::address_mode_absolute()
 {
-    std::uint16_t offset = read_from_memory(program_counter);
+    const std::uint16_t offset = read_from_memory(program_counter);
     program_counter++;
     std::uint16_t page = read_from_memory(program_counter);
     page = page << 8;
@@ -285,7 +297,7 @@ std::uint8_t CPU::address_mode_absolute_x()
 
     //new page, costs a cycle
     const auto address_absolute_page = address_absolute & 0xFF00;
-    if (address_absolute_page == page)
+    if (address_absolute_page != page)
         return 1;
     
     return 0;
@@ -304,7 +316,7 @@ std::uint8_t CPU::address_mode_absolute_y()
 
     //new page, costs a cycle
     const auto address_absolute_page = address_absolute & 0xFF00;
-    if (address_absolute_page == page)
+    if (address_absolute_page != page)
         return 1;
 
     return 0;
@@ -312,21 +324,71 @@ std::uint8_t CPU::address_mode_absolute_y()
 
 std::uint8_t CPU::address_mode_indirect()
 {
+    const std::uint16_t pointer_low_byte = read_from_memory(program_counter);
+    program_counter++;
+    std::uint16_t pointer_high_byte = read_from_memory(program_counter);
+    program_counter++;
+    pointer_high_byte = pointer_high_byte << 8;
+
+    const std::uint16_t pointer = pointer_high_byte | pointer_low_byte;
+
+    //simulate bug
+    if (pointer_low_byte == 0x00FF)
+    {
+        std::uint16_t high_byte = read_from_memory(pointer_high_byte);
+        high_byte = high_byte << 8;
+        const std::uint16_t low_byte = read_from_memory(pointer_low_byte);
+        address_absolute = high_byte | low_byte;
+    }
+    else
+    {
+        std::uint16_t high_byte = read_from_memory(pointer + 1);
+        high_byte = high_byte << 8;
+        const std::uint16_t low_byte = read_from_memory(pointer_low_byte);
+        address_absolute = high_byte | low_byte;
+    }
+
     return 0;
 }
 
 std::uint8_t CPU::address_mode_indirect_x()
 {
+    std::uint16_t pointer = read_from_memory(program_counter);
+    program_counter++;
+
+    pointer += register_x;
+
+    const std::uint16_t low_byte = read_from_memory(pointer & 0x00FF);
+    std::uint16_t high_byte = read_from_memory((pointer + 1) & 0x00FF);
+    high_byte = high_byte << 8;
+
+    address_absolute = high_byte | low_byte;
     return 0;
 }
 
 std::uint8_t CPU::address_mode_indirect_y()
 {
+    const std::uint16_t pointer = read_from_memory(program_counter);
+    program_counter++;
+
+    const std::uint16_t low_byte = read_from_memory(pointer & 0x00FF);
+    std::uint16_t high_byte = read_from_memory((pointer + 1) & 0x00FF);
+    high_byte = high_byte << 8;
+
+    address_absolute = high_byte | low_byte;
+    address_absolute += register_y;
+
+    const std::uint16_t address_absolute_page = address_absolute & 0xFF00;
+    if (address_absolute_page != high_byte)
+        return 1;
+
     return 0;
 }
 
 std::uint8_t CPU::unofficial_opcode()
 {
+    //todo: implement the ones we need
+    spdlog::error("tried to access unofficial opcode");
     return 0;
 }
 
