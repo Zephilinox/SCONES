@@ -1,4 +1,4 @@
-#include "BUS.hpp"
+#include "Bus.hpp"
 
 Bus::Bus()
     : ram(std::make_unique<std::uint8_t[]>(ADDRESS_BUS_RAM_SIZE))
