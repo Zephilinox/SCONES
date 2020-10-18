@@ -3,8 +3,9 @@
 Framebuffer::Framebuffer(int x, int y)
     : w(x), h(y)
 {
-    data = std::make_unique<std::uint8_t[]>(sizeof(uint8_t) * FRAMEBUFFER_COLOUR_FORMAT_RGB_BYTES);
-    std::fill_n(data.get(), sizeof(uint8_t) * FRAMEBUFFER_COLOUR_FORMAT_RGB_BYTES, 0);
+    const auto total_bytes = sizeof(uint8_t) * FRAMEBUFFER_COLOUR_FORMAT_RGB_BYTES * w * h;
+    data = std::make_unique<std::uint8_t[]>(total_bytes);
+    std::fill_n(data.get(), total_bytes, 0);
 }
 
 RGB Framebuffer::operator()(int x, int y)

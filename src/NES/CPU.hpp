@@ -733,7 +733,7 @@ std::uint8_t CPU::instruction_rol()
     std::uint16_t result = static_cast<std::uint16_t>(fetched << 1) | static_cast<std::uint16_t>(get_flag(StatusRegisterFlags::Carry));
     set_flag(StatusRegisterFlags::Carry, result & 0xFF00);
     set_flag(StatusRegisterFlags::Zero, (result & 0x00FF) == 0);
-    set_flag(StatusRegisterFlags::Negative, result & 0x0080 == 0);
+    set_flag(StatusRegisterFlags::Negative, (result & 0x0080) == 0);
     if constexpr (AddressMode == &CPU::address_mode_implied)
         register_accumulator = result & 0x00FF;
     else
