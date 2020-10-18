@@ -10,3 +10,8 @@ PPU::~PPU()
 {
 
 }
+
+void PPU::step()
+{
+    // Tick the CPU.
+}

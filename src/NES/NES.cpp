@@ -2,12 +2,13 @@
 
 NES::NES()
     : cpu6502(std::make_unique<CPU>(&addressBus))
+    , ppu2C02(std::make_unique<PPU>(&addressBus))
 {
 }
 
 void NES::tick()
 {
-    // TODO - Tick PPU here.
+    ppu2C02->step();
     if (clock % 3) {
         cpu6502->step();
     }

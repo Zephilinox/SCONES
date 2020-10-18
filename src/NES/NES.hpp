@@ -4,6 +4,7 @@
 
 #include "Bus.hpp"
 #include "CPU.hpp"
+#include "PPU.hpp"
 
 class NES {
  public:
@@ -16,6 +17,7 @@ class NES {
 private:
    // NES components.
    std::unique_ptr<CPU> cpu6502;
+   std::unique_ptr<PPU> ppu2C02;
    Bus addressBus;
 
    // Internal clock.

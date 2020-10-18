@@ -23,7 +23,7 @@ public:
     PPU(Bus* bus);
     ~PPU(); 
 
-
+    void step();
 
 private:
     Bus* addBus = nullptr;
