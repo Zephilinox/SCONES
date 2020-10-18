@@ -4,6 +4,9 @@
 #include <cstdint>
 #include <array>
 
+//SELF
+#include "Bus.hpp"
+
 //todo: maybe I don't need this :shrug:
 enum InstructionType
 {
@@ -104,16 +107,11 @@ enum class StatusRegisterFlags : std::uint8_t
     // clang-format on
 };
 
-class Bus
-{
-    
-};
-
 class CPU
 {
 public:
     CPU(Bus* bus)
-        : bus(bus)
+      : bus(bus)
     {
 
     }
@@ -140,17 +138,7 @@ private:
 
     using AddressModeFunction = std::uint8_t (CPU::*)();
     // clang-format off
-    template<AddressModeFunction AddressMode> std::uint8_t instruction_adc()
-    {
-        std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
-
-        program_counter++;
-
-        //todo
-
-        return 0;
-    }
-
+    template<AddressModeFunction AddressMode> std::uint8_t instruction_adc();
     template<AddressModeFunction AddressMode> std::uint8_t instruction_and();
     template<AddressModeFunction AddressMode> std::uint8_t instruction_asl();
     template<AddressModeFunction AddressMode> std::uint8_t instruction_bcc();
@@ -250,3 +238,180 @@ private:
 
     InstructionTable instruction_table = generate_instruction_table();
 };
+
+template<CPU::AddressModeFunction AddressMode>
+std::uint8_t CPU::instruction_adc()
+{
+    std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
+
+    program_counter++;
+
+    //todo
+
+    return 0;
+}
+
+template<CPU::AddressModeFunction AddressMode>
+std::uint8_t CPU::instruction_and(){ return 0; }
+
+template<CPU::AddressModeFunction AddressMode>
+std::uint8_t CPU::instruction_asl(){ return 0; }
+
+template<CPU::AddressModeFunction AddressMode>
+std::uint8_t CPU::instruction_bcc(){ return 0; }
+
+template<CPU::AddressModeFunction AddressMode>
+std::uint8_t CPU::instruction_bcs(){ return 0; }
+
+template<CPU::AddressModeFunction AddressMode>
+std::uint8_t CPU::instruction_beq(){ return 0; }
+
+template<CPU::AddressModeFunction AddressMode>
+std::uint8_t CPU::instruction_bit(){ return 0; }
+
+template<CPU::AddressModeFunction AddressMode>
+std::uint8_t CPU::instruction_bmi(){ return 0; }
+
+template<CPU::AddressModeFunction AddressMode>
+std::uint8_t CPU::instruction_bne(){ return 0; }
+
+template<CPU::AddressModeFunction AddressMode>
+std::uint8_t CPU::instruction_bpl(){ return 0; }
+
+template<CPU::AddressModeFunction AddressMode>
+std::uint8_t CPU::instruction_brk(){ return 0; }
+
+template<CPU::AddressModeFunction AddressMode>
+std::uint8_t CPU::instruction_bvc(){ return 0; }
+
+template<CPU::AddressModeFunction AddressMode>
+std::uint8_t CPU::instruction_bvs(){ return 0; }
+
+template<CPU::AddressModeFunction AddressMode>
+std::uint8_t CPU::instruction_clc(){ return 0; }
+
+template<CPU::AddressModeFunction AddressMode>
+std::uint8_t CPU::instruction_cld(){ return 0; }
+
+template<CPU::AddressModeFunction AddressMode>
+std::uint8_t CPU::instruction_cli(){ return 0; }
+
+template<CPU::AddressModeFunction AddressMode>
+std::uint8_t CPU::instruction_clv(){ return 0; }
+
+template<CPU::AddressModeFunction AddressMode>
+std::uint8_t CPU::instruction_cmp(){ return 0; }
+
+template<CPU::AddressModeFunction AddressMode>
+std::uint8_t CPU::instruction_cpx(){ return 0; }
+
+template<CPU::AddressModeFunction AddressMode>
+std::uint8_t CPU::instruction_cpy(){ return 0; }
+
+template<CPU::AddressModeFunction AddressMode>
+std::uint8_t CPU::instruction_dec(){ return 0; }
+
+template<CPU::AddressModeFunction AddressMode>
+std::uint8_t CPU::instruction_dex(){ return 0; }
+
+template<CPU::AddressModeFunction AddressMode>
+std::uint8_t CPU::instruction_dey(){ return 0; }
+
+template<CPU::AddressModeFunction AddressMode>
+std::uint8_t CPU::instruction_eor(){ return 0; }
+
+template<CPU::AddressModeFunction AddressMode>
+std::uint8_t CPU::instruction_inc(){ return 0; }
+
+template<CPU::AddressModeFunction AddressMode>
+std::uint8_t CPU::instruction_inx(){ return 0; }
+
+template<CPU::AddressModeFunction AddressMode>
+std::uint8_t CPU::instruction_iny(){ return 0; }
+
+template<CPU::AddressModeFunction AddressMode>
+std::uint8_t CPU::instruction_jmp(){ return 0; }
+
+template<CPU::AddressModeFunction AddressMode>
+std::uint8_t CPU::instruction_jsr(){ return 0; }
+
+template<CPU::AddressModeFunction AddressMode>
+std::uint8_t CPU::instruction_lda(){ return 0; }
+
+template<CPU::AddressModeFunction AddressMode>
+std::uint8_t CPU::instruction_ldx(){ return 0; }
+
+template<CPU::AddressModeFunction AddressMode>
+std::uint8_t CPU::instruction_ldy(){ return 0; }
+
+template<CPU::AddressModeFunction AddressMode>
+std::uint8_t CPU::instruction_lsr(){ return 0; }
+
+template<CPU::AddressModeFunction AddressMode>
+std::uint8_t CPU::instruction_nop(){ return 0; }
+
+template<CPU::AddressModeFunction AddressMode>
+std::uint8_t CPU::instruction_ora(){ return 0; }
+
+template<CPU::AddressModeFunction AddressMode>
+std::uint8_t CPU::instruction_pha(){ return 0; }
+
+template<CPU::AddressModeFunction AddressMode>
+std::uint8_t CPU::instruction_php(){ return 0; }
+
+template<CPU::AddressModeFunction AddressMode>
+std::uint8_t CPU::instruction_pla(){ return 0; }
+
+template<CPU::AddressModeFunction AddressMode>
+std::uint8_t CPU::instruction_plp(){ return 0; }
+
+template<CPU::AddressModeFunction AddressMode>
+std::uint8_t CPU::instruction_rol(){ return 0; }
+
+template<CPU::AddressModeFunction AddressMode>
+std::uint8_t CPU::instruction_ror(){ return 0; }
+
+template<CPU::AddressModeFunction AddressMode>
+std::uint8_t CPU::instruction_rti(){ return 0; }
+
+template<CPU::AddressModeFunction AddressMode>
+std::uint8_t CPU::instruction_rts(){ return 0; }
+
+template<CPU::AddressModeFunction AddressMode>
+std::uint8_t CPU::instruction_sbc(){ return 0; }
+
+template<CPU::AddressModeFunction AddressMode>
+std::uint8_t CPU::instruction_sec(){ return 0; }
+
+template<CPU::AddressModeFunction AddressMode>
+std::uint8_t CPU::instruction_sed(){ return 0; }
+
+template<CPU::AddressModeFunction AddressMode>
+std::uint8_t CPU::instruction_sei(){ return 0; }
+
+template<CPU::AddressModeFunction AddressMode>
+std::uint8_t CPU::instruction_sta(){ return 0; }
+
+template<CPU::AddressModeFunction AddressMode>
+std::uint8_t CPU::instruction_stx(){ return 0; }
+
+template<CPU::AddressModeFunction AddressMode>
+std::uint8_t CPU::instruction_sty(){ return 0; }
+
+template<CPU::AddressModeFunction AddressMode>
+std::uint8_t CPU::instruction_tax(){ return 0; }
+
+template<CPU::AddressModeFunction AddressMode>
+std::uint8_t CPU::instruction_tay(){ return 0; }
+
+template<CPU::AddressModeFunction AddressMode>
+std::uint8_t CPU::instruction_tsx(){ return 0; }
+
+template<CPU::AddressModeFunction AddressMode>
+std::uint8_t CPU::instruction_txa(){ return 0; }
+
+template<CPU::AddressModeFunction AddressMode>
+std::uint8_t CPU::instruction_txs(){ return 0; }
+
+template<CPU::AddressModeFunction AddressMode>
+std::uint8_t CPU::instruction_tya(){ return 0; }

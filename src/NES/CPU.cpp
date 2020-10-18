@@ -4,6 +4,10 @@ constexpr CPU::InstructionTable CPU::generate_instruction_table()
 {
     InstructionTable instruction_table{};
 
+    for (int i = 0; i < 256; ++i) {
+        instruction_table[i] = Instruction{ &CPU::unofficial_opcode, 0, 0 };
+    }
+
     //http://archive.6502.org/datasheets/rockwell_r650x_r651x.pdf
     // clang-format off
     instruction_table[0x00] = Instruction{ &CPU::instruction_brk<&CPU::address_mode_implied>,       1, 7 };
