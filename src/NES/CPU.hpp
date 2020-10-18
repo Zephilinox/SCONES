@@ -156,25 +156,90 @@ private:
     InstructionTable generate_instruction_table()
     {
         InstructionTable instruction_table{};
+
         //http://archive.6502.org/datasheets/rockwell_r650x_r651x.pdf
-        instruction_table[0x00] = Instruction{ &CPU::instruction_break<&CPU::address_mode_implied>, 1, 7 };
-        instruction_table[0x01] = Instruction{ &CPU::instruction_ora<&CPU::address_mode_indirect_x>, 2, 6 };
-        instruction_table[0x05] = Instruction{ &CPU::instruction_ora<&CPU::address_mode_zero_page>, 2, 3 };
-        instruction_table[0x06] = Instruction{ &CPU::instruction_asl<&CPU::address_mode_zero_page>, 2, 5 };
-        instruction_table[0x08] = Instruction{ &CPU::instruction_php<&CPU::address_mode_implied>, 1, 3 };
-        instruction_table[0x09] = Instruction{ &CPU::instruction_ora<&CPU::address_mode_immidiate>, 2, 2 };
-        instruction_table[0x0A] = Instruction{ &CPU::instruction_asl<&CPU::address_mode_accumulator>, 1, 2 };
-        instruction_table[0x0D] = Instruction{ &CPU::instruction_ora<&CPU::address_mode_absolute>, 3, 4 };
-        instruction_table[0x0E] = Instruction{ &CPU::instruction_asl<&CPU::address_mode_absolute>, 3, 6 };
+        // clang-format off
+        instruction_table[0x00] = Instruction{ &CPU::instruction_break<&CPU::address_mode_implied>,     1, 7 };
+        instruction_table[0x01] = Instruction{ &CPU::instruction_ora<&CPU::address_mode_indirect_x>,    2, 6 };
+        instruction_table[0x05] = Instruction{ &CPU::instruction_ora<&CPU::address_mode_zero_page>,     2, 3 };
+        instruction_table[0x06] = Instruction{ &CPU::instruction_asl<&CPU::address_mode_zero_page>,     2, 5 };
+        instruction_table[0x08] = Instruction{ &CPU::instruction_php<&CPU::address_mode_implied>,       1, 3 };
+        instruction_table[0x09] = Instruction{ &CPU::instruction_ora<&CPU::address_mode_immidiate>,     2, 2 };
+        instruction_table[0x0A] = Instruction{ &CPU::instruction_asl<&CPU::address_mode_accumulator>,   1, 2 };
+        instruction_table[0x0D] = Instruction{ &CPU::instruction_ora<&CPU::address_mode_absolute>,      3, 4 };
+        instruction_table[0x0E] = Instruction{ &CPU::instruction_asl<&CPU::address_mode_absolute>,      3, 6 };
         
-        instruction_table[0x10] = Instruction{ &CPU::instruction_bpl<&CPU::address_mode_relative>, 2, 2 };
-        instruction_table[0x11] = Instruction{ &CPU::instruction_ora<&CPU::address_mode_indirect_y>, 2, 5 };
-        instruction_table[0x15] = Instruction{ &CPU::instruction_ora<&CPU::address_mode_zero_page_x>, 2, 4 };
-        instruction_table[0x16] = Instruction{ &CPU::instruction_asl<&CPU::address_mode_zero_page_x>, 2, 6 };
-        instruction_table[0x18] = Instruction{ &CPU::instruction_clc<&CPU::address_mode_implied>, 1, 2 };
-        instruction_table[0x19] = Instruction{ &CPU::instruction_ora<&CPU::address_mode_absolute_y>, 3, 4 };
-        instruction_table[0x1D] = Instruction{ &CPU::instruction_ora<&CPU::address_mode_absolute_x>, 3, 4 };
-        instruction_table[0x1E] = Instruction{ &CPU::instruction_asl<&CPU::address_mode_absolute_x>, 3, 7 };
+        instruction_table[0x10] = Instruction{ &CPU::instruction_bpl<&CPU::address_mode_relative>,      2, 2 };
+        instruction_table[0x11] = Instruction{ &CPU::instruction_ora<&CPU::address_mode_indirect_y>,    2, 5 };
+        instruction_table[0x15] = Instruction{ &CPU::instruction_ora<&CPU::address_mode_zero_page_x>,   2, 4 };
+        instruction_table[0x16] = Instruction{ &CPU::instruction_asl<&CPU::address_mode_zero_page_x>,   2, 6 };
+        instruction_table[0x18] = Instruction{ &CPU::instruction_clc<&CPU::address_mode_implied>,       1, 2 };
+        instruction_table[0x19] = Instruction{ &CPU::instruction_ora<&CPU::address_mode_absolute_y>,    3, 4 };
+        instruction_table[0x1D] = Instruction{ &CPU::instruction_ora<&CPU::address_mode_absolute_x>,    3, 4 };
+        instruction_table[0x1E] = Instruction{ &CPU::instruction_asl<&CPU::address_mode_absolute_x>,    3, 7 };
+
+        instruction_table[0x20] = Instruction{ &CPU::instruction_jsr<&CPU::address_mode_absolute>,      3, 6 };
+        instruction_table[0x21] = Instruction{ &CPU::instruction_and<&CPU::address_mode_indirect_x>,    2, 6 };
+        instruction_table[0x24] = Instruction{ &CPU::instruction_bit<&CPU::address_mode_zero_page>,     2, 3 };
+        instruction_table[0x25] = Instruction{ &CPU::instruction_and<&CPU::address_mode_zero_page>,     2, 3 };
+        instruction_table[0x26] = Instruction{ &CPU::instruction_rol<&CPU::address_mode_zero_page>,     2, 5 };
+        instruction_table[0x28] = Instruction{ &CPU::instruction_plp<&CPU::address_mode_implied>,       1, 4 };
+        instruction_table[0x29] = Instruction{ &CPU::instruction_and<&CPU::address_mode_immidiate>,     2, 2 };
+        instruction_table[0x2A] = Instruction{ &CPU::instruction_rol<&CPU::address_mode_accumulator>,   1, 2 };
+        instruction_table[0x2C] = Instruction{ &CPU::instruction_bit<&CPU::address_mode_absolute>,      3, 4 };
+        instruction_table[0x2D] = Instruction{ &CPU::instruction_and<&CPU::address_mode_absolute>,      3, 4 };
+        instruction_table[0x2E] = Instruction{ &CPU::instruction_rol<&CPU::address_mode_absolute>,      3, 6 };
+
+        instruction_table[0x30] = Instruction{ &CPU::instruction_bmi<&CPU::address_mode_relative>,      2, 2 };
+        instruction_table[0x31] = Instruction{ &CPU::instruction_and<&CPU::address_mode_indirect_y>,    2, 5 };
+        instruction_table[0x35] = Instruction{ &CPU::instruction_and<&CPU::address_mode_zero_page_x>,   2, 4 };
+        instruction_table[0x36] = Instruction{ &CPU::instruction_rol<&CPU::address_mode_zero_page_x>,   2, 6 };
+        instruction_table[0x38] = Instruction{ &CPU::instruction_sec<&CPU::address_mode_implied>,       1, 2 };
+        instruction_table[0x39] = Instruction{ &CPU::instruction_and<&CPU::address_mode_absolute_y>,    3, 4 };
+        instruction_table[0x3D] = Instruction{ &CPU::instruction_and<&CPU::address_mode_absolute_x>,    3, 4 };
+        instruction_table[0x3E] = Instruction{ &CPU::instruction_rol<&CPU::address_mode_absolute_x>,    3, 7 };
+        
+        instruction_table[0x40] = Instruction{ &CPU::instruction_rti<&CPU::address_mode_implied>,       1, 6 };
+        instruction_table[0x41] = Instruction{ &CPU::instruction_eor<&CPU::address_mode_indirect_x>,    2, 6 };
+        instruction_table[0x45] = Instruction{ &CPU::instruction_eor<&CPU::address_mode_zero_page>,     2, 3 };
+        instruction_table[0x46] = Instruction{ &CPU::instruction_lsr<&CPU::address_mode_zero_page>,     2, 5 };
+        instruction_table[0x48] = Instruction{ &CPU::instruction_pha<&CPU::address_mode_implied>,       1, 3 };
+        instruction_table[0x49] = Instruction{ &CPU::instruction_eor<&CPU::address_mode_immidiate>,     2, 2 };
+        instruction_table[0x4A] = Instruction{ &CPU::instruction_lsr<&CPU::address_mode_accumulator>,   1, 2 };
+        instruction_table[0x4C] = Instruction{ &CPU::instruction_jmp<&CPU::address_mode_absolute>,      3, 3 };
+        instruction_table[0x4D] = Instruction{ &CPU::instruction_eor<&CPU::address_mode_absolute>,      3, 4 };
+        instruction_table[0x4E] = Instruction{ &CPU::instruction_lsr<&CPU::address_mode_absolute>,      3, 6 };
+        
+        instruction_table[0x50] = Instruction{ &CPU::instruction_bvc<&CPU::address_mode_relative>,      2, 2 };
+        instruction_table[0x51] = Instruction{ &CPU::instruction_eor<&CPU::address_mode_indirect_y>,    2, 5 };
+        instruction_table[0x55] = Instruction{ &CPU::instruction_eor<&CPU::address_mode_zero_page_x>,   2, 4 };
+        instruction_table[0x56] = Instruction{ &CPU::instruction_lsr<&CPU::address_mode_zero_page_x>,   2, 6 };
+        instruction_table[0x58] = Instruction{ &CPU::instruction_cli<&CPU::address_mode_implied>,       1, 2 };
+        instruction_table[0x59] = Instruction{ &CPU::instruction_eor<&CPU::address_mode_absolute_y,     3, 4 };
+        instruction_table[0x5D] = Instruction{ &CPU::instruction_eor<&CPU::address_mode_absolute_x,     3, 4 };
+        instruction_table[0x5E] = Instruction{ &CPU::instruction_lsr<&CPU::address_mode_absolute_x,     3, 7 };
+        
+        instruction_table[0x60] = Instruction{ &CPU::instruction_rts<&CPU::address_mode_implied>,       1, 6 };
+        instruction_table[0x61] = Instruction{ &CPU::instruction_adc<&CPU::address_mode_indirect_x>,    2, 6 };
+        instruction_table[0x65] = Instruction{ &CPU::instruction_adc<&CPU::address_mode_zero_page>,     2, 3 };
+        instruction_table[0x66] = Instruction{ &CPU::instruction_ror<&CPU::address_mode_zero_page>,     2, 5 };
+        instruction_table[0x68] = Instruction{ &CPU::instruction_pla<&CPU::address_mode_implied>,       1, 4 };
+        instruction_table[0x69] = Instruction{ &CPU::instruction_adc<&CPU::address_mode_immidiate>,     2, 2 };
+        instruction_table[0x6A] = Instruction{ &CPU::instruction_ror<&CPU::address_mode_accumulator>,   1, 2 };
+        instruction_table[0x6C] = Instruction{ &CPU::instruction_jmp<&CPU::address_mode_indirect>,      3, 5 };
+        instruction_table[0x6D] = Instruction{ &CPU::instruction_adc<&CPU::address_mode_absolute>,      3, 4 };
+        instruction_table[0x6E] = Instruction{ &CPU::instruction_ror<&CPU::address_mode_absolute>,      3, 6 };
+
+        instruction_table[0x70] = Instruction{ &CPU::instruction_bvs<&CPU::address_mode_relative>,      2, 2 };
+        instruction_table[0x71] = Instruction{ &CPU::instruction_adc<&CPU::address_mode_indirect_y>,    2, 5 };
+        instruction_table[0x75] = Instruction{ &CPU::instruction_adc<&CPU::address_mode_zero_page_x>,   2, 4 };
+        instruction_table[0x76] = Instruction{ &CPU::instruction_ror<&CPU::address_mode_zero_page_x>,   2, 6 };
+        instruction_table[0x78] = Instruction{ &CPU::instruction_sei<&CPU::address_mode_implied>,       1, 2 };
+        instruction_table[0x79] = Instruction{ &CPU::instruction_adc<&CPU::address_mode_absolute_y>,    3, 4 };
+        instruction_table[0x7D] = Instruction{ &CPU::instruction_adc<&CPU::address_mode_absolute_x>,    3, 4 };
+        instruction_table[0x7E] = Instruction{ &CPU::instruction_ror<&CPU::address_mode_absolute_x>,    3, 7 };
+
+        // clang-format on
         return instruction_table;
     }
 
