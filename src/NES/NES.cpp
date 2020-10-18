@@ -1,4 +1,4 @@
-#include "NES.h"
+#include "NES.hpp"
 
 NES::NES()
     : cpu6502(std::make_unique<CPU>(&addressBus))
