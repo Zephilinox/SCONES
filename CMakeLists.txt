@@ -1,7 +1,9 @@
-cmake_minimum_required (VERSION 3.15)
+cmake_minimum_required(VERSION 3.15)
 
 project("SCONES")
 add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/MP>")
+add_subdirectory("dependencies")
+add_subdirectory("tests")
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 SET(SCONES_INCLUDES
@@ -28,6 +30,7 @@ SET(SCONES_SOURCES
 )
 
 add_executable(SCONES ${SCONES_INCLUDES} ${SCONES_SOURCES})
+target_link_libraries(SCONES spdlog)
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SCONES_INCLUDES} ${SCONES_SOURCES})
 set_property(TARGET SCONES PROPERTY CXX_STANDARD 17)
 set_property(TARGET SCONES PROPERTY CXX_EXTENSIONS OFF)

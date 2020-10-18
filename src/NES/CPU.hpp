@@ -2,9 +2,7 @@
 
 //STD
 #include <cstdint>
-#include <variant>
 #include <array>
-#include <functional>
 
 //todo: maybe I don't need this :shrug:
 enum InstructionType
@@ -16,7 +14,7 @@ enum InstructionType
     BCC, //Branch on Carry Clear
     BCS, //Branch on Carry Set
     BEQ, //Branch on Result Zero
-    BIT, //Test Bits in Mmeory with Accumulator
+    BIT, //Test Bits in Memory with Accumulator
     BMI, //Branch on Result Minus
     BNE, //Branch on Result not Zero
     BPL, //Branch on Result Plus
@@ -68,25 +66,6 @@ enum InstructionType
     TYA, //Transfer Index Y to Accumulator
 };
 
-struct InstructionValue
-{
-    std::uint8_t value = 0;
-};
-
-struct InstructionAddress
-{
-    std::uint16_t address = 0;
-};
-
-using InstructionData = std::variant<InstructionValue, InstructionAddress>;
-
-enum class InstructionAddressMode
-{
-    None = 0,
-    Implied,
-    Immediate,
-};
-
 class CPU;
 
 class Instruction
@@ -99,6 +78,7 @@ public:
     std::uint8_t base_cycles = 0;
 
 private:
+
 };
 
 /*
@@ -133,8 +113,9 @@ public:
     CPU(Bus* bus)
         : bus(bus)
     {
-        
+
     }
+
     void reset();
     void interrupt_request();
     void force_interrupt_request();
