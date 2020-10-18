@@ -1,6 +1,6 @@
 //STD
 #include <iostream>
-#include "NES/Bus.hpp"
+#include "NES/NES.h"
 
 int main()
 {
