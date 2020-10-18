@@ -33,4 +33,6 @@ private:
     std::unique_ptr<std::uint8_t[]> vram;
 
     std::uint32_t clock = 0;
+    std::uint32_t scanline = 0;
+    bool frameready = false;
 };
