@@ -7,7 +7,7 @@
 
 class Bus;
 
-constexpr std::uint32_t PPU_MAX_ADDRESSABLE_MEMEORY = 16 * 1024;
+constexpr std::uint32_t PPU_MAX_ADDRESSABLE_MEMORY = 16 * 1024;
 
 // PPU I/O Addresses
 constexpr std::uint8_t PPU_ADRESS_CONTROL_REG_1 = 0x2000;

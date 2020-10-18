@@ -3,7 +3,7 @@
 
 PPU::PPU(Bus* bus, Framebuffer* fbuffer)
     : addBus(bus)
-    , vram(std::make_unique<std::uint8_t[]>(PPU_MAX_ADDRESSABLE_MEMEORY))
+    , vram(std::make_unique<std::uint8_t[]>(PPU_MAX_ADDRESSABLE_MEMORY))
     , fb(fbuffer)
 {}
 
