@@ -1,6 +1,6 @@
 #include "CPU.hpp"
 
-constexpr CPU::InstructionTable CPU::generate_instruction_table()
+constexpr CPU::InstructionTable CPU::generate_instruction_table() const
 {
     InstructionTable instruction_table{};
 
@@ -179,4 +179,82 @@ constexpr CPU::InstructionTable CPU::generate_instruction_table()
     // clang-format on
 
     return instruction_table;
+}
+
+CPU::CPU(Bus* bus)
+    : bus(bus)
+    , instruction_table(generate_instruction_table())
+{
+
+}
+
+std::uint8_t CPU::address_mode_implied()
+{
+    fetched = register_accumulator;
+    return 0;
+}
+
+std::uint8_t CPU::address_mode_immidiate()
+{
+    return 0;
+}
+
+std::uint8_t CPU::address_mode_accumulator()
+{
+    return 0;
+}
+
+std::uint8_t CPU::address_mode_relative()
+{
+    return 0;
+}
+
+std::uint8_t CPU::address_mode_zero_page()
+{
+    return 0;
+}
+
+std::uint8_t CPU::address_mode_zero_page_y()
+{
+    return 0;
+}
+
+std::uint8_t CPU::address_mode_zero_page_x()
+{
+    return 0;
+}
+
+std::uint8_t CPU::address_mode_absolute()
+{
+    return 0;
+}
+
+std::uint8_t CPU::address_mode_absolute_x()
+{
+    return 0;
+}
+
+std::uint8_t CPU::address_mode_absolute_y()
+{
+    return 0;
+}
+
+std::uint8_t CPU::address_mode_indirect()
+{
+    return 0;
+}
+
+std::uint8_t CPU::address_mode_indirect_x()
+{
+    return 0;
+}
+
+std::uint8_t CPU::address_mode_indirect_y()
+{
+    return 0;
+}
+
+std::uint8_t CPU::unofficial_opcode()
+{
+    return 0;
 }

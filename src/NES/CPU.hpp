@@ -110,11 +110,7 @@ enum class StatusRegisterFlags : std::uint8_t
 class CPU
 {
 public:
-    CPU(Bus* bus)
-      : bus(bus)
-    {
-
-    }
+    CPU(Bus* bus);
 
     void reset();
     void interrupt_request();
@@ -133,8 +129,7 @@ private:
     std::uint8_t fetch();
     
     using InstructionTable = std::array<Instruction, 256>;
-    static constexpr InstructionTable generate_instruction_table();
-
+    constexpr InstructionTable generate_instruction_table() const;
 
     using AddressModeFunction = std::uint8_t (CPU::*)();
     // clang-format off
@@ -196,12 +191,7 @@ private:
     template<AddressModeFunction AddressMode> std::uint8_t instruction_tya();
     // clang-format on
 
-    std::uint8_t address_mode_implied()
-    {
-        fetched = register_accumulator;
-        return 0;
-    }
-
+    std::uint8_t address_mode_implied();
     std::uint8_t address_mode_immidiate();
     std::uint8_t address_mode_accumulator();
     std::uint8_t address_mode_relative();
@@ -236,7 +226,7 @@ private:
     std::uint8_t remaining_cycles;; //For the last executed instruction
     std::uint32_t clock_count = 0; //Number of clock cycles executed
 
-    InstructionTable instruction_table = generate_instruction_table();
+    InstructionTable instruction_table;
 };
 
 template<CPU::AddressModeFunction AddressMode>
