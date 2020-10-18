@@ -1,8 +1,9 @@
 #include "BUS.hpp"
 
 Bus::Bus()
-    : ram(new uint8_t[ADDRESS_BUS_RAM_SIZE])
-{}
+    : ram(std::make_unique<std::uint8_t[]>(ADDRESS_BUS_RAM_SIZE))
+{
+}
 
 std::uint8_t Bus::read(std::uint16_t add)
 {

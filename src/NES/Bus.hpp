@@ -16,5 +16,5 @@ public:
   void write(std::uint16_t add, std::uint8_t data);
 
 private: 
-	std::unique_ptr<std::uint8_t> ram;
+	std::unique_ptr<std::uint8_t[]> ram;
 };
