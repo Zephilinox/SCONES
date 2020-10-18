@@ -92,14 +92,14 @@ private:
 enum StatusRegisterFlags : std::uint8_t
 {
     Invalid = 0,
-    Zero = 1 << 0,
-    CarryBit = 1 << 2,
-    DisableInterrupts = 1 << 3,
-    DecimalMode = 1 << 4, //Unused
-    Break = 1 << 5,
-    Unused = 1 << 6,
-    Overflow = 1 << 7,
-    Negative = 1 << 8,
+    Carry = 1 << 0,
+    Zero = 1 << 1,
+    DisableInterrupts = 1 << 2,
+    DecimalMode = 1 << 3, //Unused
+    Break = 1 << 4,
+    Unused = 1 << 5,
+    Overflow = 1 << 6,
+    Negative = 1 << 7,
 };
 
 class Bus
