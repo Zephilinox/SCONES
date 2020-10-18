@@ -22,4 +22,7 @@ private:
 
    // Internal clock.
    uint32_t clock = 0;
+
+   // display framebuffer.
+   std::unique_ptr<Framebuffer> fb;
 };
