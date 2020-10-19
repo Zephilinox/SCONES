@@ -240,7 +240,7 @@ std::uint8_t CPU::fetch()
 template <CPU::AddressModeFunction AddressMode>
 std::uint8_t CPU::instruction_adc()
 {
-    std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
+    std::uint8_t extra_cycles_from_addressing = std::invoke(AddressMode, *this);
 
     fetch<AddressMode>();
 
@@ -263,7 +263,7 @@ std::uint8_t CPU::instruction_adc()
 template <CPU::AddressModeFunction AddressMode>
 std::uint8_t CPU::instruction_and()
 {
-    std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
+    std::uint8_t extra_cycles_from_addressing = std::invoke(AddressMode, *this);
 
     fetch<AddressMode>();
     register_accumulator = register_accumulator & fetched;
@@ -275,7 +275,7 @@ std::uint8_t CPU::instruction_and()
 template <CPU::AddressModeFunction AddressMode>
 std::uint8_t CPU::instruction_asl()
 {
-    std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
+    std::uint8_t extra_cycles_from_addressing = std::invoke(AddressMode, *this);
 
     fetch<AddressMode>();
     auto result = static_cast<std::uint16_t>(fetched) << 1;
@@ -295,7 +295,7 @@ std::uint8_t CPU::instruction_asl()
 template <CPU::AddressModeFunction AddressMode, StatusRegisterFlags flag, bool set>
 std::uint8_t CPU::instruction_branch()
 {
-    std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
+    std::uint8_t extra_cycles_from_addressing = std::invoke(AddressMode, *this);
 
     if (get_flag(flag) == set)
         return extra_cycles_from_addressing;
@@ -334,7 +334,7 @@ std::uint8_t CPU::instruction_beq()
 template <CPU::AddressModeFunction AddressMode>
 std::uint8_t CPU::instruction_bit()
 {
-    std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
+    std::uint8_t extra_cycles_from_addressing = std::invoke(AddressMode, *this);
 
     fetch<AddressMode>();
 
@@ -373,7 +373,7 @@ std::uint8_t CPU::instruction_brk()
 {
     constexpr auto stack_address = 0x0100;
 
-    std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
+    std::uint8_t extra_cycles_from_addressing = std::invoke(AddressMode, *this);
 
     program_counter++;
 
@@ -415,7 +415,7 @@ std::uint8_t CPU::instruction_bvs()
 template <CPU::AddressModeFunction AddressMode>
 std::uint8_t CPU::instruction_clc()
 {
-    std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
+    std::uint8_t extra_cycles_from_addressing = std::invoke(AddressMode, *this);
     set_flag(StatusRegisterFlags::Carry, false);
     return extra_cycles_from_addressing;
 }
@@ -423,7 +423,7 @@ std::uint8_t CPU::instruction_clc()
 template <CPU::AddressModeFunction AddressMode>
 std::uint8_t CPU::instruction_cld()
 {
-    std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
+    std::uint8_t extra_cycles_from_addressing = std::invoke(AddressMode, *this);
     set_flag(StatusRegisterFlags::DecimalMode, false);
     return extra_cycles_from_addressing;
 }
@@ -431,7 +431,7 @@ std::uint8_t CPU::instruction_cld()
 template <CPU::AddressModeFunction AddressMode>
 std::uint8_t CPU::instruction_cli()
 {
-    std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
+    std::uint8_t extra_cycles_from_addressing = std::invoke(AddressMode, *this);
     set_flag(StatusRegisterFlags::DisableInterrupts, false);
     return extra_cycles_from_addressing;
 }
@@ -439,7 +439,7 @@ std::uint8_t CPU::instruction_cli()
 template <CPU::AddressModeFunction AddressMode>
 std::uint8_t CPU::instruction_clv()
 {
-    std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
+    std::uint8_t extra_cycles_from_addressing = std::invoke(AddressMode, *this);
     set_flag(StatusRegisterFlags::Overflow, false);
     return extra_cycles_from_addressing;
 }
@@ -447,7 +447,7 @@ std::uint8_t CPU::instruction_clv()
 template <CPU::AddressModeFunction AddressMode>
 std::uint8_t CPU::instruction_compare(std::uint8_t& target_register)
 {
-    std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
+    std::uint8_t extra_cycles_from_addressing = std::invoke(AddressMode, *this);
 
     fetch<AddressMode>();
 
@@ -480,7 +480,7 @@ std::uint8_t CPU::instruction_cpy()
 template <CPU::AddressModeFunction AddressMode>
 std::uint8_t CPU::instruction_dec()
 {
-    std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
+    std::uint8_t extra_cycles_from_addressing = std::invoke(AddressMode, *this);
 
     fetch<AddressMode>();
 
@@ -495,7 +495,7 @@ std::uint8_t CPU::instruction_dec()
 template <CPU::AddressModeFunction AddressMode>
 std::uint8_t CPU::instruction_modify_register(std::uint8_t& target_register, std::int8_t value)
 {
-    std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
+    std::uint8_t extra_cycles_from_addressing = std::invoke(AddressMode, *this);
 
     target_register += value;
     set_flag(StatusRegisterFlags::Zero, target_register == 0);
@@ -519,7 +519,7 @@ std::uint8_t CPU::instruction_dey()
 template <CPU::AddressModeFunction AddressMode>
 std::uint8_t CPU::instruction_eor()
 {
-    std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
+    std::uint8_t extra_cycles_from_addressing = std::invoke(AddressMode, *this);
 
     fetch<AddressMode>();
 
@@ -533,7 +533,7 @@ std::uint8_t CPU::instruction_eor()
 template <CPU::AddressModeFunction AddressMode>
 std::uint8_t CPU::instruction_inc()
 {
-    std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
+    std::uint8_t extra_cycles_from_addressing = std::invoke(AddressMode, *this);
 
     fetch<AddressMode>();
 
@@ -560,7 +560,7 @@ std::uint8_t CPU::instruction_iny()
 template <CPU::AddressModeFunction AddressMode>
 std::uint8_t CPU::instruction_jmp()
 {
-    std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
+    std::uint8_t extra_cycles_from_addressing = std::invoke(AddressMode, *this);
     program_counter = address_absolute;
     return extra_cycles_from_addressing;
 }
@@ -568,7 +568,7 @@ std::uint8_t CPU::instruction_jmp()
 template <CPU::AddressModeFunction AddressMode>
 std::uint8_t CPU::instruction_jsr()
 {
-    std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
+    std::uint8_t extra_cycles_from_addressing = std::invoke(AddressMode, *this);
 
     program_counter--;
 
@@ -588,7 +588,7 @@ std::uint8_t CPU::instruction_jsr()
 template <CPU::AddressModeFunction AddressMode>
 std::uint8_t CPU::instruction_load_register(std::uint8_t& target_register)
 {
-    std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
+    std::uint8_t extra_cycles_from_addressing = std::invoke(AddressMode, *this);
 
     fetch<AddressMode>();
     target_register = fetched;
@@ -620,7 +620,7 @@ std::uint8_t CPU::instruction_ldy()
 template <CPU::AddressModeFunction AddressMode>
 std::uint8_t CPU::instruction_lsr()
 {
-    std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
+    std::uint8_t extra_cycles_from_addressing = std::invoke(AddressMode, *this);
 
     fetch<AddressMode>();
     set_flag(StatusRegisterFlags::Carry, fetched & 0x0001);
@@ -642,7 +642,7 @@ std::uint8_t CPU::instruction_lsr()
 template <CPU::AddressModeFunction AddressMode>
 std::uint8_t CPU::instruction_nop()
 {
-    std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
+    std::uint8_t extra_cycles_from_addressing = std::invoke(AddressMode, *this);
 
     switch (opcode)
     {
@@ -661,7 +661,7 @@ std::uint8_t CPU::instruction_nop()
 template <CPU::AddressModeFunction AddressMode>
 std::uint8_t CPU::instruction_ora()
 {
-    std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
+    std::uint8_t extra_cycles_from_addressing = std::invoke(AddressMode, *this);
 
     fetch<AddressMode>();
     register_accumulator = register_accumulator & fetched;
@@ -674,7 +674,7 @@ std::uint8_t CPU::instruction_ora()
 template <CPU::AddressModeFunction AddressMode>
 std::uint8_t CPU::instruction_pha()
 {
-    std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
+    std::uint8_t extra_cycles_from_addressing = std::invoke(AddressMode, *this);
 
     constexpr auto stack_address = 0x0100;
     write_to_memory(stack_address + stack_pointer, register_accumulator);
@@ -686,7 +686,7 @@ std::uint8_t CPU::instruction_pha()
 template <CPU::AddressModeFunction AddressMode>
 std::uint8_t CPU::instruction_php()
 {
-    std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
+    std::uint8_t extra_cycles_from_addressing = std::invoke(AddressMode, *this);
 
     constexpr auto stack_address = 0x0100;
     write_to_memory(stack_address + stack_pointer, register_status | static_cast<std::uint8_t>(StatusRegisterFlags::Break) | static_cast<std::uint8_t>(StatusRegisterFlags::Unused));
@@ -700,7 +700,7 @@ std::uint8_t CPU::instruction_php()
 template <CPU::AddressModeFunction AddressMode>
 std::uint8_t CPU::instruction_pla()
 {
-    std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
+    std::uint8_t extra_cycles_from_addressing = std::invoke(AddressMode, *this);
 
     constexpr auto stack_address = 0x0100;
     stack_pointer++;
@@ -714,7 +714,7 @@ std::uint8_t CPU::instruction_pla()
 template <CPU::AddressModeFunction AddressMode>
 std::uint8_t CPU::instruction_plp()
 {
-    std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
+    std::uint8_t extra_cycles_from_addressing = std::invoke(AddressMode, *this);
 
     constexpr auto stack_address = 0x0100;
     stack_pointer++;
@@ -727,7 +727,7 @@ std::uint8_t CPU::instruction_plp()
 template <CPU::AddressModeFunction AddressMode>
 std::uint8_t CPU::instruction_rol()
 {
-    std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
+    std::uint8_t extra_cycles_from_addressing = std::invoke(AddressMode, *this);
 
     fetch<AddressMode>();
 
@@ -746,7 +746,7 @@ std::uint8_t CPU::instruction_rol()
 template <CPU::AddressModeFunction AddressMode>
 std::uint8_t CPU::instruction_ror()
 {
-    std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
+    std::uint8_t extra_cycles_from_addressing = std::invoke(AddressMode, *this);
 
     fetch<AddressMode>();
 
@@ -765,7 +765,7 @@ std::uint8_t CPU::instruction_ror()
 template <CPU::AddressModeFunction AddressMode>
 std::uint8_t CPU::instruction_rti()
 {
-    std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
+    std::uint8_t extra_cycles_from_addressing = std::invoke(AddressMode, *this);
 
     constexpr auto stack_address = 0x0100;
 
@@ -785,7 +785,7 @@ std::uint8_t CPU::instruction_rti()
 template <CPU::AddressModeFunction AddressMode>
 std::uint8_t CPU::instruction_rts()
 {
-    std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
+    std::uint8_t extra_cycles_from_addressing = std::invoke(AddressMode, *this);
 
     constexpr auto stack_address = 0x0100;
 
@@ -801,7 +801,7 @@ std::uint8_t CPU::instruction_rts()
 template <CPU::AddressModeFunction AddressMode>
 std::uint8_t CPU::instruction_sbc()
 {
-    std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
+    std::uint8_t extra_cycles_from_addressing = std::invoke(AddressMode, *this);
 
     fetch<AddressMode>();
     std::uint16_t result = static_cast<std::uint16_t>(fetched) & 0x00FF;
@@ -825,7 +825,7 @@ std::uint8_t CPU::instruction_sbc()
 template <CPU::AddressModeFunction AddressMode>
 std::uint8_t CPU::instruction_sec()
 {
-    std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
+    std::uint8_t extra_cycles_from_addressing = std::invoke(AddressMode, *this);
     set_flag(StatusRegisterFlags::Carry, true);
     return extra_cycles_from_addressing;
 }
@@ -833,7 +833,7 @@ std::uint8_t CPU::instruction_sec()
 template <CPU::AddressModeFunction AddressMode>
 std::uint8_t CPU::instruction_sed()
 {
-    std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
+    std::uint8_t extra_cycles_from_addressing = std::invoke(AddressMode, *this);
     set_flag(StatusRegisterFlags::DecimalMode, true);
     return extra_cycles_from_addressing;
 }
@@ -841,7 +841,7 @@ std::uint8_t CPU::instruction_sed()
 template <CPU::AddressModeFunction AddressMode>
 std::uint8_t CPU::instruction_sei()
 {
-    std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
+    std::uint8_t extra_cycles_from_addressing = std::invoke(AddressMode, *this);
     set_flag(StatusRegisterFlags::DisableInterrupts, true);
     return extra_cycles_from_addressing;
 }
@@ -849,7 +849,7 @@ std::uint8_t CPU::instruction_sei()
 template <CPU::AddressModeFunction AddressMode>
 std::uint8_t CPU::instruction_sta()
 {
-    std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
+    std::uint8_t extra_cycles_from_addressing = std::invoke(AddressMode, *this);
     write_to_memory(address_absolute, register_accumulator);
     return extra_cycles_from_addressing;
 }
@@ -857,7 +857,7 @@ std::uint8_t CPU::instruction_sta()
 template <CPU::AddressModeFunction AddressMode>
 std::uint8_t CPU::instruction_stx()
 {
-    std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
+    std::uint8_t extra_cycles_from_addressing = std::invoke(AddressMode, *this);
     write_to_memory(address_absolute, register_x);
     return extra_cycles_from_addressing;
 }
@@ -865,7 +865,7 @@ std::uint8_t CPU::instruction_stx()
 template <CPU::AddressModeFunction AddressMode>
 std::uint8_t CPU::instruction_sty()
 {
-    std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
+    std::uint8_t extra_cycles_from_addressing = std::invoke(AddressMode, *this);
     write_to_memory(address_absolute, register_y);
     return extra_cycles_from_addressing;
 }
@@ -873,7 +873,7 @@ std::uint8_t CPU::instruction_sty()
 template <CPU::AddressModeFunction AddressMode>
 std::uint8_t CPU::instruction_transfer(std::uint8_t& source, std::uint8_t& target)
 {
-    std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
+    std::uint8_t extra_cycles_from_addressing = std::invoke(AddressMode, *this);
 
     target = source;
     set_flag(StatusRegisterFlags::Zero, target == 0);
