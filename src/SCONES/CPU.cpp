@@ -7,9 +7,8 @@ constexpr CPU::InstructionTable CPU::generate_instruction_table() const
 {
     InstructionTable instruction_table{};
 
-    for (int i = 0; i < 256; ++i) {
+    for (int i = 0; i < 256; ++i)
         instruction_table[i] = Instruction{ &CPU::unofficial_opcode, 0, 0 };
-    }
 
     //http://archive.6502.org/datasheets/rockwell_r650x_r651x.pdf
     // clang-format off
@@ -188,7 +187,6 @@ CPU::CPU(Bus* bus)
     : bus(bus)
     , instruction_table(generate_instruction_table())
 {
-
 }
 
 void CPU::reset()
@@ -275,6 +273,7 @@ void CPU::step()
         set_flag(StatusRegisterFlags::Unused, true);
     }
 
+    clock_count++;
     remaining_cycles--;
 }
 
@@ -309,8 +308,8 @@ std::uint8_t CPU::address_mode_relative()
     //can only branch within 256 instructions of the address read from memory
     //todo: understand what is going on here better
     const std::uint16_t address_relative_ignore_sign_bit = address_relative & 0x80; // -128 to 127
-    if (address_relative_ignore_sign_bit) //without the sign bit of the lower byte, we're non-zero
-        address_relative |= 0xFF00; //set upper half to 1's?
+    if (address_relative_ignore_sign_bit)                                           //without the sign bit of the lower byte, we're non-zero
+        address_relative |= 0xFF00;                                                 //set upper half to 1's?
 
     return 0;
 }
@@ -370,7 +369,7 @@ std::uint8_t CPU::address_mode_absolute_x()
     const auto address_absolute_page = address_absolute & 0xFF00;
     if (address_absolute_page != page)
         return 1;
-    
+
     return 0;
 }
 

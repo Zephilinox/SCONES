@@ -11,62 +11,62 @@
 enum InstructionType
 {
     None = 0,
-    ADC, //Add Memory to Accumulator with Carry
-    AND, //AND Memory with Accumulator
+    ADC,  //Add Memory to Accumulator with Carry
+    AND,  //AND Memory with Accumulator
     ASIL, //Shift Left One Bit (Memory or Accumulator)
-    BCC, //Branch on Carry Clear
-    BCS, //Branch on Carry Set
-    BEQ, //Branch on Result Zero
-    BIT, //Test Bits in Memory with Accumulator
-    BMI, //Branch on Result Minus
-    BNE, //Branch on Result not Zero
-    BPL, //Branch on Result Plus
-    BRK, //Force Break
-    BVC, //Branch on Overflow Clear
-    BVS, //Branch on Overflow Set
-    CLC, //Clear Carry Flag
-    CLD, //Clear Decimal Mode
-    CLI, //CLear Interrupt Disable Bit
-    CLV, //Clear Overflow Flag
-    CMP, //Compare Memory and Accumulator
-    CPX, //Compare Memory and Index X
-    CPY, //Comapre Memory and Index Y
-    DEC, //Decrement Memory by One
-    DEX, //Decrement Index X by One
-    DEY, //Decrement Index Y by One
-    EOR, //XOR Memory with Accumulator
-    INC, //Increment Memory by One
-    INX, //Increment Index X by One
-    INY, //Increment Index Y by One
-    JMP, //Jump to New Location
-    JSR, //Jump to New Location Saving Return Address
-    LDA, //Load Accumulator with Memory
-    LDX, //Load Index X with Memory
-    LDY, //Load Index Y with Memory
-    LSR, //Shift One Bit Right (Memory or Accumulator)
-    NOP, //No Operation
-    ORA, //OR Memory with Accumulator
-    PHA, //Push Accumulator on Stack
-    PHP, //Push Processor Status on Stack
-    PLA, //Pull Accumulator from Stack
-    PLP, //Pull Processor Status from Stack
-    ROL, //Rotate One Bit Left (Memory or Accumulator)
-    ROR, //Rotate One Bit Right (Memory or Accumulator)
-    RTI, //Return from Interrupt
-    RTS, //Return from Subroutine
-    SBC, //Subtract Memory from Accumulator with Borrow
-    SEC, //Set Carry Flag
-    SED, //Set Decimal Mode
-    SEI, //Set Interrupt Disable Status
-    STA, //Store Accumulator in Memory
-    STX, //Store Index X in Memory
-    STY, //Store Index Y in Memory
-    TAX, //Transfer Accumulator to Index X
-    TAY, //Transfer Accumulator to Index Y
-    TSX, //Transfer Stack Pointer to Index X
-    TXA, //Transfer Index X to Accumulator
-    TXS, //Transfer Index X to Stack Register
-    TYA, //Transfer Index Y to Accumulator
+    BCC,  //Branch on Carry Clear
+    BCS,  //Branch on Carry Set
+    BEQ,  //Branch on Result Zero
+    BIT,  //Test Bits in Memory with Accumulator
+    BMI,  //Branch on Result Minus
+    BNE,  //Branch on Result not Zero
+    BPL,  //Branch on Result Plus
+    BRK,  //Force Break
+    BVC,  //Branch on Overflow Clear
+    BVS,  //Branch on Overflow Set
+    CLC,  //Clear Carry Flag
+    CLD,  //Clear Decimal Mode
+    CLI,  //CLear Interrupt Disable Bit
+    CLV,  //Clear Overflow Flag
+    CMP,  //Compare Memory and Accumulator
+    CPX,  //Compare Memory and Index X
+    CPY,  //Comapre Memory and Index Y
+    DEC,  //Decrement Memory by One
+    DEX,  //Decrement Index X by One
+    DEY,  //Decrement Index Y by One
+    EOR,  //XOR Memory with Accumulator
+    INC,  //Increment Memory by One
+    INX,  //Increment Index X by One
+    INY,  //Increment Index Y by One
+    JMP,  //Jump to New Location
+    JSR,  //Jump to New Location Saving Return Address
+    LDA,  //Load Accumulator with Memory
+    LDX,  //Load Index X with Memory
+    LDY,  //Load Index Y with Memory
+    LSR,  //Shift One Bit Right (Memory or Accumulator)
+    NOP,  //No Operation
+    ORA,  //OR Memory with Accumulator
+    PHA,  //Push Accumulator on Stack
+    PHP,  //Push Processor Status on Stack
+    PLA,  //Pull Accumulator from Stack
+    PLP,  //Pull Processor Status from Stack
+    ROL,  //Rotate One Bit Left (Memory or Accumulator)
+    ROR,  //Rotate One Bit Right (Memory or Accumulator)
+    RTI,  //Return from Interrupt
+    RTS,  //Return from Subroutine
+    SBC,  //Subtract Memory from Accumulator with Borrow
+    SEC,  //Set Carry Flag
+    SED,  //Set Decimal Mode
+    SEI,  //Set Interrupt Disable Status
+    STA,  //Store Accumulator in Memory
+    STX,  //Store Index X in Memory
+    STY,  //Store Index Y in Memory
+    TAX,  //Transfer Accumulator to Index X
+    TAY,  //Transfer Accumulator to Index Y
+    TSX,  //Transfer Stack Pointer to Index X
+    TXA,  //Transfer Index X to Accumulator
+    TXS,  //Transfer Index X to Stack Register
+    TYA,  //Transfer Index Y to Accumulator
 };
 
 class CPU;
@@ -74,14 +74,13 @@ class CPU;
 class Instruction
 {
 public:
-    using InstructionFunction = std::uint8_t(CPU::*)();
+    using InstructionFunction = std::uint8_t (CPU::*)();
 
     InstructionFunction execute;
     std::uint8_t bytes = 0;
     std::uint8_t base_cycles = 0;
 
 private:
-
 };
 
 enum class StatusRegisterFlags : std::uint8_t
@@ -121,9 +120,9 @@ private:
     void write_to_memory(std::uint16_t address, std::uint8_t data);
 
     //The read location could be a memory address or part of the instruction
-    template<AddressModeFunction AddressMode>
+    template <AddressModeFunction AddressMode>
     std::uint8_t fetch();
-    
+
     [[nodiscard]] constexpr InstructionTable generate_instruction_table() const;
 
     // clang-format off
@@ -218,18 +217,18 @@ private:
     //Stores the address of the next program byte
     std::uint16_t program_counter = 0;
 
-    std::uint8_t fetched = 0; //Represents the working input value to the ALU
-    std::uint16_t temp = 0; //A convenience variable used everywhere
-    std::uint16_t address_absolute; //All used memory addresses end up in here
-    std::uint16_t address_relative; //Represents the absolute address following a branch
-    std::uint8_t opcode; //Instruction byte
-    std::uint8_t remaining_cycles; //For the last executed instruction
-    std::uint32_t clock_count = 0; //Number of clock cycles executed
+    std::uint8_t fetched = 0;          //Represents the working input value to the ALU
+    std::uint16_t temp = 0;            //A convenience variable used everywhere
+    std::uint16_t address_absolute;    //All used memory addresses end up in here
+    std::uint16_t address_relative;    //Represents the absolute address following a branch
+    std::uint8_t opcode;               //Instruction byte
+    std::uint8_t remaining_cycles = 0; //For the last executed instruction
+    std::uint32_t clock_count = 0;     //Number of clock cycles executed
 
     const InstructionTable instruction_table;
 };
 
-template<CPU::AddressModeFunction AddressMode>
+template <CPU::AddressModeFunction AddressMode>
 std::uint8_t CPU::fetch()
 {
     if constexpr (AddressMode != &CPU::address_mode_immidiate)
@@ -238,7 +237,7 @@ std::uint8_t CPU::fetch()
     return fetched;
 }
 
-template<CPU::AddressModeFunction AddressMode>
+template <CPU::AddressModeFunction AddressMode>
 std::uint8_t CPU::instruction_adc()
 {
     std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
@@ -261,7 +260,7 @@ std::uint8_t CPU::instruction_adc()
     return 1 + extra_cycles_from_addressing;
 }
 
-template<CPU::AddressModeFunction AddressMode>
+template <CPU::AddressModeFunction AddressMode>
 std::uint8_t CPU::instruction_and()
 {
     std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
@@ -273,7 +272,7 @@ std::uint8_t CPU::instruction_and()
     return 1 + extra_cycles_from_addressing;
 }
 
-template<CPU::AddressModeFunction AddressMode>
+template <CPU::AddressModeFunction AddressMode>
 std::uint8_t CPU::instruction_asl()
 {
     std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
@@ -314,25 +313,25 @@ std::uint8_t CPU::instruction_branch()
     return extra_cycles_from_addressing;
 }
 
-template<CPU::AddressModeFunction AddressMode>
+template <CPU::AddressModeFunction AddressMode>
 std::uint8_t CPU::instruction_bcc()
 {
     return instruction_branch<AddressMode, StatusRegisterFlags::Carry, true>();
 }
 
-template<CPU::AddressModeFunction AddressMode>
+template <CPU::AddressModeFunction AddressMode>
 std::uint8_t CPU::instruction_bcs()
 {
     return instruction_branch<AddressMode, StatusRegisterFlags::Carry, false>();
 }
 
-template<CPU::AddressModeFunction AddressMode>
+template <CPU::AddressModeFunction AddressMode>
 std::uint8_t CPU::instruction_beq()
 {
     return instruction_branch<AddressMode, StatusRegisterFlags::Zero, true>();
 }
 
-template<CPU::AddressModeFunction AddressMode>
+template <CPU::AddressModeFunction AddressMode>
 std::uint8_t CPU::instruction_bit()
 {
     std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
@@ -351,25 +350,25 @@ std::uint8_t CPU::instruction_bit()
     return extra_cycles_from_addressing;
 }
 
-template<CPU::AddressModeFunction AddressMode>
+template <CPU::AddressModeFunction AddressMode>
 std::uint8_t CPU::instruction_bmi()
 {
     return instruction_branch<AddressMode, StatusRegisterFlags::Negative, true>();
 }
 
-template<CPU::AddressModeFunction AddressMode>
+template <CPU::AddressModeFunction AddressMode>
 std::uint8_t CPU::instruction_bne()
 {
     return instruction_branch<AddressMode, StatusRegisterFlags::Zero, false>();
 }
 
-template<CPU::AddressModeFunction AddressMode>
+template <CPU::AddressModeFunction AddressMode>
 std::uint8_t CPU::instruction_bpl()
 {
     return instruction_branch<AddressMode, StatusRegisterFlags::Negative, false>();
 }
 
-template<CPU::AddressModeFunction AddressMode>
+template <CPU::AddressModeFunction AddressMode>
 std::uint8_t CPU::instruction_brk()
 {
     constexpr auto stack_address = 0x0100;
@@ -401,19 +400,19 @@ std::uint8_t CPU::instruction_brk()
     return extra_cycles_from_addressing;
 }
 
-template<CPU::AddressModeFunction AddressMode>
+template <CPU::AddressModeFunction AddressMode>
 std::uint8_t CPU::instruction_bvc()
 {
     return instruction_branch<AddressMode, StatusRegisterFlags::Overflow, false>();
 }
 
-template<CPU::AddressModeFunction AddressMode>
+template <CPU::AddressModeFunction AddressMode>
 std::uint8_t CPU::instruction_bvs()
 {
     return instruction_branch<AddressMode, StatusRegisterFlags::Overflow, true>();
 }
 
-template<CPU::AddressModeFunction AddressMode>
+template <CPU::AddressModeFunction AddressMode>
 std::uint8_t CPU::instruction_clc()
 {
     std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
@@ -421,7 +420,7 @@ std::uint8_t CPU::instruction_clc()
     return extra_cycles_from_addressing;
 }
 
-template<CPU::AddressModeFunction AddressMode>
+template <CPU::AddressModeFunction AddressMode>
 std::uint8_t CPU::instruction_cld()
 {
     std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
@@ -429,7 +428,7 @@ std::uint8_t CPU::instruction_cld()
     return extra_cycles_from_addressing;
 }
 
-template<CPU::AddressModeFunction AddressMode>
+template <CPU::AddressModeFunction AddressMode>
 std::uint8_t CPU::instruction_cli()
 {
     std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
@@ -437,7 +436,7 @@ std::uint8_t CPU::instruction_cli()
     return extra_cycles_from_addressing;
 }
 
-template<CPU::AddressModeFunction AddressMode>
+template <CPU::AddressModeFunction AddressMode>
 std::uint8_t CPU::instruction_clv()
 {
     std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
@@ -460,25 +459,25 @@ std::uint8_t CPU::instruction_compare(std::uint8_t& target_register)
     return extra_cycles_from_addressing;
 }
 
-template<CPU::AddressModeFunction AddressMode>
+template <CPU::AddressModeFunction AddressMode>
 std::uint8_t CPU::instruction_cmp()
 {
     return instruction_compare<AddressMode>(register_accumulator);
 }
 
-template<CPU::AddressModeFunction AddressMode>
+template <CPU::AddressModeFunction AddressMode>
 std::uint8_t CPU::instruction_cpx()
 {
     return instruction_compare<AddressMode>(register_x);
 }
 
-template<CPU::AddressModeFunction AddressMode>
+template <CPU::AddressModeFunction AddressMode>
 std::uint8_t CPU::instruction_cpy()
 {
     return instruction_compare<AddressMode>(register_y);
 }
 
-template<CPU::AddressModeFunction AddressMode>
+template <CPU::AddressModeFunction AddressMode>
 std::uint8_t CPU::instruction_dec()
 {
     std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
@@ -505,19 +504,19 @@ std::uint8_t CPU::instruction_modify_register(std::uint8_t& target_register, std
     return extra_cycles_from_addressing;
 }
 
-template<CPU::AddressModeFunction AddressMode>
+template <CPU::AddressModeFunction AddressMode>
 std::uint8_t CPU::instruction_dex()
 {
     return instruction_modify_register<AddressMode>(register_x, -1);
 }
 
-template<CPU::AddressModeFunction AddressMode>
+template <CPU::AddressModeFunction AddressMode>
 std::uint8_t CPU::instruction_dey()
 {
     return instruction_modify_register<AddressMode>(register_y, -1);
 }
 
-template<CPU::AddressModeFunction AddressMode>
+template <CPU::AddressModeFunction AddressMode>
 std::uint8_t CPU::instruction_eor()
 {
     std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
@@ -531,7 +530,7 @@ std::uint8_t CPU::instruction_eor()
     return 1 + extra_cycles_from_addressing;
 }
 
-template<CPU::AddressModeFunction AddressMode>
+template <CPU::AddressModeFunction AddressMode>
 std::uint8_t CPU::instruction_inc()
 {
     std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
@@ -546,19 +545,19 @@ std::uint8_t CPU::instruction_inc()
     return extra_cycles_from_addressing;
 }
 
-template<CPU::AddressModeFunction AddressMode>
+template <CPU::AddressModeFunction AddressMode>
 std::uint8_t CPU::instruction_inx()
 {
     return instruction_modify_register<AddressMode>(register_x, 1);
 }
 
-template<CPU::AddressModeFunction AddressMode>
+template <CPU::AddressModeFunction AddressMode>
 std::uint8_t CPU::instruction_iny()
 {
     return instruction_modify_register<AddressMode>(register_y, 1);
 }
 
-template<CPU::AddressModeFunction AddressMode>
+template <CPU::AddressModeFunction AddressMode>
 std::uint8_t CPU::instruction_jmp()
 {
     std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
@@ -566,7 +565,7 @@ std::uint8_t CPU::instruction_jmp()
     return extra_cycles_from_addressing;
 }
 
-template<CPU::AddressModeFunction AddressMode>
+template <CPU::AddressModeFunction AddressMode>
 std::uint8_t CPU::instruction_jsr()
 {
     std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
@@ -600,25 +599,25 @@ std::uint8_t CPU::instruction_load_register(std::uint8_t& target_register)
 }
 
 //todo: do this within the instruction table instead? or is that too noisy
-template<CPU::AddressModeFunction AddressMode>
+template <CPU::AddressModeFunction AddressMode>
 std::uint8_t CPU::instruction_lda()
 {
     return instruction_load_register<AddressMode>(register_accumulator);
 }
 
-template<CPU::AddressModeFunction AddressMode>
+template <CPU::AddressModeFunction AddressMode>
 std::uint8_t CPU::instruction_ldx()
 {
     return instruction_load_register<AddressMode>(register_x);
 }
 
-template<CPU::AddressModeFunction AddressMode>
+template <CPU::AddressModeFunction AddressMode>
 std::uint8_t CPU::instruction_ldy()
 {
     return instruction_load_register<AddressMode>(register_y);
 }
 
-template<CPU::AddressModeFunction AddressMode>
+template <CPU::AddressModeFunction AddressMode>
 std::uint8_t CPU::instruction_lsr()
 {
     std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
@@ -640,26 +639,26 @@ std::uint8_t CPU::instruction_lsr()
 }
 
 //todo: make better
-template<CPU::AddressModeFunction AddressMode>
+template <CPU::AddressModeFunction AddressMode>
 std::uint8_t CPU::instruction_nop()
 {
     std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
 
     switch (opcode)
     {
-        case 0x1C:
-        case 0x3C:
-        case 0x5C:
-        case 0x7C:
-        case 0xDC:
-        case 0xFC:
-            return 1 + extra_cycles_from_addressing;
+    case 0x1C:
+    case 0x3C:
+    case 0x5C:
+    case 0x7C:
+    case 0xDC:
+    case 0xFC:
+        return 1 + extra_cycles_from_addressing;
     }
 
     return extra_cycles_from_addressing;
 }
 
-template<CPU::AddressModeFunction AddressMode>
+template <CPU::AddressModeFunction AddressMode>
 std::uint8_t CPU::instruction_ora()
 {
     std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
@@ -672,7 +671,7 @@ std::uint8_t CPU::instruction_ora()
     return 1 + extra_cycles_from_addressing;
 }
 
-template<CPU::AddressModeFunction AddressMode>
+template <CPU::AddressModeFunction AddressMode>
 std::uint8_t CPU::instruction_pha()
 {
     std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
@@ -684,7 +683,7 @@ std::uint8_t CPU::instruction_pha()
     return extra_cycles_from_addressing;
 }
 
-template<CPU::AddressModeFunction AddressMode>
+template <CPU::AddressModeFunction AddressMode>
 std::uint8_t CPU::instruction_php()
 {
     std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
@@ -698,7 +697,7 @@ std::uint8_t CPU::instruction_php()
     return extra_cycles_from_addressing;
 }
 
-template<CPU::AddressModeFunction AddressMode>
+template <CPU::AddressModeFunction AddressMode>
 std::uint8_t CPU::instruction_pla()
 {
     std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
@@ -712,7 +711,7 @@ std::uint8_t CPU::instruction_pla()
     return extra_cycles_from_addressing;
 }
 
-template<CPU::AddressModeFunction AddressMode>
+template <CPU::AddressModeFunction AddressMode>
 std::uint8_t CPU::instruction_plp()
 {
     std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
@@ -725,7 +724,7 @@ std::uint8_t CPU::instruction_plp()
     return extra_cycles_from_addressing;
 }
 
-template<CPU::AddressModeFunction AddressMode>
+template <CPU::AddressModeFunction AddressMode>
 std::uint8_t CPU::instruction_rol()
 {
     std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
@@ -744,7 +743,7 @@ std::uint8_t CPU::instruction_rol()
     return extra_cycles_from_addressing;
 }
 
-template<CPU::AddressModeFunction AddressMode>
+template <CPU::AddressModeFunction AddressMode>
 std::uint8_t CPU::instruction_ror()
 {
     std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
@@ -763,7 +762,7 @@ std::uint8_t CPU::instruction_ror()
     return extra_cycles_from_addressing;
 }
 
-template<CPU::AddressModeFunction AddressMode>
+template <CPU::AddressModeFunction AddressMode>
 std::uint8_t CPU::instruction_rti()
 {
     std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
@@ -783,7 +782,7 @@ std::uint8_t CPU::instruction_rti()
     return extra_cycles_from_addressing;
 }
 
-template<CPU::AddressModeFunction AddressMode>
+template <CPU::AddressModeFunction AddressMode>
 std::uint8_t CPU::instruction_rts()
 {
     std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
@@ -799,7 +798,7 @@ std::uint8_t CPU::instruction_rts()
     return extra_cycles_from_addressing;
 }
 
-template<CPU::AddressModeFunction AddressMode>
+template <CPU::AddressModeFunction AddressMode>
 std::uint8_t CPU::instruction_sbc()
 {
     std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
@@ -823,7 +822,7 @@ std::uint8_t CPU::instruction_sbc()
     return 1 + extra_cycles_from_addressing;
 }
 
-template<CPU::AddressModeFunction AddressMode>
+template <CPU::AddressModeFunction AddressMode>
 std::uint8_t CPU::instruction_sec()
 {
     std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
@@ -831,7 +830,7 @@ std::uint8_t CPU::instruction_sec()
     return extra_cycles_from_addressing;
 }
 
-template<CPU::AddressModeFunction AddressMode>
+template <CPU::AddressModeFunction AddressMode>
 std::uint8_t CPU::instruction_sed()
 {
     std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
@@ -839,7 +838,7 @@ std::uint8_t CPU::instruction_sed()
     return extra_cycles_from_addressing;
 }
 
-template<CPU::AddressModeFunction AddressMode>
+template <CPU::AddressModeFunction AddressMode>
 std::uint8_t CPU::instruction_sei()
 {
     std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
@@ -847,7 +846,7 @@ std::uint8_t CPU::instruction_sei()
     return extra_cycles_from_addressing;
 }
 
-template<CPU::AddressModeFunction AddressMode>
+template <CPU::AddressModeFunction AddressMode>
 std::uint8_t CPU::instruction_sta()
 {
     std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
@@ -855,7 +854,7 @@ std::uint8_t CPU::instruction_sta()
     return extra_cycles_from_addressing;
 }
 
-template<CPU::AddressModeFunction AddressMode>
+template <CPU::AddressModeFunction AddressMode>
 std::uint8_t CPU::instruction_stx()
 {
     std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
@@ -863,7 +862,7 @@ std::uint8_t CPU::instruction_stx()
     return extra_cycles_from_addressing;
 }
 
-template<CPU::AddressModeFunction AddressMode>
+template <CPU::AddressModeFunction AddressMode>
 std::uint8_t CPU::instruction_sty()
 {
     std::uint8_t extra_cycles_from_addressing = (*this.*AddressMode)();
@@ -883,37 +882,37 @@ std::uint8_t CPU::instruction_transfer(std::uint8_t& source, std::uint8_t& targe
     return extra_cycles_from_addressing;
 }
 
-template<CPU::AddressModeFunction AddressMode>
+template <CPU::AddressModeFunction AddressMode>
 std::uint8_t CPU::instruction_tax()
 {
     return instruction_transfer<AddressMode>(register_accumulator, register_x);
 }
 
-template<CPU::AddressModeFunction AddressMode>
+template <CPU::AddressModeFunction AddressMode>
 std::uint8_t CPU::instruction_tay()
 {
     return instruction_transfer<AddressMode>(register_accumulator, register_y);
 }
 
-template<CPU::AddressModeFunction AddressMode>
+template <CPU::AddressModeFunction AddressMode>
 std::uint8_t CPU::instruction_tsx()
 {
     return instruction_transfer<AddressMode>(stack_pointer, register_x);
 }
 
-template<CPU::AddressModeFunction AddressMode>
+template <CPU::AddressModeFunction AddressMode>
 std::uint8_t CPU::instruction_txa()
 {
     return instruction_transfer<AddressMode>(register_x, register_accumulator);
 }
 
-template<CPU::AddressModeFunction AddressMode>
+template <CPU::AddressModeFunction AddressMode>
 std::uint8_t CPU::instruction_txs()
 {
     return instruction_transfer<AddressMode>(register_x, stack_pointer);
 }
 
-template<CPU::AddressModeFunction AddressMode>
+template <CPU::AddressModeFunction AddressMode>
 std::uint8_t CPU::instruction_tya()
 {
     return instruction_transfer<AddressMode>(register_y, register_accumulator);
