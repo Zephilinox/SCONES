@@ -265,6 +265,7 @@ void CPU::step()
     if (last_instruction_complete())
     {
         opcode = read_from_memory(program_counter);
+        spdlog::info("[CPU] executing opcode {:0x} from address {:0x}", opcode, program_counter);
 
         set_flag(StatusRegisterFlags::Unused, true);
         program_counter++;
