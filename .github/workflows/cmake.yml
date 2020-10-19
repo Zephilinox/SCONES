@@ -15,7 +15,7 @@ jobs:
       - name: Create Build Environment
         run: cmake -E make_directory ${{runner.workspace}}/build
 
-      - name Configure CMake:
+      - name: Configure CMake
         working-directory: ${{runner.workspace}}/build
         shell: bash
         run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE
