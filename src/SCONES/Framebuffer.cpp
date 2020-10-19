@@ -1,4 +1,4 @@
-#include "Framebuffer.h"
+#include "Framebuffer.hpp"
 
 Framebuffer::Framebuffer(int x, int y)
     : w(x), h(y)

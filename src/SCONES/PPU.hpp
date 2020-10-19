@@ -3,7 +3,7 @@
 #include <cstdint>
 #include <memory>
 
-#include "Framebuffer.h"
+#include "Framebuffer.hpp"
 
 class Bus;
 

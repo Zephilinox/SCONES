@@ -3,9 +3,9 @@
 
 //LIBS
 #include <doctest/doctest.h>
+#include <SCONES/CPU.hpp>
 
 //SELF
-#include "NES/CPU.hpp"
 
 TEST_CASE(":)")
 {
