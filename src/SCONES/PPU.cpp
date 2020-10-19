@@ -1,4 +1,4 @@
-#include "Framebuffer.h"
+#include "Framebuffer.hpp"
 #include "PPU.hpp"
 
 PPU::PPU(Bus* bus, Framebuffer* fbuffer)
