@@ -193,23 +193,94 @@ CPU::CPU(Bus* bus)
 
 void CPU::reset()
 {
+    address_absolute = 0xFFFC;
+    const std::uint16_t address_absolute_offset = read_from_memory(address_absolute);
+    const std::uint16_t address_absolute_page = static_cast<std::uint16_t>(read_from_memory(address_absolute + 1)) << 8;
+
+    program_counter = address_absolute_page | address_absolute_offset;
+
+    register_accumulator = 0;
+    register_x = 0;
+    register_y = 0;
+    stack_pointer = 0xFD;
+    register_status = static_cast<std::uint8_t>(StatusRegisterFlags::Unused);
+
+    address_absolute = 0;
+    address_relative = 0;
+    fetched = 0;
+
+    remaining_cycles = 8;
 }
 
 void CPU::interrupt_request()
 {
+    if (get_flag(StatusRegisterFlags::DisableInterrupts))
+        return;
+
+    constexpr auto stack_address = 0x0100;
+    const std::uint8_t program_counter_high_byte = (program_counter >> 8) & 0x00FF;
+    const std::uint8_t program_counter_low_byte = program_counter & 0x00FF;
+    write_to_memory(stack_address + stack_pointer, program_counter_high_byte);
+    stack_pointer--;
+    write_to_memory(stack_address + stack_pointer, program_counter_low_byte);
+    stack_pointer--;
+
+    set_flag(StatusRegisterFlags::Break, false);
+    set_flag(StatusRegisterFlags::Unused, true);
+    set_flag(StatusRegisterFlags::DisableInterrupts, true);
+    write_to_memory(stack_address + stack_pointer, register_status);
+    stack_pointer--;
+
+    address_absolute = 0xFFFE;
+    const std::uint16_t low_byte = read_from_memory(address_absolute);
+    const std::uint16_t high_byte = read_from_memory(address_absolute + 1) << 8;
+    program_counter += high_byte | low_byte;
+
+    remaining_cycles = 7;
 }
 
 void CPU::force_interrupt_request()
 {
+    constexpr auto stack_address = 0x0100;
+    const std::uint8_t program_counter_high_byte = (program_counter >> 8) & 0x00FF;
+    const std::uint8_t program_counter_low_byte = program_counter & 0x00FF;
+    write_to_memory(stack_address + stack_pointer, program_counter_high_byte);
+    stack_pointer--;
+    write_to_memory(stack_address + stack_pointer, program_counter_low_byte);
+    stack_pointer--;
+
+    set_flag(StatusRegisterFlags::Break, false);
+    set_flag(StatusRegisterFlags::Unused, true);
+    set_flag(StatusRegisterFlags::DisableInterrupts, true);
+    write_to_memory(stack_address + stack_pointer, register_status);
+    stack_pointer--;
+
+    address_absolute = 0xFFFA;
+    const std::uint16_t low_byte = read_from_memory(address_absolute);
+    const std::uint16_t high_byte = (read_from_memory(address_absolute + 1)) << 8;
+    program_counter = high_byte | low_byte;
+    remaining_cycles = 8;
 }
 
 void CPU::step()
 {
+    if (last_instruction_complete())
+    {
+        opcode = read_from_memory(program_counter);
+
+        set_flag(StatusRegisterFlags::Unused, true);
+        program_counter++;
+        remaining_cycles += instruction_table[opcode].base_cycles;
+        remaining_cycles += std::invoke(instruction_table[opcode].execute, *this);
+        set_flag(StatusRegisterFlags::Unused, true);
+    }
+
+    remaining_cycles--;
 }
 
-bool CPU::last_instruction_complete()
+bool CPU::last_instruction_complete() const
 {
-    return false;
+    return remaining_cycles == 0;
 }
 
 std::uint8_t CPU::address_mode_implied()
@@ -408,9 +479,4 @@ std::uint8_t CPU::read_from_memory(std::uint16_t address)
 
 void CPU::write_to_memory(std::uint16_t address, std::uint8_t data)
 {
-}
-
-std::uint8_t CPU::fetch()
-{
-    return std::uint8_t();
 }
