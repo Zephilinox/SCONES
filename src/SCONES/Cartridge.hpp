@@ -21,5 +21,4 @@ private:
     std::uint8_t  nameTableMirroring = 0;
     std::uint8_t mapperNumber = 0;
     bool extendedRAM = false;
-    bool chrRam;
 };
