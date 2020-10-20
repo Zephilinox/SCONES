@@ -283,25 +283,25 @@ bool CPU::last_instruction_complete() const
     return remaining_cycles == 0;
 }
 
-std::uint8_t CPU::address_mode_implied()
+bool CPU::address_mode_implied()
 {
-    return 0;
+    return false;
 }
 
-std::uint8_t CPU::address_mode_immidiate()
+bool CPU::address_mode_immidiate()
 {
     address_absolute = program_counter;
     program_counter++;
-    return 0;
+    return false;
 }
 
-std::uint8_t CPU::address_mode_accumulator()
+bool CPU::address_mode_accumulator()
 {
     fetched = register_accumulator;
-    return 0;
+    return false;
 }
 
-std::uint8_t CPU::address_mode_relative()
+bool CPU::address_mode_relative()
 {
     address_relative = read_from_memory(program_counter);
     program_counter++;
@@ -312,38 +312,38 @@ std::uint8_t CPU::address_mode_relative()
     if (address_relative_ignore_sign_bit)                                           //without the sign bit of the lower byte, we're non-zero
         address_relative |= 0xFF00;                                                 //set upper half to 1's?
 
-    return 0;
+    return false;
 }
 
-std::uint8_t CPU::address_mode_zero_page()
+bool CPU::address_mode_zero_page()
 {
     address_absolute = read_from_memory(program_counter);
     program_counter++;
     //we only need the first byte
     address_absolute = address_absolute & 0x00FF;
-    return 0;
+    return false;
 }
 
-std::uint8_t CPU::address_mode_zero_page_y()
+bool CPU::address_mode_zero_page_y()
 {
     address_absolute = read_from_memory(program_counter) + register_y;
     program_counter++;
     //we only need the first byte
     address_absolute = address_absolute & 0x00FF;
-    return 0;
+    return false;
 }
 
-std::uint8_t CPU::address_mode_zero_page_x()
+bool CPU::address_mode_zero_page_x()
 {
     address_absolute = read_from_memory(program_counter) + register_x;
     program_counter++;
     //we only need the first byte
     address_absolute = address_absolute & 0x00FF;
-    return 0;
+    return true;
 }
 
 // Load a 16-bit address
-std::uint8_t CPU::address_mode_absolute()
+bool CPU::address_mode_absolute()
 {
     const std::uint16_t offset = read_from_memory(program_counter);
     program_counter++;
@@ -352,10 +352,10 @@ std::uint8_t CPU::address_mode_absolute()
     program_counter++;
 
     address_absolute = page | offset;
-    return 0;
+    return false;
 }
 
-std::uint8_t CPU::address_mode_absolute_x()
+bool CPU::address_mode_absolute_x()
 {
     const std::uint16_t offset = read_from_memory(program_counter);
     program_counter++;
@@ -369,12 +369,12 @@ std::uint8_t CPU::address_mode_absolute_x()
     //new page, costs a cycle
     const auto address_absolute_page = address_absolute & 0xFF00;
     if (address_absolute_page != page)
-        return 1;
+        return true;
 
-    return 0;
+    return false;
 }
 
-std::uint8_t CPU::address_mode_absolute_y()
+bool CPU::address_mode_absolute_y()
 {
     const std::uint16_t offset = read_from_memory(program_counter);
     program_counter++;
@@ -388,12 +388,12 @@ std::uint8_t CPU::address_mode_absolute_y()
     //new page, costs a cycle
     const auto address_absolute_page = address_absolute & 0xFF00;
     if (address_absolute_page != page)
-        return 1;
+        return true;
 
-    return 0;
+    return false;
 }
 
-std::uint8_t CPU::address_mode_indirect()
+bool CPU::address_mode_indirect()
 {
     const std::uint16_t pointer_low_byte = read_from_memory(program_counter);
     program_counter++;
@@ -419,10 +419,10 @@ std::uint8_t CPU::address_mode_indirect()
         address_absolute = high_byte | low_byte;
     }
 
-    return 0;
+    return false;
 }
 
-std::uint8_t CPU::address_mode_indirect_x()
+bool CPU::address_mode_indirect_x()
 {
     std::uint16_t pointer = read_from_memory(program_counter);
     program_counter++;
@@ -434,10 +434,10 @@ std::uint8_t CPU::address_mode_indirect_x()
     high_byte = high_byte << 8;
 
     address_absolute = high_byte | low_byte;
-    return 0;
+    return false;
 }
 
-std::uint8_t CPU::address_mode_indirect_y()
+bool CPU::address_mode_indirect_y()
 {
     const std::uint16_t pointer = read_from_memory(program_counter);
     program_counter++;
@@ -451,9 +451,9 @@ std::uint8_t CPU::address_mode_indirect_y()
 
     const std::uint16_t address_absolute_page = address_absolute & 0xFF00;
     if (address_absolute_page != high_byte)
-        return 1;
+        return true;
 
-    return 0;
+    return false;
 }
 
 bool CPU::unofficial_opcode()

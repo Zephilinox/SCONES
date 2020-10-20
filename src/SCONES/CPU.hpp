@@ -101,7 +101,7 @@ enum class StatusRegisterFlags : std::uint8_t
 class CPU
 {
 public:
-    using AddressModeFunction = std::uint8_t (CPU::*)();
+    using AddressModeFunction = bool(CPU::*)();
     using InstructionTable = std::array<Instruction, 256>;
 
     CPU(Bus* bus);
@@ -190,19 +190,19 @@ private:
     template <AddressModeFunction AddressMode> bool instruction_compare(std::uint8_t& target_register);
     // clang-format on
 
-    std::uint8_t address_mode_implied();
-    std::uint8_t address_mode_immidiate();
-    std::uint8_t address_mode_accumulator();
-    std::uint8_t address_mode_relative();
-    std::uint8_t address_mode_zero_page();
-    std::uint8_t address_mode_zero_page_y();
-    std::uint8_t address_mode_zero_page_x();
-    std::uint8_t address_mode_absolute();
-    std::uint8_t address_mode_absolute_x();
-    std::uint8_t address_mode_absolute_y();
-    std::uint8_t address_mode_indirect();
-    std::uint8_t address_mode_indirect_x();
-    std::uint8_t address_mode_indirect_y();
+    bool address_mode_implied();
+    bool address_mode_immidiate();
+    bool address_mode_accumulator();
+    bool address_mode_relative();
+    bool address_mode_zero_page();
+    bool address_mode_zero_page_y();
+    bool address_mode_zero_page_x();
+    bool address_mode_absolute();
+    bool address_mode_absolute_x();
+    bool address_mode_absolute_y();
+    bool address_mode_indirect();
+    bool address_mode_indirect_x();
+    bool address_mode_indirect_y();
 
     bool unofficial_opcode();
 
@@ -479,13 +479,15 @@ bool CPU::instruction_cmp()
 template <CPU::AddressModeFunction AddressMode>
 bool CPU::instruction_cpx()
 {
-    return instruction_compare<AddressMode>(register_x);
+    constexpr bool ignore_crossed_page_boundary = true;
+    return instruction_compare<AddressMode>(register_x) && !ignore_crossed_page_boundary;
 }
 
 template <CPU::AddressModeFunction AddressMode>
 bool CPU::instruction_cpy()
 {
-    return instruction_compare<AddressMode>(register_y);
+    constexpr bool ignore_crossed_page_boundary = true;
+    return instruction_compare<AddressMode>(register_y) && !ignore_crossed_page_boundary;
 }
 
 template <CPU::AddressModeFunction AddressMode>
