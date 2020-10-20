@@ -270,7 +270,7 @@ void CPU::step()
         set_flag(StatusRegisterFlags::Unused, true);
         program_counter++;
         remaining_cycles += instruction_table[opcode].base_cycles;
-        remaining_cycles += std::invoke(instruction_table[opcode].execute, *this);
+        remaining_cycles += static_cast<int>(std::invoke(instruction_table[opcode].execute, *this));
         set_flag(StatusRegisterFlags::Unused, true);
     }
 
@@ -456,7 +456,7 @@ std::uint8_t CPU::address_mode_indirect_y()
     return 0;
 }
 
-std::uint8_t CPU::unofficial_opcode()
+bool CPU::unofficial_opcode()
 {
     //todo: implement the ones we need
     spdlog::error("tried to access unofficial opcode");

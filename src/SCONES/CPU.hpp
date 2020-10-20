@@ -74,7 +74,7 @@ class CPU;
 class Instruction
 {
 public:
-    using InstructionFunction = std::uint8_t (CPU::*)();
+    using InstructionFunction = bool(CPU::*)();
 
     InstructionFunction execute;
     std::uint8_t bytes = 0;
@@ -126,68 +126,68 @@ private:
     [[nodiscard]] constexpr InstructionTable generate_instruction_table() const;
 
     // clang-format off
-    template<AddressModeFunction AddressMode> std::uint8_t instruction_adc();
-    template<AddressModeFunction AddressMode> std::uint8_t instruction_and();
-    template<AddressModeFunction AddressMode> std::uint8_t instruction_asl();
-    template<AddressModeFunction AddressMode> std::uint8_t instruction_bcc();
-    template<AddressModeFunction AddressMode> std::uint8_t instruction_bcs();
-    template<AddressModeFunction AddressMode> std::uint8_t instruction_beq();
-    template<AddressModeFunction AddressMode> std::uint8_t instruction_bit();
-    template<AddressModeFunction AddressMode> std::uint8_t instruction_bmi();
-    template<AddressModeFunction AddressMode> std::uint8_t instruction_bne();
-    template<AddressModeFunction AddressMode> std::uint8_t instruction_bpl();
-    template<AddressModeFunction AddressMode> std::uint8_t instruction_brk();
-    template<AddressModeFunction AddressMode> std::uint8_t instruction_bvc();
-    template<AddressModeFunction AddressMode> std::uint8_t instruction_bvs();
-    template<AddressModeFunction AddressMode> std::uint8_t instruction_clc();
-    template<AddressModeFunction AddressMode> std::uint8_t instruction_cld();
-    template<AddressModeFunction AddressMode> std::uint8_t instruction_cli();
-    template<AddressModeFunction AddressMode> std::uint8_t instruction_clv();
-    template<AddressModeFunction AddressMode> std::uint8_t instruction_cmp();
-    template<AddressModeFunction AddressMode> std::uint8_t instruction_cpx();
-    template<AddressModeFunction AddressMode> std::uint8_t instruction_cpy();
-    template<AddressModeFunction AddressMode> std::uint8_t instruction_dec();
-    template<AddressModeFunction AddressMode> std::uint8_t instruction_dex();
-    template<AddressModeFunction AddressMode> std::uint8_t instruction_dey();
-    template<AddressModeFunction AddressMode> std::uint8_t instruction_eor();
-    template<AddressModeFunction AddressMode> std::uint8_t instruction_inc();
-    template<AddressModeFunction AddressMode> std::uint8_t instruction_inx();
-    template<AddressModeFunction AddressMode> std::uint8_t instruction_iny();
-    template<AddressModeFunction AddressMode> std::uint8_t instruction_jmp();
-    template<AddressModeFunction AddressMode> std::uint8_t instruction_jsr();
-    template<AddressModeFunction AddressMode> std::uint8_t instruction_lda();
-    template<AddressModeFunction AddressMode> std::uint8_t instruction_ldx();
-    template<AddressModeFunction AddressMode> std::uint8_t instruction_ldy();
-    template<AddressModeFunction AddressMode> std::uint8_t instruction_lsr();
-    template<AddressModeFunction AddressMode> std::uint8_t instruction_nop();
-    template<AddressModeFunction AddressMode> std::uint8_t instruction_ora();
-    template<AddressModeFunction AddressMode> std::uint8_t instruction_pha();
-    template<AddressModeFunction AddressMode> std::uint8_t instruction_php();
-    template<AddressModeFunction AddressMode> std::uint8_t instruction_pla();
-    template<AddressModeFunction AddressMode> std::uint8_t instruction_plp();
-    template<AddressModeFunction AddressMode> std::uint8_t instruction_rol();
-    template<AddressModeFunction AddressMode> std::uint8_t instruction_ror();
-    template<AddressModeFunction AddressMode> std::uint8_t instruction_rti();
-    template<AddressModeFunction AddressMode> std::uint8_t instruction_rts();
-    template<AddressModeFunction AddressMode> std::uint8_t instruction_sbc();
-    template<AddressModeFunction AddressMode> std::uint8_t instruction_sec();
-    template<AddressModeFunction AddressMode> std::uint8_t instruction_sed();
-    template<AddressModeFunction AddressMode> std::uint8_t instruction_sei();
-    template<AddressModeFunction AddressMode> std::uint8_t instruction_sta();
-    template<AddressModeFunction AddressMode> std::uint8_t instruction_stx();
-    template<AddressModeFunction AddressMode> std::uint8_t instruction_sty();
-    template<AddressModeFunction AddressMode> std::uint8_t instruction_tax();
-    template<AddressModeFunction AddressMode> std::uint8_t instruction_tay();
-    template<AddressModeFunction AddressMode> std::uint8_t instruction_tsx();
-    template<AddressModeFunction AddressMode> std::uint8_t instruction_txa();
-    template<AddressModeFunction AddressMode> std::uint8_t instruction_txs();
-    template<AddressModeFunction AddressMode> std::uint8_t instruction_tya();
+    template<AddressModeFunction AddressMode> bool instruction_adc();
+    template<AddressModeFunction AddressMode> bool instruction_and();
+    template<AddressModeFunction AddressMode> bool instruction_asl();
+    template<AddressModeFunction AddressMode> bool instruction_bcc();
+    template<AddressModeFunction AddressMode> bool instruction_bcs();
+    template<AddressModeFunction AddressMode> bool instruction_beq();
+    template<AddressModeFunction AddressMode> bool instruction_bit();
+    template<AddressModeFunction AddressMode> bool instruction_bmi();
+    template<AddressModeFunction AddressMode> bool instruction_bne();
+    template<AddressModeFunction AddressMode> bool instruction_bpl();
+    template<AddressModeFunction AddressMode> bool instruction_brk();
+    template<AddressModeFunction AddressMode> bool instruction_bvc();
+    template<AddressModeFunction AddressMode> bool instruction_bvs();
+    template<AddressModeFunction AddressMode> bool instruction_clc();
+    template<AddressModeFunction AddressMode> bool instruction_cld();
+    template<AddressModeFunction AddressMode> bool instruction_cli();
+    template<AddressModeFunction AddressMode> bool instruction_clv();
+    template<AddressModeFunction AddressMode> bool instruction_cmp();
+    template<AddressModeFunction AddressMode> bool instruction_cpx();
+    template<AddressModeFunction AddressMode> bool instruction_cpy();
+    template<AddressModeFunction AddressMode> bool instruction_dec();
+    template<AddressModeFunction AddressMode> bool instruction_dex();
+    template<AddressModeFunction AddressMode> bool instruction_dey();
+    template<AddressModeFunction AddressMode> bool instruction_eor();
+    template<AddressModeFunction AddressMode> bool instruction_inc();
+    template<AddressModeFunction AddressMode> bool instruction_inx();
+    template<AddressModeFunction AddressMode> bool instruction_iny();
+    template<AddressModeFunction AddressMode> bool instruction_jmp();
+    template<AddressModeFunction AddressMode> bool instruction_jsr();
+    template<AddressModeFunction AddressMode> bool instruction_lda();
+    template<AddressModeFunction AddressMode> bool instruction_ldx();
+    template<AddressModeFunction AddressMode> bool instruction_ldy();
+    template<AddressModeFunction AddressMode> bool instruction_lsr();
+    template<AddressModeFunction AddressMode> bool instruction_nop();
+    template<AddressModeFunction AddressMode> bool instruction_ora();
+    template<AddressModeFunction AddressMode> bool instruction_pha();
+    template<AddressModeFunction AddressMode> bool instruction_php();
+    template<AddressModeFunction AddressMode> bool instruction_pla();
+    template<AddressModeFunction AddressMode> bool instruction_plp();
+    template<AddressModeFunction AddressMode> bool instruction_rol();
+    template<AddressModeFunction AddressMode> bool instruction_ror();
+    template<AddressModeFunction AddressMode> bool instruction_rti();
+    template<AddressModeFunction AddressMode> bool instruction_rts();
+    template<AddressModeFunction AddressMode> bool instruction_sbc();
+    template<AddressModeFunction AddressMode> bool instruction_sec();
+    template<AddressModeFunction AddressMode> bool instruction_sed();
+    template<AddressModeFunction AddressMode> bool instruction_sei();
+    template<AddressModeFunction AddressMode> bool instruction_sta();
+    template<AddressModeFunction AddressMode> bool instruction_stx();
+    template<AddressModeFunction AddressMode> bool instruction_sty();
+    template<AddressModeFunction AddressMode> bool instruction_tax();
+    template<AddressModeFunction AddressMode> bool instruction_tay();
+    template<AddressModeFunction AddressMode> bool instruction_tsx();
+    template<AddressModeFunction AddressMode> bool instruction_txa();
+    template<AddressModeFunction AddressMode> bool instruction_txs();
+    template<AddressModeFunction AddressMode> bool instruction_tya();
 
-    template <AddressModeFunction AddressMode, StatusRegisterFlags flag, bool set> std::uint8_t instruction_branch();
-    template <AddressModeFunction AddressMode> std::uint8_t instruction_modify_register(std::uint8_t& target_register, std::int8_t value);
-    template <AddressModeFunction AddressMode> std::uint8_t instruction_transfer(std::uint8_t& source, std::uint8_t& target);
-    template <AddressModeFunction AddressMode> std::uint8_t instruction_load_register(std::uint8_t& target_register);
-    template <AddressModeFunction AddressMode> std::uint8_t instruction_compare(std::uint8_t& target_register);
+    template <AddressModeFunction AddressMode, StatusRegisterFlags flag, bool set> bool instruction_branch();
+    template <AddressModeFunction AddressMode> bool instruction_modify_register(std::uint8_t& target_register, std::int8_t value);
+    template <AddressModeFunction AddressMode> bool instruction_transfer(std::uint8_t& source, std::uint8_t& target);
+    template <AddressModeFunction AddressMode> bool instruction_load_register(std::uint8_t& target_register);
+    template <AddressModeFunction AddressMode> bool instruction_compare(std::uint8_t& target_register);
     // clang-format on
 
     std::uint8_t address_mode_implied();
@@ -204,24 +204,23 @@ private:
     std::uint8_t address_mode_indirect_x();
     std::uint8_t address_mode_indirect_y();
 
-    std::uint8_t unofficial_opcode();
+    bool unofficial_opcode();
 
     Bus* bus = nullptr;
 
     std::uint8_t register_accumulator = 0;
     std::uint8_t register_x = 0;
     std::uint8_t register_y = 0;
-    std::uint8_t register_status{};
+    std::uint8_t register_status = 0;
     //points to a memory address that is incremented/decremented when pushing/pulling from the stack
     std::uint8_t stack_pointer = 0;
     //Stores the address of the next program byte
     std::uint16_t program_counter = 0;
 
     std::uint8_t fetched = 0;          //Represents the working input value to the ALU
-    std::uint16_t temp = 0;            //A convenience variable used everywhere
-    std::uint16_t address_absolute;    //All used memory addresses end up in here
-    std::uint16_t address_relative;    //Represents the absolute address following a branch
-    std::uint8_t opcode;               //Instruction byte
+    std::uint16_t address_absolute = 0;    //All used memory addresses end up in here
+    std::uint16_t address_relative = 0;    //Represents the absolute address following a branch
+    std::uint8_t opcode = 0;               //Instruction byte
     std::uint8_t remaining_cycles = 0; //For the last executed instruction
     std::uint32_t clock_count = 0;     //Number of clock cycles executed
 
@@ -238,13 +237,14 @@ std::uint8_t CPU::fetch()
 }
 
 template <CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_adc()
+bool CPU::instruction_adc()
 {
-    std::uint8_t extra_cycles_from_addressing = std::invoke(AddressMode, *this);
+    constexpr bool ignore_crossed_page_boundary = false;
+    const bool crossed_page_boundary = std::invoke(AddressMode, *this);
 
     fetch<AddressMode>();
 
-    std::uint16_t add = static_cast<std::uint16_t>(register_accumulator) + static_cast<std::uint16_t>(fetched) + static_cast<std::uint16_t>(get_flag(StatusRegisterFlags::Carry));
+    const std::uint16_t add = static_cast<std::uint16_t>(register_accumulator) + static_cast<std::uint16_t>(fetched) + static_cast<std::uint16_t>(get_flag(StatusRegisterFlags::Carry));
     const bool over_a_byte = add > 255;
     const bool byte_is_zero = (add & 0x00FF) == 0;
     const bool negative = add & 0x80;
@@ -257,28 +257,30 @@ std::uint8_t CPU::instruction_adc()
 
     register_accumulator = add & 0x00FF;
 
-    return 1 + extra_cycles_from_addressing;
+    return crossed_page_boundary && !ignore_crossed_page_boundary;
 }
 
 template <CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_and()
+bool CPU::instruction_and()
 {
-    std::uint8_t extra_cycles_from_addressing = std::invoke(AddressMode, *this);
+    constexpr bool ignore_crossed_page_boundary = false;
+    const bool crossed_page_boundary = std::invoke(AddressMode, *this);
 
     fetch<AddressMode>();
     register_accumulator = register_accumulator & fetched;
     set_flag(StatusRegisterFlags::Zero, register_accumulator == 0);
     set_flag(StatusRegisterFlags::Negative, register_accumulator & 0x80);
-    return 1 + extra_cycles_from_addressing;
+    return crossed_page_boundary & !ignore_crossed_page_boundary;
 }
 
 template <CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_asl()
+bool CPU::instruction_asl()
 {
-    std::uint8_t extra_cycles_from_addressing = std::invoke(AddressMode, *this);
+    constexpr bool ignore_crossed_page_boundary = true;
+    const bool crossed_page_boundary = std::invoke(AddressMode, *this);
 
     fetch<AddressMode>();
-    auto result = static_cast<std::uint16_t>(fetched) << 1;
+    const std::uint16_t result = static_cast<std::uint16_t>(fetched) << 1;
     const bool carry = (result & 0xFF00) > 0;
     set_flag(StatusRegisterFlags::Carry, carry);
     set_flag(StatusRegisterFlags::Zero, register_accumulator == 0);
@@ -289,56 +291,59 @@ std::uint8_t CPU::instruction_asl()
     else
         write_to_memory(address_absolute, result & 0x00FF);
 
-    return extra_cycles_from_addressing;
+    return crossed_page_boundary && !ignore_crossed_page_boundary;
 }
 
 template <CPU::AddressModeFunction AddressMode, StatusRegisterFlags flag, bool set>
-std::uint8_t CPU::instruction_branch()
+bool CPU::instruction_branch()
 {
-    std::uint8_t extra_cycles_from_addressing = std::invoke(AddressMode, *this);
+    constexpr bool ignore_crossed_page_boundary = true;
+    const bool crossed_page_boundary = std::invoke(AddressMode, *this);
 
     if (get_flag(flag) == set)
-        return extra_cycles_from_addressing;
+        return crossed_page_boundary && !ignore_crossed_page_boundary;
 
     clock_count++;
     address_absolute = program_counter + address_relative;
-    std::uint16_t address_absolute_page = address_absolute & 0xFF00;
-    std::uint16_t program_counter_page = program_counter & 0xFF00;
+    //don't shift, faster
+    const std::uint16_t address_absolute_page = address_absolute & 0xFF00;
+    const std::uint16_t program_counter_page = program_counter & 0xFF00;
 
     //different page costs a cycle
     if (address_absolute_page != program_counter_page)
         clock_count++;
 
     program_counter = address_absolute;
-    return extra_cycles_from_addressing;
+    return crossed_page_boundary && !ignore_crossed_page_boundary;
 }
 
 template <CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_bcc()
+bool CPU::instruction_bcc()
 {
     return instruction_branch<AddressMode, StatusRegisterFlags::Carry, true>();
 }
 
 template <CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_bcs()
+bool CPU::instruction_bcs()
 {
     return instruction_branch<AddressMode, StatusRegisterFlags::Carry, false>();
 }
 
 template <CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_beq()
+bool CPU::instruction_beq()
 {
     return instruction_branch<AddressMode, StatusRegisterFlags::Zero, true>();
 }
 
 template <CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_bit()
+bool CPU::instruction_bit()
 {
-    std::uint8_t extra_cycles_from_addressing = std::invoke(AddressMode, *this);
+    constexpr bool ignore_crossed_page_boundary = true;
+    const bool crossed_page_boundary = std::invoke(AddressMode, *this);
 
     fetch<AddressMode>();
 
-    auto result = register_accumulator & fetched;
+    const std::uint16_t result = register_accumulator & fetched;
 
     const bool byte_is_zero = (result & 0x00FF) == 0;
     const bool overflow = fetched & (1 << 6);
@@ -347,40 +352,41 @@ std::uint8_t CPU::instruction_bit()
     set_flag(StatusRegisterFlags::Overflow, overflow);
     set_flag(StatusRegisterFlags::Negative, negative);
 
-    return extra_cycles_from_addressing;
+    return crossed_page_boundary && !ignore_crossed_page_boundary;
 }
 
 template <CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_bmi()
+bool CPU::instruction_bmi()
 {
     return instruction_branch<AddressMode, StatusRegisterFlags::Negative, true>();
 }
 
 template <CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_bne()
+bool CPU::instruction_bne()
 {
     return instruction_branch<AddressMode, StatusRegisterFlags::Zero, false>();
 }
 
 template <CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_bpl()
+bool CPU::instruction_bpl()
 {
     return instruction_branch<AddressMode, StatusRegisterFlags::Negative, false>();
 }
 
 template <CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_brk()
+bool CPU::instruction_brk()
 {
     constexpr auto stack_address = 0x0100;
 
-    std::uint8_t extra_cycles_from_addressing = std::invoke(AddressMode, *this);
+    constexpr bool ignore_crossed_page_boundary = true;
+    const bool crossed_page_boundary = std::invoke(AddressMode, *this);
 
     program_counter++;
 
     set_flag(StatusRegisterFlags::DisableInterrupts, true);
 
-    auto program_counter_low_byte = program_counter & 0x00FF;
-    auto program_counter_high_byte = (program_counter >> 8) & 0x00FF;
+    const std::uint8_t program_counter_low_byte = program_counter & 0x00FF;
+    const std::uint8_t program_counter_high_byte = (program_counter >> 8) & 0x00FF;
     write_to_memory(stack_address + stack_pointer, program_counter_high_byte);
     stack_pointer++;
     write_to_memory(stack_address + stack_pointer, program_counter_low_byte);
@@ -392,134 +398,142 @@ std::uint8_t CPU::instruction_brk()
     set_flag(StatusRegisterFlags::Break, false);
 
     //todo: magic address
-    std::uint16_t low_byte = read_from_memory(0xFFFE);
+    const std::uint16_t low_byte = read_from_memory(0xFFFE);
     std::uint16_t high_byte = read_from_memory(0xFFFF);
     high_byte = high_byte << 8;
     program_counter = high_byte | low_byte;
 
-    return extra_cycles_from_addressing;
+    return crossed_page_boundary && !ignore_crossed_page_boundary;
 }
 
 template <CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_bvc()
+bool CPU::instruction_bvc()
 {
     return instruction_branch<AddressMode, StatusRegisterFlags::Overflow, false>();
 }
 
 template <CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_bvs()
+bool CPU::instruction_bvs()
 {
     return instruction_branch<AddressMode, StatusRegisterFlags::Overflow, true>();
 }
 
 template <CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_clc()
+bool CPU::instruction_clc()
 {
-    std::uint8_t extra_cycles_from_addressing = std::invoke(AddressMode, *this);
+    constexpr bool ignore_crossed_page_boundary = true;
+    const bool crossed_page_boundary = std::invoke(AddressMode, *this);
     set_flag(StatusRegisterFlags::Carry, false);
-    return extra_cycles_from_addressing;
+    return crossed_page_boundary && !ignore_crossed_page_boundary;
 }
 
 template <CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_cld()
+bool CPU::instruction_cld()
 {
-    std::uint8_t extra_cycles_from_addressing = std::invoke(AddressMode, *this);
+    constexpr bool ignore_crossed_page_boundary = true;
+    const bool crossed_page_boundary = std::invoke(AddressMode, *this);
     set_flag(StatusRegisterFlags::DecimalMode, false);
-    return extra_cycles_from_addressing;
+    return crossed_page_boundary && !ignore_crossed_page_boundary;
 }
 
 template <CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_cli()
+bool CPU::instruction_cli()
 {
-    std::uint8_t extra_cycles_from_addressing = std::invoke(AddressMode, *this);
+    constexpr bool ignore_crossed_page_boundary = true;
+    const bool crossed_page_boundary = std::invoke(AddressMode, *this);
     set_flag(StatusRegisterFlags::DisableInterrupts, false);
-    return extra_cycles_from_addressing;
+    return crossed_page_boundary && !ignore_crossed_page_boundary;
 }
 
 template <CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_clv()
+bool CPU::instruction_clv()
 {
-    std::uint8_t extra_cycles_from_addressing = std::invoke(AddressMode, *this);
+    constexpr bool ignore_crossed_page_boundary = true;
+    const bool crossed_page_boundary = std::invoke(AddressMode, *this);
     set_flag(StatusRegisterFlags::Overflow, false);
-    return extra_cycles_from_addressing;
+    return crossed_page_boundary && !ignore_crossed_page_boundary;
 }
 
 template <CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_compare(std::uint8_t& target_register)
+bool CPU::instruction_compare(std::uint8_t& target_register)
 {
-    std::uint8_t extra_cycles_from_addressing = std::invoke(AddressMode, *this);
+    const bool crossed_page_boundary = std::invoke(AddressMode, *this);
 
     fetch<AddressMode>();
 
-    auto result = static_cast<std::uint16_t>(target_register) - static_cast<std::uint16_t>(fetched);
+    const std::uint16_t result = static_cast<std::uint16_t>(target_register) - static_cast<std::uint16_t>(fetched);
     set_flag(StatusRegisterFlags::Carry, target_register >= fetched);
     set_flag(StatusRegisterFlags::Zero, (result & 0x00FF) == 0x0000);
     set_flag(StatusRegisterFlags::Negative, result & 0x0080);
 
-    return extra_cycles_from_addressing;
+    return crossed_page_boundary;
 }
 
 template <CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_cmp()
+bool CPU::instruction_cmp()
 {
-    return instruction_compare<AddressMode>(register_accumulator);
+    constexpr bool ignore_crossed_page_boundary = AddressMode != &CPU::address_mode_indirect_y;
+    return instruction_compare<AddressMode>(register_accumulator) && !ignore_crossed_page_boundary;
 }
 
 template <CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_cpx()
+bool CPU::instruction_cpx()
 {
     return instruction_compare<AddressMode>(register_x);
 }
 
 template <CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_cpy()
+bool CPU::instruction_cpy()
 {
     return instruction_compare<AddressMode>(register_y);
 }
 
 template <CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_dec()
+bool CPU::instruction_dec()
 {
-    std::uint8_t extra_cycles_from_addressing = std::invoke(AddressMode, *this);
+    constexpr bool ignore_crossed_page_boundary = true;
+    const bool crossed_page_boundary = std::invoke(AddressMode, *this);
 
     fetch<AddressMode>();
 
-    auto result = fetched - 1;
+    const std::uint16_t result = fetched - 1;
     write_to_memory(address_absolute, result & 0x00FF);
     set_flag(StatusRegisterFlags::Zero, (result & 0x00FF) == 0);
     set_flag(StatusRegisterFlags::Negative, result & 0x0080);
 
-    return extra_cycles_from_addressing;
+    return crossed_page_boundary && !ignore_crossed_page_boundary;
 }
 
 template <CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_modify_register(std::uint8_t& target_register, std::int8_t value)
+bool CPU::instruction_modify_register(std::uint8_t& target_register, std::int8_t value)
 {
-    std::uint8_t extra_cycles_from_addressing = std::invoke(AddressMode, *this);
+    constexpr bool ignore_crossed_page_boundary = true;
+    const bool crossed_page_boundary = std::invoke(AddressMode, *this);
 
     target_register += value;
     set_flag(StatusRegisterFlags::Zero, target_register == 0);
     set_flag(StatusRegisterFlags::Negative, target_register & 0x80);
 
-    return extra_cycles_from_addressing;
+    return crossed_page_boundary && !ignore_crossed_page_boundary;
 }
 
 template <CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_dex()
+bool CPU::instruction_dex()
 {
     return instruction_modify_register<AddressMode>(register_x, -1);
 }
 
 template <CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_dey()
+bool CPU::instruction_dey()
 {
     return instruction_modify_register<AddressMode>(register_y, -1);
 }
 
 template <CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_eor()
+bool CPU::instruction_eor()
 {
-    std::uint8_t extra_cycles_from_addressing = std::invoke(AddressMode, *this);
+    constexpr bool ignore_crossed_page_boundary = false;
+    const bool crossed_page_boundary = std::invoke(AddressMode, *this);
 
     fetch<AddressMode>();
 
@@ -527,54 +541,57 @@ std::uint8_t CPU::instruction_eor()
     set_flag(StatusRegisterFlags::Zero, register_accumulator == 0);
     set_flag(StatusRegisterFlags::Negative, register_accumulator & 0x80);
 
-    return 1 + extra_cycles_from_addressing;
+    return crossed_page_boundary && !ignore_crossed_page_boundary;
 }
 
 template <CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_inc()
+bool CPU::instruction_inc()
 {
-    std::uint8_t extra_cycles_from_addressing = std::invoke(AddressMode, *this);
+    constexpr bool ignore_crossed_page_boundary = true;
+    const bool crossed_page_boundary = std::invoke(AddressMode, *this);
 
     fetch<AddressMode>();
 
-    auto result = fetched + 1;
+    const std::uint16_t result = fetched + 1;
     write_to_memory(address_absolute, result & 0x00FF);
     set_flag(StatusRegisterFlags::Zero, (result & 0x00FF) == 0);
-    set_flag(StatusRegisterFlags::Negative, result & 0x0080);
+    set_flag(StatusRegisterFlags::Negative, result & 0x80);
 
-    return extra_cycles_from_addressing;
+    return crossed_page_boundary && !ignore_crossed_page_boundary;
 }
 
 template <CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_inx()
+bool CPU::instruction_inx()
 {
     return instruction_modify_register<AddressMode>(register_x, 1);
 }
 
 template <CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_iny()
+bool CPU::instruction_iny()
 {
     return instruction_modify_register<AddressMode>(register_y, 1);
 }
 
 template <CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_jmp()
+bool CPU::instruction_jmp()
 {
-    std::uint8_t extra_cycles_from_addressing = std::invoke(AddressMode, *this);
+    constexpr bool ignore_crossed_page_boundary = true;
+    const bool crossed_page_boundary = std::invoke(AddressMode, *this);
     program_counter = address_absolute;
-    return extra_cycles_from_addressing;
+    return crossed_page_boundary && !ignore_crossed_page_boundary;
 }
 
 template <CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_jsr()
+bool CPU::instruction_jsr()
 {
-    std::uint8_t extra_cycles_from_addressing = std::invoke(AddressMode, *this);
+    constexpr bool ignore_crossed_page_boundary = true;
+    const bool crossed_page_boundary = std::invoke(AddressMode, *this);
 
     program_counter--;
 
     constexpr auto stack_address = 0x0100;
-    auto program_counter_low_byte = program_counter & 0x00FF;
-    auto program_counter_high_byte = (program_counter >> 8) & 0x00FF;
+    const std::uint8_t program_counter_low_byte = program_counter & 0x00FF;
+    const std::uint8_t program_counter_high_byte = (program_counter >> 8) & 0x00FF;
     write_to_memory(stack_address + stack_pointer, program_counter_high_byte);
     stack_pointer--;
     write_to_memory(stack_address + stack_pointer, program_counter_low_byte);
@@ -582,50 +599,52 @@ std::uint8_t CPU::instruction_jsr()
 
     program_counter = address_absolute;
 
-    return extra_cycles_from_addressing;
+    return crossed_page_boundary && !ignore_crossed_page_boundary;
 }
 
 template <CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_load_register(std::uint8_t& target_register)
+bool CPU::instruction_load_register(std::uint8_t& target_register)
 {
-    std::uint8_t extra_cycles_from_addressing = std::invoke(AddressMode, *this);
+    constexpr bool ignore_crossed_page_boundary = false;
+    const bool crossed_page_boundary = std::invoke(AddressMode, *this);
 
     fetch<AddressMode>();
     target_register = fetched;
     set_flag(StatusRegisterFlags::Zero, target_register == 0);
     set_flag(StatusRegisterFlags::Negative, target_register & 0x80);
 
-    return 1 + extra_cycles_from_addressing;
+    return crossed_page_boundary && !ignore_crossed_page_boundary;
 }
 
 //todo: do this within the instruction table instead? or is that too noisy
 template <CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_lda()
+bool CPU::instruction_lda()
 {
     return instruction_load_register<AddressMode>(register_accumulator);
 }
 
 template <CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_ldx()
+bool CPU::instruction_ldx()
 {
     return instruction_load_register<AddressMode>(register_x);
 }
 
 template <CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_ldy()
+bool CPU::instruction_ldy()
 {
     return instruction_load_register<AddressMode>(register_y);
 }
 
 template <CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_lsr()
+bool CPU::instruction_lsr()
 {
-    std::uint8_t extra_cycles_from_addressing = std::invoke(AddressMode, *this);
+    constexpr bool ignore_crossed_page_boundary = true;
+    const bool crossed_page_boundary = std::invoke(AddressMode, *this);
 
     fetch<AddressMode>();
     set_flag(StatusRegisterFlags::Carry, fetched & 0x0001);
 
-    std::uint16_t result = fetched >> 1;
+    const std::uint16_t result = fetched >> 1;
 
     set_flag(StatusRegisterFlags::Zero, (result & 0x00FF) == 0);
     set_flag(StatusRegisterFlags::Negative, result & 0x0080);
@@ -635,14 +654,15 @@ std::uint8_t CPU::instruction_lsr()
     else
         write_to_memory(address_absolute, result & 0x00FF);
 
-    return extra_cycles_from_addressing;
+    return crossed_page_boundary && !ignore_crossed_page_boundary;
 }
 
 //todo: make better
 template <CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_nop()
+bool CPU::instruction_nop()
 {
-    std::uint8_t extra_cycles_from_addressing = std::invoke(AddressMode, *this);
+    constexpr bool ignore_crossed_page_boundary = false;
+    const bool crossed_page_boundary = std::invoke(AddressMode, *this);
 
     switch (opcode)
     {
@@ -652,41 +672,44 @@ std::uint8_t CPU::instruction_nop()
     case 0x7C:
     case 0xDC:
     case 0xFC:
-        return 1 + extra_cycles_from_addressing;
+        return crossed_page_boundary && !ignore_crossed_page_boundary;
     }
 
-    return extra_cycles_from_addressing;
+    return false;
 }
 
 template <CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_ora()
+bool CPU::instruction_ora()
 {
-    std::uint8_t extra_cycles_from_addressing = std::invoke(AddressMode, *this);
+    constexpr bool ignore_crossed_page_boundary = false;
+    const bool crossed_page_boundary = std::invoke(AddressMode, *this);
 
     fetch<AddressMode>();
     register_accumulator = register_accumulator & fetched;
     set_flag(StatusRegisterFlags::Zero, register_accumulator == 0);
     set_flag(StatusRegisterFlags::Negative, register_accumulator & 0x80);
 
-    return 1 + extra_cycles_from_addressing;
+    return crossed_page_boundary && !ignore_crossed_page_boundary;
 }
 
 template <CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_pha()
+bool CPU::instruction_pha()
 {
-    std::uint8_t extra_cycles_from_addressing = std::invoke(AddressMode, *this);
+    constexpr bool ignore_crossed_page_boundary = true;
+    const bool crossed_page_boundary = std::invoke(AddressMode, *this);
 
     constexpr auto stack_address = 0x0100;
     write_to_memory(stack_address + stack_pointer, register_accumulator);
     stack_pointer--;
 
-    return extra_cycles_from_addressing;
+    return crossed_page_boundary && !ignore_crossed_page_boundary;
 }
 
 template <CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_php()
+bool CPU::instruction_php()
 {
-    std::uint8_t extra_cycles_from_addressing = std::invoke(AddressMode, *this);
+    constexpr bool ignore_crossed_page_boundary = true;
+    const bool crossed_page_boundary = std::invoke(AddressMode, *this);
 
     constexpr auto stack_address = 0x0100;
     write_to_memory(stack_address + stack_pointer, register_status | static_cast<std::uint8_t>(StatusRegisterFlags::Break) | static_cast<std::uint8_t>(StatusRegisterFlags::Unused));
@@ -694,13 +717,14 @@ std::uint8_t CPU::instruction_php()
     set_flag(StatusRegisterFlags::Unused, false);
     stack_pointer--;
 
-    return extra_cycles_from_addressing;
+    return crossed_page_boundary && !ignore_crossed_page_boundary;
 }
 
 template <CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_pla()
+bool CPU::instruction_pla()
 {
-    std::uint8_t extra_cycles_from_addressing = std::invoke(AddressMode, *this);
+    constexpr bool ignore_crossed_page_boundary = true;
+    const bool crossed_page_boundary = std::invoke(AddressMode, *this);
 
     constexpr auto stack_address = 0x0100;
     stack_pointer++;
@@ -708,26 +732,28 @@ std::uint8_t CPU::instruction_pla()
     set_flag(StatusRegisterFlags::Zero, register_accumulator == 0);
     set_flag(StatusRegisterFlags::Negative, register_accumulator & 0x80);
 
-    return extra_cycles_from_addressing;
+    return crossed_page_boundary && !ignore_crossed_page_boundary;
 }
 
 template <CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_plp()
+bool CPU::instruction_plp()
 {
-    std::uint8_t extra_cycles_from_addressing = std::invoke(AddressMode, *this);
+    constexpr bool ignore_crossed_page_boundary = true;
+    const bool crossed_page_boundary = std::invoke(AddressMode, *this);
 
     constexpr auto stack_address = 0x0100;
     stack_pointer++;
     register_status = read_from_memory(stack_address + stack_pointer);
     set_flag(StatusRegisterFlags::Unused, true);
 
-    return extra_cycles_from_addressing;
+    return crossed_page_boundary && !ignore_crossed_page_boundary;
 }
 
 template <CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_rol()
+bool CPU::instruction_rol()
 {
-    std::uint8_t extra_cycles_from_addressing = std::invoke(AddressMode, *this);
+    constexpr bool ignore_crossed_page_boundary = true;
+    const bool crossed_page_boundary = std::invoke(AddressMode, *this);
 
     fetch<AddressMode>();
 
@@ -740,13 +766,14 @@ std::uint8_t CPU::instruction_rol()
     else
         write_to_memory(address_absolute, result & 0x00FF);
 
-    return extra_cycles_from_addressing;
+    return crossed_page_boundary && !ignore_crossed_page_boundary;
 }
 
 template <CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_ror()
+bool CPU::instruction_ror()
 {
-    std::uint8_t extra_cycles_from_addressing = std::invoke(AddressMode, *this);
+    constexpr bool ignore_crossed_page_boundary = true;
+    const bool crossed_page_boundary = std::invoke(AddressMode, *this);
 
     fetch<AddressMode>();
 
@@ -759,13 +786,14 @@ std::uint8_t CPU::instruction_ror()
     else
         write_to_memory(address_absolute, result & 0x00FF);
 
-    return extra_cycles_from_addressing;
+    return crossed_page_boundary && !ignore_crossed_page_boundary;
 }
 
 template <CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_rti()
+bool CPU::instruction_rti()
 {
-    std::uint8_t extra_cycles_from_addressing = std::invoke(AddressMode, *this);
+    constexpr bool ignore_crossed_page_boundary = true;
+    const bool crossed_page_boundary = std::invoke(AddressMode, *this);
 
     constexpr auto stack_address = 0x0100;
 
@@ -779,13 +807,14 @@ std::uint8_t CPU::instruction_rti()
     stack_pointer++;
     program_counter = program_counter | (static_cast<std::uint16_t>(read_from_memory(stack_address + stack_pointer)) << 8);
 
-    return extra_cycles_from_addressing;
+    return crossed_page_boundary && !ignore_crossed_page_boundary;
 }
 
 template <CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_rts()
+bool CPU::instruction_rts()
 {
-    std::uint8_t extra_cycles_from_addressing = std::invoke(AddressMode, *this);
+    constexpr bool ignore_crossed_page_boundary = true;
+    const bool crossed_page_boundary = std::invoke(AddressMode, *this);
 
     constexpr auto stack_address = 0x0100;
 
@@ -795,19 +824,20 @@ std::uint8_t CPU::instruction_rts()
     program_counter = program_counter | (static_cast<std::uint16_t>(read_from_memory(stack_address + stack_pointer)) << 8);
 
     program_counter++;
-    return extra_cycles_from_addressing;
+    return crossed_page_boundary && !ignore_crossed_page_boundary;
 }
 
 template <CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_sbc()
+bool CPU::instruction_sbc()
 {
-    std::uint8_t extra_cycles_from_addressing = std::invoke(AddressMode, *this);
+    constexpr bool ignore_crossed_page_boundary = false;
+    const bool crossed_page_boundary = std::invoke(AddressMode, *this);
 
     fetch<AddressMode>();
-    std::uint16_t result = static_cast<std::uint16_t>(fetched) & 0x00FF;
+    const std::uint16_t result = static_cast<std::uint16_t>(fetched) & 0x00FF;
 
     //same as ADC
-    std::uint16_t add = static_cast<std::uint16_t>(register_accumulator) + static_cast<std::uint16_t>(result) + static_cast<std::uint16_t>(get_flag(StatusRegisterFlags::Carry));
+    const std::uint16_t add = static_cast<std::uint16_t>(register_accumulator) + result + static_cast<std::uint16_t>(get_flag(StatusRegisterFlags::Carry));
     const bool over_a_byte = add > 255;
     const bool byte_is_zero = (add & 0x00FF) == 0;
     const bool negative = add & 0x80;
@@ -819,101 +849,108 @@ std::uint8_t CPU::instruction_sbc()
     set_flag(StatusRegisterFlags::Overflow, overflow);
 
     register_accumulator = add & 0x00FF;
-    return 1 + extra_cycles_from_addressing;
+    return crossed_page_boundary && !ignore_crossed_page_boundary;
 }
 
 template <CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_sec()
+bool CPU::instruction_sec()
 {
-    std::uint8_t extra_cycles_from_addressing = std::invoke(AddressMode, *this);
+    constexpr bool ignore_crossed_page_boundary = true;
+    const bool crossed_page_boundary = std::invoke(AddressMode, *this);
     set_flag(StatusRegisterFlags::Carry, true);
-    return extra_cycles_from_addressing;
+    return crossed_page_boundary && !ignore_crossed_page_boundary;
 }
 
 template <CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_sed()
+bool CPU::instruction_sed()
 {
-    std::uint8_t extra_cycles_from_addressing = std::invoke(AddressMode, *this);
+    constexpr bool ignore_crossed_page_boundary = true;
+    const bool crossed_page_boundary = std::invoke(AddressMode, *this);
     set_flag(StatusRegisterFlags::DecimalMode, true);
-    return extra_cycles_from_addressing;
+    return crossed_page_boundary && !ignore_crossed_page_boundary;
 }
 
 template <CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_sei()
+bool CPU::instruction_sei()
 {
-    std::uint8_t extra_cycles_from_addressing = std::invoke(AddressMode, *this);
+    constexpr bool ignore_crossed_page_boundary = true;
+    const bool crossed_page_boundary = std::invoke(AddressMode, *this);
     set_flag(StatusRegisterFlags::DisableInterrupts, true);
-    return extra_cycles_from_addressing;
+    return crossed_page_boundary && !ignore_crossed_page_boundary;
 }
 
 template <CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_sta()
+bool CPU::instruction_sta()
 {
-    std::uint8_t extra_cycles_from_addressing = std::invoke(AddressMode, *this);
+    constexpr bool ignore_crossed_page_boundary = true;
+    const bool crossed_page_boundary = std::invoke(AddressMode, *this);
     write_to_memory(address_absolute, register_accumulator);
-    return extra_cycles_from_addressing;
+    return crossed_page_boundary && !ignore_crossed_page_boundary;
 }
 
 template <CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_stx()
+bool CPU::instruction_stx()
 {
-    std::uint8_t extra_cycles_from_addressing = std::invoke(AddressMode, *this);
+    constexpr bool ignore_crossed_page_boundary = true;
+    const bool crossed_page_boundary = std::invoke(AddressMode, *this);
     write_to_memory(address_absolute, register_x);
-    return extra_cycles_from_addressing;
+    return crossed_page_boundary && !ignore_crossed_page_boundary;
 }
 
 template <CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_sty()
+bool CPU::instruction_sty()
 {
-    std::uint8_t extra_cycles_from_addressing = std::invoke(AddressMode, *this);
+    constexpr bool ignore_crossed_page_boundary = true;
+    const bool crossed_page_boundary = std::invoke(AddressMode, *this);
     write_to_memory(address_absolute, register_y);
-    return extra_cycles_from_addressing;
+    return crossed_page_boundary && !ignore_crossed_page_boundary;
 }
 
 template <CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_transfer(std::uint8_t& source, std::uint8_t& target)
+bool CPU::instruction_transfer(std::uint8_t& source, std::uint8_t& target)
 {
-    std::uint8_t extra_cycles_from_addressing = std::invoke(AddressMode, *this);
+    constexpr bool ignore_crossed_page_boundary = true;
+    const bool crossed_page_boundary = std::invoke(AddressMode, *this);
 
     target = source;
     set_flag(StatusRegisterFlags::Zero, target == 0);
     set_flag(StatusRegisterFlags::Negative, target & 0x80);
 
-    return extra_cycles_from_addressing;
+    return crossed_page_boundary && !ignore_crossed_page_boundary;
 }
 
 template <CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_tax()
+bool CPU::instruction_tax()
 {
     return instruction_transfer<AddressMode>(register_accumulator, register_x);
 }
 
 template <CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_tay()
+bool CPU::instruction_tay()
 {
     return instruction_transfer<AddressMode>(register_accumulator, register_y);
 }
 
 template <CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_tsx()
+bool CPU::instruction_tsx()
 {
     return instruction_transfer<AddressMode>(stack_pointer, register_x);
 }
 
 template <CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_txa()
+bool CPU::instruction_txa()
 {
     return instruction_transfer<AddressMode>(register_x, register_accumulator);
 }
 
 template <CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_txs()
+bool CPU::instruction_txs()
 {
     return instruction_transfer<AddressMode>(register_x, stack_pointer);
 }
 
 template <CPU::AddressModeFunction AddressMode>
-std::uint8_t CPU::instruction_tya()
+bool CPU::instruction_tya()
 {
     return instruction_transfer<AddressMode>(register_y, register_accumulator);
 }
