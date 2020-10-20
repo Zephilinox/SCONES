@@ -12,8 +12,8 @@ public:
    Bus();
   ~Bus() = default;
 
-  std::uint8_t read(std::uint16_t add);
-  void write(std::uint16_t add, std::uint8_t data);
+  std::uint8_t read(std::uint16_t address);
+  void write(std::uint16_t address, std::uint8_t data);
 
 private: 
 	std::unique_ptr<std::uint8_t[]> ram;
