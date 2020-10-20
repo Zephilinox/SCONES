@@ -20,6 +20,10 @@ constexpr std::uint8_t PPU_ADRESS_VRAM_REG_1 = 0x2005;
 constexpr std::uint8_t PPU_ADRESS_VRAM_REG_2 = 0x2006;
 constexpr std::uint8_t PPU_ADRESS_VRAM_IO_REG = 0x2007;
 
+// PPU Rendering constants.
+constexpr std::uint32_t PPU_SCANLINE_CYCLE_COUNT = 341;
+constexpr std::uint32_t PPU_TOTAL_SCANLINES_PER_FRAME = 262;
+
 class PPU
 {
 public:

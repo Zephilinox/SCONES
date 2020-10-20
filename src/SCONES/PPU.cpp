@@ -18,11 +18,13 @@ void PPU::step()
 {
     // Tick the PPU.
     clock++;
-    if (clock >= 341)
+
+
+    if (clock >= PPU_SCANLINE_CYCLE_COUNT)
     {
         clock = 0;
         scanline++;
-        if (scanline >= 261)
+        if (scanline >= PPU_TOTAL_SCANLINES_PER_FRAME - 1)
         {
             scanline = -1;
             frameready = true;
