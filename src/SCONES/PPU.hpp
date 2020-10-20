@@ -8,6 +8,7 @@
 class Bus;
 
 constexpr std::uint32_t PPU_MAX_ADDRESSABLE_MEMORY = 16 * 1024;
+constexpr std::uint32_t PPU_PAL_PALETTE_SIZE = 0x40;
 
 // PPU I/O Addresses
 constexpr std::uint8_t PPU_ADRESS_CONTROL_REG_1 = 0x2000;
@@ -26,11 +27,17 @@ public:
     ~PPU(); 
 
     void step();
+    void create_palette();
 
 private:
     Bus* addBus = nullptr;
     Framebuffer* fb = nullptr;
     std::unique_ptr<std::uint8_t[]> vram;
+
+    std::uint16_t shiftRegister16[2];
+    std::uint8_t shiftRegister8[2];
+
+    RGB palPalette[PPU_PAL_PALETTE_SIZE];
 
     std::uint32_t clock = 0;
     std::uint32_t scanline = 0;
