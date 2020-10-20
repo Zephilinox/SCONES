@@ -115,9 +115,11 @@ public:
 private:
     bool get_flag(StatusRegisterFlags flag);
     void set_flag(StatusRegisterFlags flag, bool value);
+    void set_flag_true(StatusRegisterFlags flag);
+    void set_flag_false(StatusRegisterFlags flag);
 
-    std::uint8_t read_from_memory(std::uint16_t address);
-    void write_to_memory(std::uint16_t address, std::uint8_t data);
+    std::uint8_t read_from_memory(std::uint16_t address) const;
+    void write_to_memory(std::uint16_t address, std::uint8_t data) const;
 
     //The read location could be a memory address or part of the instruction
     template <AddressModeFunction AddressMode>
@@ -383,7 +385,7 @@ bool CPU::instruction_brk()
 
     program_counter++;
 
-    set_flag(StatusRegisterFlags::DisableInterrupts, true);
+    set_flag_true(StatusRegisterFlags::DisableInterrupts);
 
     const std::uint8_t program_counter_low_byte = program_counter & 0x00FF;
     const std::uint8_t program_counter_high_byte = (program_counter >> 8) & 0x00FF;
@@ -392,10 +394,10 @@ bool CPU::instruction_brk()
     write_to_memory(stack_address + stack_pointer, program_counter_low_byte);
     stack_pointer++;
 
-    set_flag(StatusRegisterFlags::Break, true);
+    set_flag_true(StatusRegisterFlags::Break);
     write_to_memory(stack_address + stack_pointer, register_status);
     stack_pointer--;
-    set_flag(StatusRegisterFlags::Break, false);
+    set_flag_false(StatusRegisterFlags::Break);
 
     //todo: magic address
     const std::uint16_t low_byte = read_from_memory(0xFFFE);
@@ -423,7 +425,7 @@ bool CPU::instruction_clc()
 {
     constexpr bool ignore_crossed_page_boundary = true;
     const bool crossed_page_boundary = std::invoke(AddressMode, *this);
-    set_flag(StatusRegisterFlags::Carry, false);
+    set_flag_false(StatusRegisterFlags::Carry);
     return crossed_page_boundary && !ignore_crossed_page_boundary;
 }
 
@@ -432,7 +434,7 @@ bool CPU::instruction_cld()
 {
     constexpr bool ignore_crossed_page_boundary = true;
     const bool crossed_page_boundary = std::invoke(AddressMode, *this);
-    set_flag(StatusRegisterFlags::DecimalMode, false);
+    set_flag_false(StatusRegisterFlags::DecimalMode);
     return crossed_page_boundary && !ignore_crossed_page_boundary;
 }
 
@@ -441,7 +443,7 @@ bool CPU::instruction_cli()
 {
     constexpr bool ignore_crossed_page_boundary = true;
     const bool crossed_page_boundary = std::invoke(AddressMode, *this);
-    set_flag(StatusRegisterFlags::DisableInterrupts, false);
+    set_flag_false(StatusRegisterFlags::DisableInterrupts);
     return crossed_page_boundary && !ignore_crossed_page_boundary;
 }
 
@@ -450,7 +452,7 @@ bool CPU::instruction_clv()
 {
     constexpr bool ignore_crossed_page_boundary = true;
     const bool crossed_page_boundary = std::invoke(AddressMode, *this);
-    set_flag(StatusRegisterFlags::Overflow, false);
+    set_flag_false(StatusRegisterFlags::Overflow);
     return crossed_page_boundary && !ignore_crossed_page_boundary;
 }
 
@@ -715,8 +717,8 @@ bool CPU::instruction_php()
 
     constexpr auto stack_address = 0x0100;
     write_to_memory(stack_address + stack_pointer, register_status | static_cast<std::uint8_t>(StatusRegisterFlags::Break) | static_cast<std::uint8_t>(StatusRegisterFlags::Unused));
-    set_flag(StatusRegisterFlags::Break, false);
-    set_flag(StatusRegisterFlags::Unused, false);
+    set_flag_false(StatusRegisterFlags::Break);
+    set_flag_false(StatusRegisterFlags::Unused);
     stack_pointer--;
 
     return crossed_page_boundary && !ignore_crossed_page_boundary;
@@ -746,7 +748,7 @@ bool CPU::instruction_plp()
     constexpr auto stack_address = 0x0100;
     stack_pointer++;
     register_status = read_from_memory(stack_address + stack_pointer);
-    set_flag(StatusRegisterFlags::Unused, true);
+    set_flag_true(StatusRegisterFlags::Unused);
 
     return crossed_page_boundary && !ignore_crossed_page_boundary;
 }
@@ -759,7 +761,7 @@ bool CPU::instruction_rol()
 
     fetch<AddressMode>();
 
-    std::uint16_t result = static_cast<std::uint16_t>(fetched << 1) | static_cast<std::uint16_t>(get_flag(StatusRegisterFlags::Carry));
+    const std::uint16_t result = static_cast<std::uint16_t>(fetched << 1) | static_cast<std::uint16_t>(get_flag(StatusRegisterFlags::Carry));
     set_flag(StatusRegisterFlags::Carry, result & 0xFF00);
     set_flag(StatusRegisterFlags::Zero, (result & 0x00FF) == 0);
     set_flag(StatusRegisterFlags::Negative, (result & 0x0080) == 0);
@@ -779,7 +781,7 @@ bool CPU::instruction_ror()
 
     fetch<AddressMode>();
 
-    std::uint16_t result = static_cast<std::uint16_t>(static_cast<std::uint16_t>(get_flag(StatusRegisterFlags::Carry)) << 7) | static_cast<std::uint16_t>(fetched >> 1);
+    const std::uint16_t result = static_cast<std::uint16_t>(static_cast<std::uint16_t>(get_flag(StatusRegisterFlags::Carry)) << 7) | static_cast<std::uint16_t>(fetched >> 1);
     set_flag(StatusRegisterFlags::Carry, fetched & 0x01);
     set_flag(StatusRegisterFlags::Zero, (result & 0x00FF) == 0);
     set_flag(StatusRegisterFlags::Negative, result & 0x0080);
@@ -859,7 +861,7 @@ bool CPU::instruction_sec()
 {
     constexpr bool ignore_crossed_page_boundary = true;
     const bool crossed_page_boundary = std::invoke(AddressMode, *this);
-    set_flag(StatusRegisterFlags::Carry, true);
+    set_flag_true(StatusRegisterFlags::Carry);
     return crossed_page_boundary && !ignore_crossed_page_boundary;
 }
 
@@ -868,7 +870,7 @@ bool CPU::instruction_sed()
 {
     constexpr bool ignore_crossed_page_boundary = true;
     const bool crossed_page_boundary = std::invoke(AddressMode, *this);
-    set_flag(StatusRegisterFlags::DecimalMode, true);
+    set_flag_true(StatusRegisterFlags::DecimalMode);
     return crossed_page_boundary && !ignore_crossed_page_boundary;
 }
 
@@ -877,7 +879,7 @@ bool CPU::instruction_sei()
 {
     constexpr bool ignore_crossed_page_boundary = true;
     const bool crossed_page_boundary = std::invoke(AddressMode, *this);
-    set_flag(StatusRegisterFlags::DisableInterrupts, true);
+    set_flag_true(StatusRegisterFlags::DisableInterrupts);
     return crossed_page_boundary && !ignore_crossed_page_boundary;
 }
 

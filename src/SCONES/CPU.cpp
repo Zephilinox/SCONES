@@ -470,13 +470,28 @@ bool CPU::get_flag(StatusRegisterFlags flag)
 
 void CPU::set_flag(StatusRegisterFlags flag, bool value)
 {
+    if (value)
+        register_status = register_status & ~static_cast<std::uint8_t>(flag);
+    else
+        register_status = register_status | static_cast<std::uint8_t>(flag);
 }
 
-std::uint8_t CPU::read_from_memory(std::uint16_t address)
+void CPU::set_flag_true(StatusRegisterFlags flag)
 {
-    return std::uint8_t();
+    register_status = register_status & ~static_cast<std::uint8_t>(flag);
 }
 
-void CPU::write_to_memory(std::uint16_t address, std::uint8_t data)
+void CPU::set_flag_false(StatusRegisterFlags flag)
 {
+    register_status = register_status | static_cast<std::uint8_t>(flag);
+}
+
+std::uint8_t CPU::read_from_memory(std::uint16_t address) const
+{
+    return bus->read(address);
+}
+
+void CPU::write_to_memory(std::uint16_t address, std::uint8_t data) const
+{
+    bus->write(address, data);
 }
