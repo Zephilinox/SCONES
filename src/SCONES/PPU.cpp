@@ -1,3 +1,4 @@
+#include "Bus.hpp"
 #include "Framebuffer.hpp"
 #include "PPU.hpp"
 
@@ -19,6 +20,14 @@ void PPU::step()
     // Tick the PPU.
     clock++;
 
+    if (scanline <= 239)
+    {
+    
+    }
+    if (clock == 1 && scanline == 241)
+    {
+        set_vblank();
+    }
 
     if (clock >= PPU_SCANLINE_CYCLE_COUNT)
     {
@@ -102,4 +111,12 @@ void PPU::create_palette()
     palPalette[0x3D] = RGB{ 160, 162, 160 };
     palPalette[0x3E] = RGB{ 0, 0, 0 };
     palPalette[0x3F] = RGB{ 0, 0, 0 };
+}
+
+void PPU::set_vblank()
+{
+    // Set VBlank interval (Signals were not rendering to CPU).
+    // PPU does not access memory at this point.
+    std::uint8_t statusByte = addBus->read(PPU_ADDRESS_STATUS_REG);
+    addBus->write(PPU_ADDRESS_STATUS_REG, statusByte |= (1 << 7));
 }
