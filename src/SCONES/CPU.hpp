@@ -111,6 +111,9 @@ public:
     void force_interrupt_request();
     void step();
     [[nodiscard]] bool last_instruction_complete() const;
+    void set_program_counter(std::uint16_t address) { program_counter = address; }
+    std::uint8_t get_opcode() const { return opcode; }
+    std::uint16_t get_program_counter() const { return program_counter; }
 
 private:
     bool get_flag(StatusRegisterFlags flag);
@@ -825,7 +828,7 @@ bool CPU::instruction_rts()
     stack_pointer++;
     program_counter = static_cast<std::uint16_t>(read_from_memory(stack_address + stack_pointer));
     stack_pointer++;
-    program_counter = program_counter | (static_cast<std::uint16_t>(read_from_memory(stack_address + stack_pointer)) << 8);
+    program_counter |= static_cast<std::uint16_t>(read_from_memory(stack_address + stack_pointer)) << 8;
 
     program_counter++;
     return crossed_page_boundary && !ignore_crossed_page_boundary;
