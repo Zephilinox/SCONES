@@ -4,6 +4,9 @@
 #include <cstdint>
 #include <array>
 
+//LIBS
+#include <spdlog/spdlog.h>
+
 //SELF
 #include "Bus.hpp"
 
@@ -230,6 +233,7 @@ private:
     std::uint32_t clock_count = 0;     //Number of clock cycles executed
 
     const InstructionTable instruction_table;
+    std::shared_ptr<spdlog::logger> dissassembly_logger;
 };
 
 template <CPU::AddressModeFunction AddressMode>
@@ -325,13 +329,13 @@ bool CPU::instruction_branch()
 template <CPU::AddressModeFunction AddressMode>
 bool CPU::instruction_bcc()
 {
-    return instruction_branch<AddressMode, StatusRegisterFlags::Carry, true>();
+    return instruction_branch<AddressMode, StatusRegisterFlags::Carry, false>();
 }
 
 template <CPU::AddressModeFunction AddressMode>
 bool CPU::instruction_bcs()
 {
-    return instruction_branch<AddressMode, StatusRegisterFlags::Carry, false>();
+    return instruction_branch<AddressMode, StatusRegisterFlags::Carry, true>();
 }
 
 template <CPU::AddressModeFunction AddressMode>

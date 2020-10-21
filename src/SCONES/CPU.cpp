@@ -1,7 +1,7 @@
 #include "CPU.hpp"
 
 //LIBS
-#include <spdlog/spdlog.h>
+#include <spdlog/sinks/basic_file_sink.h>
 
 constexpr CPU::InstructionTable CPU::generate_instruction_table() const
 {
@@ -187,6 +187,9 @@ CPU::CPU(Bus* bus)
     : bus(bus)
     , instruction_table(generate_instruction_table())
 {
+    dissassembly_logger = spdlog::basic_logger_st("dissassembly", "dissasembly.txt", true);
+    dissassembly_logger->set_formatter(std::make_unique<spdlog::pattern_formatter>(
+        "%v"));
 }
 
 void CPU::reset()
@@ -268,6 +271,8 @@ void CPU::step()
         spdlog::info("[CPU] executing opcode {:#x} from address {:#x}.\n\t"
                      "A:{:#x} X:{:#x} Y:{:#x} P:{:#x} SP:{:#x} CYC:{}",
                      opcode, program_counter, register_accumulator, register_x, register_y, register_status, stack_pointer, clock_count);
+        dissassembly_logger->info("{:04X}  {:02X} ?? ??  ???\t\t\t\t\t\t\t\tA:{:02X} X:{:02X} Y:{:02X} P:{:02X} SP:{:02X} PPU:  0,  0 CYC:{}",
+            program_counter, opcode, register_accumulator, register_x, register_y, register_status, stack_pointer, clock_count);
 
         set_flag(StatusRegisterFlags::Unused, true);
         program_counter++;
