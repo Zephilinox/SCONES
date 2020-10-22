@@ -11,9 +11,6 @@
 
 TEST_CASE("CPU Nestest")
 {
-    auto level = spdlog::get_level();
-    spdlog::set_level(spdlog::level::info);
-
     //https://www.qmtpro.com/~nes/misc/nestest.txt
 
     Cartridge cartridge;
@@ -28,12 +25,17 @@ TEST_CASE("CPU Nestest")
     cpu.reset();
     cpu.set_program_counter(0xC000);
 
+    auto level = spdlog::get_level();
+    spdlog::set_level(spdlog::level::info);
+
     while (cpu.get_clock() <= 30000)
     {
         cpu.step();
         if (cpu.get_program_counter() == 0)
           break;
     }
+
+    spdlog::set_level(level);
 
     auto nestest_log_file = std::ifstream("nestest_log.txt");
     auto dissassembly_log_file = std::ifstream("dissasembly.txt");
@@ -49,9 +51,9 @@ TEST_CASE("CPU Nestest")
     while (std::getline(dissassembly_log_file, line))
         dissassembly_log_file_lines.push_back(line);
 
-    //REQUIRE(nestest_log_file_lines.size() == dissassembly_log_file_lines.size())
+    int base_cycle_divergence = 0;
 
-    for (int i = 0; i < nestest_log_file_lines.size(); ++i)
+    for (unsigned i = 0; i < nestest_log_file_lines.size(); ++i)
     {
         const auto& nestest_line = nestest_log_file_lines[i];
 
@@ -91,10 +93,27 @@ TEST_CASE("CPU Nestest")
         //SP
         string_check(68, 5);
 
+        //Cycle difference
+        int cyc_pos = 90;
+        int nes_cyc_digits = static_cast<int>(nestest_line.size()) - cyc_pos;
+        int our_cyc_digits = static_cast<int>(dissassembly_line.size()) - cyc_pos;
+
+        int nes_cycles = std::stoi(nestest_line.substr(cyc_pos, nes_cyc_digits));
+        int our_cycles = std::stoi(dissassembly_line.substr(cyc_pos, our_cyc_digits));
+        int cycle_divergence = nes_cycles - our_cycles;
+
+        if (i == 0)
+            base_cycle_divergence = cycle_divergence;
+
+        {
+            INFO("Cycles diverged more than the starting divergence of " << base_cycle_divergence << ". " << nes_cycles << " - " << our_cycles << " = " << cycle_divergence);
+            CHECK(cycle_divergence == base_cycle_divergence);
+        }
+
         //Stop if program counter is wrong
         const bool program_counter_correct = nestest_line.substr(0, 4) == dissassembly_line.substr(0, 4);
         REQUIRE(program_counter_correct == true);
     }
 
-    spdlog::set_level(level);
+    REQUIRE(nestest_log_file_lines.size() == dissassembly_log_file_lines.size());
 }
