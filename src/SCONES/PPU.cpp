@@ -23,12 +23,15 @@ void PPU::step()
 
     if (scanline == -1)
     {
-    
+        // Do some pre-fetch work here.
     }
 
-    if (clock == 1 && scanline == 241)
+    if (scanline == 241)
     {
-        set_vblank();
+        if (clock == 1)
+        {
+            set_vblank(0x1);
+        }
     }
 
     if (clock >= PPU_SCANLINE_CYCLE_COUNT)
@@ -38,6 +41,7 @@ void PPU::step()
         if (scanline >= PPU_TOTAL_SCANLINES_PER_FRAME - 1)
         {
             scanline = -1;
+            set_vblank(0x0);
             frameready = true;
         }
     }
@@ -115,10 +119,12 @@ void PPU::create_palette()
     palPalette[0x3F] = RGB{ 0, 0, 0 };
 }
 
-void PPU::set_vblank()
+void PPU::set_vblank(std::uint8_t value)
 {
     // Set VBlank interval (Signals were not rendering to CPU).
     // PPU does not access memory at this point.
-    std::uint8_t statusByte = addBus->read(PPU_ADDRESS_STATUS_REG);
-    addBus->write(PPU_ADDRESS_STATUS_REG, statusByte |= (1 << 7));
+    PPUStatusReg status;
+    status.data = addBus->read(PPU_ADDRESS_STATUS_REG);
+    status.bits.vblank = (1 & value);
+    addBus->write(PPU_ADDRESS_STATUS_REG, status.data);
 }

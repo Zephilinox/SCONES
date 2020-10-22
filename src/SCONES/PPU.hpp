@@ -95,7 +95,7 @@ public:
 
 private:
     // Internal functions
-    void set_vblank();
+    void set_vblank(std::uint8_t value);
 
 private:
     Bus* addBus = nullptr;
@@ -108,6 +108,6 @@ private:
     RGB palPalette[PPU_PAL_PALETTE_SIZE];
 
     std::uint32_t clock = 0;
-    std::uint32_t scanline = 0;
+    std::int16_t scanline = -1;
     bool frameready = false;
 };
