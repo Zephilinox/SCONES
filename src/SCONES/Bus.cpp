@@ -20,10 +20,18 @@ std::uint8_t Bus::read(std::uint16_t address)
 
     std::uint8_t value = 0;
 
-    //todo: 0x1FFF
-    if (address >= 0x0000 && address <= 0xFFFF)
+    if (address >= 0x0100 && address <= 0x01FF)
+    {
+        //256-byte stack
+        value = ram.get()[address];
+    }
+    else if (address >= 0x0000 && address <= 0xFFFF)
     {
         value = ram.get()[address];
+    }
+    else
+    {
+        assert(!"address out of range");
     }
 
     spdlog::trace("[BUS] read from {:#x} -> {:#x}", address, value);
@@ -34,7 +42,12 @@ void Bus::write(std::uint16_t address, std::uint8_t data)
 {
     spdlog::trace("[BUS] write {:#x} to {:#x}", data, address);
 
-    if (address >= 0x0000 && address <= 0x00FF)
+    if (address >= 0x0100 && address <= 0x01FF)
+    {
+        //256-byte stack
+        ram.get()[address] = data;
+    }
+    else if (address > 0 && address <= 0xFFFF)
     {
         ram.get()[address] = data;
     }
