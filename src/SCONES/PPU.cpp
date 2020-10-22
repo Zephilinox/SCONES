@@ -123,8 +123,11 @@ void PPU::set_vblank(std::uint8_t value)
 {
     // Set VBlank interval (Signals were not rendering to CPU).
     // PPU does not access memory at this point.
-    PPUStatusReg status;
-    status.data = addBus->read(PPU_ADDRESS_STATUS_REG);
-    status.bits.vblank = (1 & value);
-    addBus->write(PPU_ADDRESS_STATUS_REG, status.data);
+    if (addBus)
+    {
+        PPUStatusReg status;
+        status.data = addBus->read(PPU_ADDRESS_STATUS_REG);
+        status.bits.vblank = (1u & value);
+        addBus->write(PPU_ADDRESS_STATUS_REG, status.data);
+    }
 }
