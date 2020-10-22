@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.15)
 
 include(FetchContent)
 
+set(FETCHCONTENT_BASE_DIR "${CMAKE_CURRENT_BINARY_DIR}")
+
 message(STATUS "############ Fetching fmt")
 FetchContent_Declare(fmt
     GIT_REPOSITORY https://github.com/fmtlib/fmt
@@ -24,7 +26,7 @@ FetchContent_Declare(spdlog
 )
 if (NOT spdlog_POPULATED)
     FetchContent_Populate(spdlog)
-endif ()
+endif()
 add_library(spdlog INTERFACE)
 target_include_directories(spdlog SYSTEM INTERFACE "${spdlog_SOURCE_DIR}/include")
 target_compile_definitions(spdlog INTERFACE "SPDLOG_FMT_EXTERNAL")
@@ -39,4 +41,14 @@ FetchContent_Declare(doctest
 )
 FetchContent_MakeAvailable(doctest)
 set_target_properties(doctest_with_main PROPERTIES FOLDER dependencies)
+message(STATUS "############ Done")
+
+message(STATUS "############ Fetching FindSDL2")
+FetchContent_Declare(find_sdl2
+    GIT_REPOSITORY https://github.com/aminosbh/sdl2-cmake-modules
+    GIT_SHALLOW    TRUE
+)
+if (NOT find_sdl2_POPULATED)
+    FetchContent_Populate(find_sdl2)
+endif()
 message(STATUS "############ Done")
