@@ -239,8 +239,8 @@ private:
 template <CPU::AddressModeFunction AddressMode>
 std::uint8_t CPU::fetch()
 {
-    if constexpr (AddressMode != &CPU::address_mode_immidiate)
-        fetched = read_from_memory(address_mode_relative());
+    if constexpr (AddressMode != &CPU::address_mode_implied)
+        fetched = read_from_memory(address_absolute);
 
     return fetched;
 }

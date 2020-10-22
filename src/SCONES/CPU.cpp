@@ -125,7 +125,7 @@ constexpr CPU::InstructionTable CPU::generate_instruction_table() const
     instruction_table[0xAD] = Instruction{ &CPU::instruction_lda<&CPU::address_mode_absolute>,      3, 4 };
     instruction_table[0xAE] = Instruction{ &CPU::instruction_ldx<&CPU::address_mode_absolute>,      3, 4 };
 
-    instruction_table[0xB0] = Instruction{ &CPU::instruction_bcs<&CPU::address_mode_immidiate>,     2, 2 };
+    instruction_table[0xB0] = Instruction{ &CPU::instruction_bcs<&CPU::address_mode_relative>,      2, 2 };
     instruction_table[0xB1] = Instruction{ &CPU::instruction_lda<&CPU::address_mode_indirect_x>,    2, 5 };
     instruction_table[0xB4] = Instruction{ &CPU::instruction_ldy<&CPU::address_mode_zero_page_x>,   2, 4 };
     instruction_table[0xB5] = Instruction{ &CPU::instruction_lda<&CPU::address_mode_zero_page_x>,   2, 4 };
@@ -204,7 +204,7 @@ void CPU::reset()
     register_x = 0;
     register_y = 0;
     stack_pointer = 0xFD;
-    register_status = static_cast<std::uint8_t>(StatusRegisterFlags::Unused);
+    register_status = static_cast<std::uint8_t>(StatusRegisterFlags::Unused) | static_cast<std::uint8_t>(StatusRegisterFlags::DisableInterrupts);
 
     address_absolute = 0;
     address_relative = 0;
@@ -269,10 +269,23 @@ void CPU::step()
     {
         opcode = read_from_memory(program_counter);
         spdlog::info("[CPU] executing opcode {:#x} from address {:#x}.\n\t"
-                     "A:{:#x} X:{:#x} Y:{:#x} P:{:#x} SP:{:#x} CYC:{}",
+                     "A:{:#x} X:{:#x} Y:{:#x} P:{:#b} SP:{:#x} CYC:{}",
                      opcode, program_counter, register_accumulator, register_x, register_y, register_status, stack_pointer, clock_count);
-        dissassembly_logger->info("{:04X}  {:02X} ?? ??  ???\t\t\t\t\t\t\t\tA:{:02X} X:{:02X} Y:{:02X} P:{:02X} SP:{:02X} PPU:  0,  0 CYC:{}",
-            program_counter, opcode, register_accumulator, register_x, register_y, register_status, stack_pointer, clock_count);
+
+        std::string operands;
+
+        if (instruction_table[opcode].bytes == 1)
+            operands = "     ";
+        if (instruction_table[opcode].bytes == 2)
+            operands = fmt::format("{:02X}   ", read_from_memory(program_counter + 1));
+        if (instruction_table[opcode].bytes == 3)
+            operands = fmt::format("{:02X} {:02X}", read_from_memory(program_counter + 1), read_from_memory(program_counter + 2));
+
+        dissassembly_logger->info("{:04X}  {:02X} {}  ???\t\t\t\t\t\t\t\tA:{:02X} X:{:02X} Y:{:02X} P:{:02X} SP:{:02X} PPU:  0,  0 CYC:{}",
+                                  program_counter, opcode, operands, register_accumulator, register_x, register_y, register_status, stack_pointer, clock_count);
+
+        if (opcode == 0xB0)
+            int i = 0;
 
         set_flag(StatusRegisterFlags::Unused, true);
         program_counter++;
@@ -472,25 +485,26 @@ bool CPU::unofficial_opcode()
 
 bool CPU::get_flag(StatusRegisterFlags flag)
 {
-    return (register_status & static_cast<std::uint8_t>(flag)) != 0;
+    return (register_status & static_cast<std::uint8_t>(flag)) == 0;
 }
 
 void CPU::set_flag(StatusRegisterFlags flag, bool value)
 {
     if (value)
-        register_status = register_status & ~static_cast<std::uint8_t>(flag);
-    else
         register_status = register_status | static_cast<std::uint8_t>(flag);
+    else
+        register_status = register_status & ~static_cast<std::uint8_t>(flag);
+        
 }
 
 void CPU::set_flag_true(StatusRegisterFlags flag)
 {
-    register_status = register_status & ~static_cast<std::uint8_t>(flag);
+    register_status = register_status | static_cast<std::uint8_t>(flag);
 }
 
 void CPU::set_flag_false(StatusRegisterFlags flag)
 {
-    register_status = register_status | static_cast<std::uint8_t>(flag);
+    register_status = register_status & ~static_cast<std::uint8_t>(flag);
 }
 
 std::uint8_t CPU::read_from_memory(std::uint16_t address) const
