@@ -84,8 +84,6 @@ public:
     InstructionFunction execute;
     std::uint8_t bytes = 0;
     std::uint8_t base_cycles = 0;
-
-private:
 };
 
 enum class StatusRegisterFlags : std::uint8_t
@@ -120,6 +118,8 @@ public:
     std::uint8_t get_opcode() const { return opcode; }
     std::uint16_t get_program_counter() const { return program_counter; }
     std::uint16_t get_clock() const { return clock_count; }
+
+    static constexpr std::uint16_t stack_address = 0x0100;
 
 private:
     bool get_flag(StatusRegisterFlags flag);
@@ -315,7 +315,9 @@ bool CPU::instruction_branch()
     if (get_flag(flag) == set)
         return crossed_page_boundary && !ignore_crossed_page_boundary;
 
+    //branching costs a cycle
     clock_count++;
+
     address_absolute = program_counter + address_relative;
     //don't shift, faster
     const std::uint16_t address_absolute_page = address_absolute & 0xFF00;
@@ -388,8 +390,6 @@ bool CPU::instruction_bpl()
 template <CPU::AddressModeFunction AddressMode>
 bool CPU::instruction_brk()
 {
-    constexpr auto stack_address = 0x0100;
-
     constexpr bool ignore_crossed_page_boundary = true;
     const bool crossed_page_boundary = std::invoke(AddressMode, *this);
 
@@ -603,7 +603,6 @@ bool CPU::instruction_jsr()
 
     program_counter--;
 
-    constexpr auto stack_address = 0x0100;
     const std::uint8_t program_counter_low_byte = program_counter & 0x00FF;
     const std::uint8_t program_counter_high_byte = (program_counter >> 8) & 0x00FF;
     write_to_memory(stack_address + stack_pointer, program_counter_high_byte);
@@ -712,7 +711,6 @@ bool CPU::instruction_pha()
     constexpr bool ignore_crossed_page_boundary = true;
     const bool crossed_page_boundary = std::invoke(AddressMode, *this);
 
-    constexpr auto stack_address = 0x0100;
     write_to_memory(stack_address + stack_pointer, register_accumulator);
     stack_pointer--;
 
@@ -725,7 +723,6 @@ bool CPU::instruction_php()
     constexpr bool ignore_crossed_page_boundary = true;
     const bool crossed_page_boundary = std::invoke(AddressMode, *this);
 
-    constexpr auto stack_address = 0x0100;
     write_to_memory(stack_address + stack_pointer, register_status | static_cast<std::uint8_t>(StatusRegisterFlags::Break) | static_cast<std::uint8_t>(StatusRegisterFlags::Unused));
     set_flag_false(StatusRegisterFlags::Break);
     set_flag_false(StatusRegisterFlags::Unused);
@@ -740,7 +737,6 @@ bool CPU::instruction_pla()
     constexpr bool ignore_crossed_page_boundary = true;
     const bool crossed_page_boundary = std::invoke(AddressMode, *this);
 
-    constexpr auto stack_address = 0x0100;
     stack_pointer++;
     register_accumulator = read_from_memory(stack_address + stack_pointer);
     set_flag(StatusRegisterFlags::Zero, register_accumulator == 0);
@@ -755,7 +751,6 @@ bool CPU::instruction_plp()
     constexpr bool ignore_crossed_page_boundary = true;
     const bool crossed_page_boundary = std::invoke(AddressMode, *this);
 
-    constexpr auto stack_address = 0x0100;
     stack_pointer++;
     register_status = read_from_memory(stack_address + stack_pointer);
     set_flag_true(StatusRegisterFlags::Unused);
@@ -809,7 +804,6 @@ bool CPU::instruction_rti()
     constexpr bool ignore_crossed_page_boundary = true;
     const bool crossed_page_boundary = std::invoke(AddressMode, *this);
 
-    constexpr auto stack_address = 0x0100;
 
     stack_pointer++;
     register_status = read_from_memory(stack_address + stack_pointer);
@@ -829,8 +823,6 @@ bool CPU::instruction_rts()
 {
     constexpr bool ignore_crossed_page_boundary = true;
     const bool crossed_page_boundary = std::invoke(AddressMode, *this);
-
-    constexpr auto stack_address = 0x0100;
 
     stack_pointer++;
     std::uint16_t address = stack_address + stack_pointer;
