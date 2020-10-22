@@ -10,13 +10,12 @@
 //SELF
 #include "Bus.hpp"
 
-//todo: maybe I don't need this :shrug:
-enum InstructionType
+enum class InstructionType
 {
     None = 0,
     ADC,  //Add Memory to Accumulator with Carry
     AND,  //AND Memory with Accumulator
-    ASIL, //Shift Left One Bit (Memory or Accumulator)
+    ASL, //Shift Left One Bit (Memory or Accumulator)
     BCC,  //Branch on Carry Clear
     BCS,  //Branch on Carry Set
     BEQ,  //Branch on Result Zero
@@ -72,6 +71,8 @@ enum InstructionType
     TYA,  //Transfer Index Y to Accumulator
 };
 
+std::string instruction_type_to_string(InstructionType type);
+
 class CPU;
 
 class Instruction
@@ -79,6 +80,7 @@ class Instruction
 public:
     using InstructionFunction = bool(CPU::*)();
 
+    InstructionType type;
     InstructionFunction execute;
     std::uint8_t bytes = 0;
     std::uint8_t base_cycles = 0;
@@ -117,6 +119,7 @@ public:
     void set_program_counter(std::uint16_t address) { program_counter = address; }
     std::uint8_t get_opcode() const { return opcode; }
     std::uint16_t get_program_counter() const { return program_counter; }
+    std::uint16_t get_clock() const { return clock_count; }
 
 private:
     bool get_flag(StatusRegisterFlags flag);
@@ -810,13 +813,13 @@ bool CPU::instruction_rti()
 
     stack_pointer++;
     register_status = read_from_memory(stack_address + stack_pointer);
-    register_status = register_status & ~static_cast<std::uint8_t>(StatusRegisterFlags::Break);
-    register_status = register_status & ~static_cast<std::uint8_t>(StatusRegisterFlags::Unused);
+    set_flag_false(StatusRegisterFlags::Break);
+    set_flag_false(StatusRegisterFlags::Unused);
 
     stack_pointer++;
     program_counter = static_cast<std::uint16_t>(read_from_memory(stack_address + stack_pointer));
     stack_pointer++;
-    program_counter = program_counter | (static_cast<std::uint16_t>(read_from_memory(stack_address + stack_pointer)) << 8);
+    program_counter |= static_cast<std::uint16_t>(read_from_memory(stack_address + stack_pointer)) << 8;
 
     return crossed_page_boundary && !ignore_crossed_page_boundary;
 }
@@ -830,9 +833,11 @@ bool CPU::instruction_rts()
     constexpr auto stack_address = 0x0100;
 
     stack_pointer++;
-    program_counter = static_cast<std::uint16_t>(read_from_memory(stack_address + stack_pointer));
+    std::uint16_t address = stack_address + stack_pointer;
+    program_counter = static_cast<std::uint16_t>(read_from_memory(address));
     stack_pointer++;
-    program_counter |= static_cast<std::uint16_t>(read_from_memory(stack_address + stack_pointer)) << 8;
+    address = stack_address + stack_pointer;
+    program_counter |= static_cast<std::uint16_t>(read_from_memory(address)) << 8;
 
     program_counter++;
     return crossed_page_boundary && !ignore_crossed_page_boundary;
