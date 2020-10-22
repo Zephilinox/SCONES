@@ -20,10 +20,12 @@ void PPU::step()
     // Tick the PPU.
     clock++;
 
-    if (scanline <= 239)
+
+    if (scanline == -1)
     {
     
     }
+
     if (clock == 1 && scanline == 241)
     {
         set_vblank();
