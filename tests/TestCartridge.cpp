@@ -9,7 +9,7 @@ TEST_CASE("Cartridge")
     SUBCASE("Can read file")
     {
         Cartridge cartridge;
-        std::string filePath = "TestRom/other/nestest.nes";
+        std::string filePath = "nes-test-roms/other/nestest.nes";
         
         REQUIRE(cartridge.loadFromFile(filePath.c_str()));
         REQUIRE(cartridge.getROM().size() == 16384);
