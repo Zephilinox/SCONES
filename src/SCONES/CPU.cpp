@@ -184,7 +184,7 @@ constexpr CPU::InstructionTable CPU::generate_instruction_table() const
     instruction_table[0x96] = Instruction{ InstructionType::STX, &CPU::instruction_stx<&CPU::address_mode_zero_page_y>,   2, 4 };
     instruction_table[0x98] = Instruction{ InstructionType::TYA, &CPU::instruction_tya<&CPU::address_mode_implied>,       1, 2 };
     instruction_table[0x99] = Instruction{ InstructionType::STA, &CPU::instruction_sta<&CPU::address_mode_absolute_y>,    3, 5 };
-    instruction_table[0x9A] = Instruction{ InstructionType::TXS, &CPU::instruction_txs<&CPU::address_mode_relative>,      1, 2 };
+    instruction_table[0x9A] = Instruction{ InstructionType::TXS, &CPU::instruction_txs<&CPU::address_mode_implied>,       1, 2 };
     instruction_table[0x9D] = Instruction{ InstructionType::STA, &CPU::instruction_sta<&CPU::address_mode_absolute_x>,    3, 5 };
 
     instruction_table[0xA0] = Instruction{ InstructionType::LDY, &CPU::instruction_ldy<&CPU::address_mode_immidiate>,     2, 2 };
