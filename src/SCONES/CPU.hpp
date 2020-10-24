@@ -847,7 +847,7 @@ bool CPU::instruction_sbc()
     const bool crossed_page_boundary = std::invoke(AddressMode, *this);
 
     fetch<AddressMode>();
-    const std::uint16_t result = static_cast<std::uint16_t>(fetched) & 0x00FF;
+    const std::uint16_t result = static_cast<std::uint16_t>(fetched) ^ 0x00FF;
 
     //same as ADC
     const std::uint16_t add = static_cast<std::uint16_t>(register_accumulator) + result + static_cast<std::uint16_t>(get_flag(StatusRegisterFlags::Carry));
@@ -855,7 +855,7 @@ bool CPU::instruction_sbc()
     const bool byte_is_zero = (add & 0x00FF) == 0;
     const bool negative = add & 0x80;
     //yikes, serious magic here that I don't understand
-    const bool overflow = (add ^ static_cast<std::uint16_t>(register_accumulator) & (add ^ result) & 0x0080);
+    const bool overflow = (add ^ static_cast<std::uint16_t>(register_accumulator)) & (add ^ result) & 0x0080;
     set_flag(StatusRegisterFlags::Carry, over_a_byte);
     set_flag(StatusRegisterFlags::Zero, byte_is_zero);
     set_flag(StatusRegisterFlags::Negative, negative);
