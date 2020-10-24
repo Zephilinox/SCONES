@@ -298,7 +298,7 @@ bool CPU::instruction_asl()
     set_flag(StatusRegisterFlags::Zero, register_accumulator == 0);
     set_flag(StatusRegisterFlags::Negative, register_accumulator & 0x80);
 
-    if constexpr (AddressMode == &CPU::address_mode_implied)
+    if constexpr (AddressMode == &CPU::address_mode_accumulator)
         register_accumulator = result & 0x00FF;
     else
         write_to_memory(address_absolute, result & 0x00FF);
@@ -663,7 +663,7 @@ bool CPU::instruction_lsr()
     set_flag(StatusRegisterFlags::Zero, (result & 0x00FF) == 0);
     set_flag(StatusRegisterFlags::Negative, result & 0x0080);
 
-    if constexpr (AddressMode == &CPU::address_mode_implied)
+    if constexpr (AddressMode == &CPU::address_mode_accumulator)
         register_accumulator = result & 0x00FF;
     else
         write_to_memory(address_absolute, result & 0x00FF);
@@ -774,7 +774,7 @@ bool CPU::instruction_rol()
     set_flag(StatusRegisterFlags::Carry, result & 0xFF00);
     set_flag(StatusRegisterFlags::Zero, (result & 0x00FF) == 0);
     set_flag(StatusRegisterFlags::Negative, (result & 0x0080) == 0);
-    if constexpr (AddressMode == &CPU::address_mode_implied)
+    if constexpr (AddressMode == &CPU::address_mode_accumulator)
         register_accumulator = result & 0x00FF;
     else
         write_to_memory(address_absolute, result & 0x00FF);
@@ -794,7 +794,7 @@ bool CPU::instruction_ror()
     set_flag(StatusRegisterFlags::Carry, fetched & 0x01);
     set_flag(StatusRegisterFlags::Zero, (result & 0x00FF) == 0);
     set_flag(StatusRegisterFlags::Negative, result & 0x0080);
-    if constexpr (AddressMode == &CPU::address_mode_implied)
+    if constexpr (AddressMode == &CPU::address_mode_accumulator)
         register_accumulator = result & 0x00FF;
     else
         write_to_memory(address_absolute, result & 0x00FF);
