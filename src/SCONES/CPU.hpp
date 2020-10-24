@@ -312,7 +312,8 @@ bool CPU::instruction_branch()
     constexpr bool ignore_crossed_page_boundary = true;
     const bool crossed_page_boundary = std::invoke(AddressMode, *this);
 
-    if (get_flag(flag) == set)
+    //not what we wanted, so don't branch
+    if (get_flag(flag) != set)
         return crossed_page_boundary && !ignore_crossed_page_boundary;
 
     //branching costs a cycle
