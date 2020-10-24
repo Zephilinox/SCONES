@@ -753,6 +753,9 @@ bool CPU::instruction_plp()
 
     stack_pointer++;
     register_status = read_from_memory(stack_address + stack_pointer);
+    //todo: https://wiki.nesdev.com/w/index.php/Status_flags Two instructions (PLP and RTI) pull a byte from the stack and set all the flags. They ignore bits 5 and 4. 
+    //nestest doesn't seem to ignore bit 4
+    set_flag_false(StatusRegisterFlags::Break);
     set_flag_true(StatusRegisterFlags::Unused);
 
     return crossed_page_boundary && !ignore_crossed_page_boundary;
@@ -804,9 +807,10 @@ bool CPU::instruction_rti()
     constexpr bool ignore_crossed_page_boundary = true;
     const bool crossed_page_boundary = std::invoke(AddressMode, *this);
 
-
     stack_pointer++;
     register_status = read_from_memory(stack_address + stack_pointer);
+    //todo: https://wiki.nesdev.com/w/index.php/Status_flags Two instructions (PLP and RTI) pull a byte from the stack and set all the flags. They ignore bits 5 and 4.
+    //nestest doesn't seem to ignore bit 4
     set_flag_false(StatusRegisterFlags::Break);
     set_flag_false(StatusRegisterFlags::Unused);
 
