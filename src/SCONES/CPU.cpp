@@ -561,7 +561,7 @@ bool CPU::unofficial_opcode()
 
 bool CPU::get_flag(StatusRegisterFlags flag)
 {
-    return (register_status & static_cast<std::uint8_t>(flag)) == 0;
+    return register_status & static_cast<std::uint8_t>(flag);
 }
 
 void CPU::set_flag(StatusRegisterFlags flag, bool value)
