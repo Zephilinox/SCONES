@@ -1,6 +1,6 @@
 build/*
 Resources/dissasembly.txt
-
+dissasembly.txt
 
 # Prerequisites
 *.d
