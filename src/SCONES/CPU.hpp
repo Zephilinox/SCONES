@@ -261,7 +261,7 @@ bool CPU::instruction_adc()
     const bool byte_is_zero = (add & 0x00FF) == 0;
     const bool negative = add & 0x80;
     //yikes, serious magic here that I don't understand
-    const bool overflow = (~(static_cast<std::uint16_t>(register_accumulator) ^ static_cast<std::uint16_t>(fetched) & (static_cast<std::uint16_t>(register_accumulator) ^ add)) & 0x0080);
+    const bool overflow = (~(static_cast<std::uint16_t>(register_accumulator) ^ static_cast<std::uint16_t>(fetched)) & (static_cast<std::uint16_t>(register_accumulator) ^ add)) & 0x0080;
     set_flag(StatusRegisterFlags::Carry, over_a_byte);
     set_flag(StatusRegisterFlags::Zero, byte_is_zero);
     set_flag(StatusRegisterFlags::Negative, negative);
