@@ -201,7 +201,7 @@ constexpr CPU::InstructionTable CPU::generate_instruction_table() const
     instruction_table[0xAE] = Instruction{ InstructionType::LDX, &CPU::instruction_ldx<&CPU::address_mode_absolute>,      3, 4 };
 
     instruction_table[0xB0] = Instruction{ InstructionType::BCS, &CPU::instruction_bcs<&CPU::address_mode_relative>,      2, 2 };
-    instruction_table[0xB1] = Instruction{ InstructionType::LDA, &CPU::instruction_lda<&CPU::address_mode_indirect_x>,    2, 5 };
+    instruction_table[0xB1] = Instruction{ InstructionType::LDA, &CPU::instruction_lda<&CPU::address_mode_indirect_y>,    2, 5 };
     instruction_table[0xB4] = Instruction{ InstructionType::LDY, &CPU::instruction_ldy<&CPU::address_mode_zero_page_x>,   2, 4 };
     instruction_table[0xB5] = Instruction{ InstructionType::LDA, &CPU::instruction_lda<&CPU::address_mode_zero_page_x>,   2, 4 };
     instruction_table[0xB6] = Instruction{ InstructionType::LDX, &CPU::instruction_ldx<&CPU::address_mode_zero_page_y>,   2, 4 };
