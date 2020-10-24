@@ -698,7 +698,7 @@ bool CPU::instruction_ora()
     const bool crossed_page_boundary = std::invoke(AddressMode, *this);
 
     fetch<AddressMode>();
-    register_accumulator = register_accumulator & fetched;
+    register_accumulator |= fetched;
     set_flag(StatusRegisterFlags::Zero, register_accumulator == 0);
     set_flag(StatusRegisterFlags::Negative, register_accumulator & 0x80);
 
