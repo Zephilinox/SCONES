@@ -959,7 +959,13 @@ bool CPU::instruction_txa()
 template <CPU::AddressModeFunction AddressMode>
 bool CPU::instruction_txs()
 {
-    return instruction_transfer<AddressMode>(register_x, stack_pointer);
+    //TXS is weird, doesn't change processor status
+    constexpr bool ignore_crossed_page_boundary = true;
+    const bool crossed_page_boundary = std::invoke(AddressMode, *this);
+
+    stack_pointer = register_x;
+
+    return crossed_page_boundary && !ignore_crossed_page_boundary;
 }
 
 template <CPU::AddressModeFunction AddressMode>
