@@ -1,4 +1,5 @@
 build/*
+imgui.ini
 Resources/dissasembly.txt
 dissasembly.txt
 
