@@ -20,14 +20,42 @@ std::uint8_t Bus::read(std::uint16_t address)
 
     std::uint8_t value = 0;
 
-    if (address >= 0x0100 && address <= 0x01FF)
+    //addressable range
+    if (address <= 0xFFFF)
     {
-        //256-byte stack
-        value = ram.get()[address];
-    }
-    else if (address >= 0x0000 && address <= 0xFFFF)
-    {
-        value = ram.get()[address];
+        if (address <= 0x1FFF)
+        {
+            //8kb (2kb mirror) internal RAM
+            //only the lower 11 bits matter, the 14th (16kb), 15th (32kb), and 16th (64kb) bits are ignored, causing 2kb to mirror to 8kb
+            const auto relevant_address = address & 0x1FFF;
+            value = ram.get()[relevant_address];
+        }
+        else if (address <= 0x3FFF)
+        {
+            //PPU registers (8 bits) mirror to 0x3FFF (14 bits)
+            //todo
+            auto relevant_address = address & 0x3FFF;
+            assert(!"failed to access PPU registers, not implemented");
+        }
+        else if (address <= 0x4017)
+        {
+            //APU and I/O registers
+            //todo
+            assert(!"failed to access APU and I/O registers, not implemented");
+        }
+        else if (address <= 0x401F)
+        {
+            //APU and I/O registers that are normally disabled (CPU test mode)
+            //todo
+            assert(!"failed to access disabled APU and I/O registers, not implemented");
+        }
+        else
+        {
+            //cartridge space. PRG ROM, PRG RAM, and Mapper registers
+            //todo
+            spdlog::warn("Accessing cartridge space but not mapped to loaded cartridge.");
+            value = ram.get()[address];
+        }
     }
     else
     {
@@ -42,14 +70,46 @@ void Bus::write(std::uint16_t address, std::uint8_t data)
 {
     spdlog::trace("[BUS] write {:#x} to {:#x}", data, address);
 
-    if (address >= 0x0100 && address <= 0x01FF)
+    //addressable range
+    if (address <= 0xFFFF)
     {
-        //256-byte stack
-        ram.get()[address] = data;
+        if (address <= 0x1FFF)
+        {
+            //8kb (2kb mirror) internal RAM
+            //only the lower 11 bits matter, the 14th (16kb), 15th (32kb), and 16th (64kb) bits are ignored, causing 2kb to mirror to 8kb
+            const auto relevant_address = address & 0x1FFF;
+            ram.get()[relevant_address] = data;
+        }
+        else if (address <= 0x3FFF)
+        {
+            //PPU registers (8 bits) mirror to 0x3FFF (14 bits)
+            //todo
+            auto relevant_address = address & 0x3FFF;
+            assert(!"failed to access PPU registers, not implemented");
+        }
+        else if (address <= 0x4017)
+        {
+            //APU and I/O registers
+            //todo
+            assert(!"failed to access APU and I/O registers, not implemented");
+        }
+        else if (address <= 0x401F)
+        {
+            //APU and I/O registers that are normally disabled (CPU test mode)
+            //todo
+            assert(!"failed to access disabled APU and I/O registers, not implemented");
+        }
+        else
+        {
+            //cartridge space. PRG ROM, PRG RAM, and Mapper registers
+            //todo
+            spdlog::warn("Accessing cartridge space but not mapped to loaded cartridge.");
+            ram.get()[address] = data;
+        }
     }
-    else if (address > 0 && address <= 0xFFFF)
+    else
     {
-        ram.get()[address] = data;
+        assert(!"address out of range");
     }
 }
 
