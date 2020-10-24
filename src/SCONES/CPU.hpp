@@ -295,8 +295,8 @@ bool CPU::instruction_asl()
     const std::uint16_t result = static_cast<std::uint16_t>(fetched) << 1;
     const bool carry = (result & 0xFF00) > 0;
     set_flag(StatusRegisterFlags::Carry, carry);
-    set_flag(StatusRegisterFlags::Zero, register_accumulator == 0);
-    set_flag(StatusRegisterFlags::Negative, register_accumulator & 0x80);
+    set_flag(StatusRegisterFlags::Zero, (result & 0x00FF) == 0);
+    set_flag(StatusRegisterFlags::Negative, result & 0x80);
 
     if constexpr (AddressMode == &CPU::address_mode_accumulator)
         register_accumulator = result & 0x00FF;
