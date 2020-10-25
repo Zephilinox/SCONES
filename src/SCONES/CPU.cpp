@@ -208,8 +208,8 @@ constexpr CPU::InstructionTable CPU::generate_instruction_table() const
     instruction_table[0xB8] = Instruction{ InstructionType::CLV, &CPU::instruction_clv<&CPU::address_mode_implied>,       1, 2 };
     instruction_table[0xB9] = Instruction{ InstructionType::LDA, &CPU::instruction_lda<&CPU::address_mode_absolute_y>,    3, 4 };
     instruction_table[0xBA] = Instruction{ InstructionType::TSX, &CPU::instruction_tsx<&CPU::address_mode_implied>,       1, 2 };
-    instruction_table[0xBC] = Instruction{ InstructionType::LDY, &CPU::instruction_ldy<&CPU::address_mode_absolute_y>,    3, 4 };
-    instruction_table[0xBD] = Instruction{ InstructionType::LDA, &CPU::instruction_lda<&CPU::address_mode_absolute_y>,    3, 4 };
+    instruction_table[0xBC] = Instruction{ InstructionType::LDY, &CPU::instruction_ldy<&CPU::address_mode_absolute_x>,    3, 4 };
+    instruction_table[0xBD] = Instruction{ InstructionType::LDA, &CPU::instruction_lda<&CPU::address_mode_absolute_x>,    3, 4 };
     instruction_table[0xBE] = Instruction{ InstructionType::LDX, &CPU::instruction_ldx<&CPU::address_mode_absolute_y>,    3, 4 };
 
     instruction_table[0xC0] = Instruction{ InstructionType::CPY, &CPU::instruction_cpy<&CPU::address_mode_immidiate>,     2, 2 };
