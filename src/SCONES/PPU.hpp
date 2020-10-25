@@ -91,6 +91,8 @@ public:
 
     void step();
     void create_palette();
+    bool nmi_set() const { return nmi; }
+    void nmi_reset() { nmi = false; }
 
 private:
     // Internal functions
@@ -111,4 +113,6 @@ private:
     std::uint32_t clock = 0;
     std::int16_t scanline = -1;
     bool frameready = false;
+
+    bool nmi = false;
 };

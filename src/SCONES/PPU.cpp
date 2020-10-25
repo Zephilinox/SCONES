@@ -21,11 +21,22 @@ void PPU::step()
 
     if (clock > 0)
     {
+        if (clock == 1 && scanline == -1)
+        {
+            set_vblank(0x0);
+        }
+
         if (scanline >= 241)
         {
             if (scanline == 241 && clock == 1)
             {
                 set_vblank(0x1);
+                if (addBus)
+                {
+                    PPUControlReg status;
+                    status.data = addBus->read(PPU_ADDRESS_PPUCTRL_REG);
+                    nmi = static_cast<bool>(status.bits.nmi_enable);
+                }
             }
         }
         else
@@ -42,7 +53,6 @@ void PPU::step()
         if (scanline >= PPU_TOTAL_SCANLINES_PER_FRAME - 1)
         {
             scanline = -1;
-            set_vblank(0x0);
             frameready = true;
         }
     }

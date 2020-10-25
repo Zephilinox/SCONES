@@ -13,6 +13,13 @@ void NES::tick()
     if (clock % 3) {
         cpu6502->step();
     }
+
+    // Process interrupts.
+    if (ppu2C02->nmi_set()) {
+        ppu2C02->nmi_reset();
+        cpu6502->interrupt_request();
+    }
+
     clock++;
 }
 
