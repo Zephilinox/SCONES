@@ -35,6 +35,7 @@ std::string instruction_type_to_string(InstructionType type)
         sorry(DEC);
         sorry(DEX);
         sorry(DEY);
+        sorry(DCP);
         sorry(EOR);
         sorry(INC);
         sorry(INX);
@@ -124,7 +125,7 @@ constexpr CPU::InstructionTable CPU::generate_instruction_table() const
     
     instruction_table[0xA3] = Instruction{ InstructionType::LAX, &CPU::instruction_lax<&CPU::address_mode_indirect_x>,    2, 6 };
     instruction_table[0xA7] = Instruction{ InstructionType::LAX, &CPU::instruction_lax<&CPU::address_mode_zero_page>,     2, 3 };
-    instruction_table[0xAF] = Instruction{ InstructionType::LAX, &CPU::instruction_lax<&CPU::address_mode_absolute >,     2, 4 };
+    instruction_table[0xAF] = Instruction{ InstructionType::LAX, &CPU::instruction_lax<&CPU::address_mode_absolute>,      2, 4 };
     
     instruction_table[0xB3] = Instruction{ InstructionType::LAX, &CPU::instruction_lax<&CPU::address_mode_indirect_y>,    2, 5 };
     instruction_table[0xB7] = Instruction{ InstructionType::LAX, &CPU::instruction_lax<&CPU::address_mode_zero_page_y>,   2, 4 };
@@ -139,6 +140,14 @@ constexpr CPU::InstructionTable CPU::generate_instruction_table() const
     instruction_table[0xF4] = Instruction{ InstructionType::NOP, &CPU::instruction_nop<&CPU::address_mode_zero_page_x>,   3, 4 };
     instruction_table[0xFA] = Instruction{ InstructionType::NOP, &CPU::instruction_nop<&CPU::address_mode_accumulator>,   1, 2 };
     instruction_table[0xFC] = Instruction{ InstructionType::NOP, &CPU::instruction_nop<&CPU::address_mode_absolute_x>,    3, 4 };
+    
+    instruction_table[0xC3] = Instruction{ InstructionType::DCP, &CPU::instruction_dcp<&CPU::address_mode_indirect_x>,    2, 8 };
+    instruction_table[0xC7] = Instruction{ InstructionType::DCP, &CPU::instruction_dcp<&CPU::address_mode_zero_page>,     2, 5 };
+    instruction_table[0xCF] = Instruction{ InstructionType::DCP, &CPU::instruction_dcp<&CPU::address_mode_absolute>,      2, 6 };
+    instruction_table[0xD3] = Instruction{ InstructionType::DCP, &CPU::instruction_dcp<&CPU::address_mode_indirect_y>,    2, 8 };
+    instruction_table[0xD7] = Instruction{ InstructionType::DCP, &CPU::instruction_dcp<&CPU::address_mode_zero_page_x>,   2, 6 };
+    instruction_table[0xDB] = Instruction{ InstructionType::DCP, &CPU::instruction_dcp<&CPU::address_mode_absolute_y>,    3, 7 };
+    instruction_table[0xDF] = Instruction{ InstructionType::DCP, &CPU::instruction_dcp<&CPU::address_mode_absolute_x>,    3, 7 };
 
     //official opcodes
     instruction_table[0x00] = Instruction{ InstructionType::BRK, &CPU::instruction_brk<&CPU::address_mode_implied>,       1, 7 };

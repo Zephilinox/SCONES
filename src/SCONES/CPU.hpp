@@ -36,6 +36,7 @@ enum class InstructionType
     DEC,  //Decrement Memory by One
     DEX,  //Decrement Index X by One
     DEY,  //Decrement Index Y by One
+    DCP,  //DECs the contents of a memory location and then CMPs the result with the Accumulator
     EOR,  //XOR Memory with Accumulator
     INC,  //Increment Memory by One
     INX,  //Increment Index X by One
@@ -162,6 +163,7 @@ private:
     template<AddressModeFunction AddressMode> bool instruction_dec();
     template<AddressModeFunction AddressMode> bool instruction_dex();
     template<AddressModeFunction AddressMode> bool instruction_dey();
+    template<AddressModeFunction AddressMode> bool instruction_dcp();
     template<AddressModeFunction AddressMode> bool instruction_eor();
     template<AddressModeFunction AddressMode> bool instruction_inc();
     template<AddressModeFunction AddressMode> bool instruction_inx();
@@ -546,6 +548,25 @@ template <CPU::AddressModeFunction AddressMode>
 bool CPU::instruction_dey()
 {
     return instruction_modify_register<AddressMode>(register_y, -1);
+}
+
+template <CPU::AddressModeFunction AddressMode>
+bool CPU::instruction_dcp()
+{
+    constexpr bool ignore_crossed_page_boundary = true;
+    const bool crossed_page_boundary = std::invoke(AddressMode, *this);
+
+    fetch<AddressMode>();
+
+    const std::uint16_t result_dec = fetched - 1;
+    write_to_memory(address_absolute, result_dec & 0x00FF);
+
+    const std::uint16_t resul_cmp = static_cast<std::uint16_t>(register_accumulator) - static_cast<std::uint16_t>(result_dec);
+    set_flag(StatusRegisterFlags::Carry, register_accumulator >= static_cast<std::uint8_t>(result_dec));
+    set_flag(StatusRegisterFlags::Zero, (resul_cmp & 0x00FF) == 0x0000);
+    set_flag(StatusRegisterFlags::Negative, resul_cmp & 0x0080);
+
+    return crossed_page_boundary && !ignore_crossed_page_boundary;
 }
 
 template <CPU::AddressModeFunction AddressMode>
