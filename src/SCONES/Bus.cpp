@@ -42,7 +42,10 @@ std::uint8_t Bus::cpu_read(std::uint16_t address)
         //PPU registers (8 bits) mirror until 0x3FFF
         //todo
         const auto relevant_address = address & (ADDRESS_PPU_REGISTER_SIZE - 1);
-        value = (*memory_ppu_register)[relevant_address];
+        if (ppu)
+        {
+            value = ppu->bus_read(relevant_address);
+        }
         spdlog::warn("Reading ppu register space but not mapped to component");
     }
     else if (address <= ADDRESS_APU_IO_REGISTER_UPPER)
@@ -90,7 +93,10 @@ void Bus::cpu_write(std::uint16_t address, std::uint8_t data)
         //PPU registers (8 bits) mirror until 0x3FFF
         //todo
         const auto relevant_address = address & (ADDRESS_PPU_REGISTER_SIZE - 1);
-        (*memory_ppu_register)[relevant_address] = data;
+        if (ppu)
+        {
+            ppu->bus_write(relevant_address, data);
+        }
         spdlog::warn("Writing ppu register space but not mapped to component");
     }
     else if (address <= ADDRESS_APU_IO_REGISTER_UPPER)

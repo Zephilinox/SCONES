@@ -94,7 +94,10 @@ public:
     bool nmi_set() const { return nmi; }
     void nmi_reset() { nmi = false; }
 
-private:
+    void bus_write(std::uint16_t address, std::uint8_t data);
+    std::uint8_t bus_read(std::uint16_t address);
+
+private :
     // Internal functions
     void set_vblank(std::uint8_t value);
     void sprite_evaluation();

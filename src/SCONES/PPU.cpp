@@ -8,6 +8,7 @@ PPU::PPU(Bus* bus, Framebuffer* fbuffer)
     , fb(fbuffer)
 {
     create_palette();
+    addBus->connect_ppu(this);
 }
 
 PPU::~PPU()
@@ -128,6 +129,18 @@ void PPU::create_palette()
     palPalette[0x3D] = RGB{ 160, 162, 160 };
     palPalette[0x3E] = RGB{ 0, 0, 0 };
     palPalette[0x3F] = RGB{ 0, 0, 0 };
+}
+
+void PPU::bus_write(std::uint16_t address, std::uint8_t data)
+{
+    // TODO - Rework registers here.
+}
+
+std::uint8_t PPU::bus_read(std::uint16_t address)
+{
+    // TODO - rework registers here.
+    std::uint8_t data;
+    return data;
 }
 
 void PPU::set_vblank(std::uint8_t value)

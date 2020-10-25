@@ -6,6 +6,7 @@
 
 //SELF
 #include "Cartridge.hpp"
+#include "PPU.hpp"
 
 //https://wiki.nesdev.com/w/index.php/CPU_memory_map
 constexpr std::int32_t ADDRESS_CPU_RAM_SIZE = 0x800;
@@ -31,6 +32,7 @@ public:
     Bus();
 
     void insert_cartridge(Cartridge&& cartridge);
+    void connect_ppu(PPU* newPPU) { ppu = newPPU; }
 
     std::uint8_t cpu_read(std::uint16_t address);
     void cpu_write(std::uint16_t address, std::uint8_t data);
@@ -45,4 +47,5 @@ private:
     std::unique_ptr<std::array<std::uint8_t, ADDRESS_APU_IO_DISABLED_REGISTER_SIZE>> memory_apu_io_disabled;
     std::unique_ptr<std::array<std::uint8_t, ADDRESS_CARTRIDGE_SIZE>> memory_cartridge;
     Cartridge cartridge;
+    PPU* ppu = nullptr;
 };
