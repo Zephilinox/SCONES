@@ -28,14 +28,14 @@ std::uint8_t Bus::read(std::uint16_t address)
     {
         //8kb (2kb mirror) internal RAM
         //only the lower 11 bits (2kb) matter, the upper 5 bits are ignored, causing 2kb to mirror to 8kb
-        const auto relevant_address = address & ADDRESS_CPU_RAM_UPPER;
+        const auto relevant_address = address & (ADDRESS_CPU_RAM_SIZE - 1);
         value = (*memory_cpu_ram)[relevant_address];
     }
     else if (address <= ADDRESS_PPU_REGISTER_UPPER_MIRROR) //lower 14 bits (16kb)
     {
         //PPU registers (8 bits) mirror until 0x3FFF
         //todo
-        const auto relevant_address = address & ADDRESS_PPU_REGISTER_UPPER;
+        const auto relevant_address = address & (ADDRESS_PPU_REGISTER_SIZE - 1);
         value = (*memory_ppu_register)[relevant_address];
         spdlog::warn("Reading ppu register space but not mapped to component");
     }
