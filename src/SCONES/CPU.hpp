@@ -44,6 +44,7 @@ enum class InstructionType
     JSR,  //Jump to New Location Saving Return Address
     LDA,  //Load Accumulator with Memory
     LDX,  //Load Index X with Memory
+    LAX,  //Load Accumulator And X with Memory
     LDY,  //Load Index Y with Memory
     LSR,  //Shift One Bit Right (Memory or Accumulator)
     NOP,  //No Operation
@@ -63,6 +64,7 @@ enum class InstructionType
     STA,  //Store Accumulator in Memory
     STX,  //Store Index X in Memory
     STY,  //Store Index Y in Memory
+    SAX,  //Store X & A in Memory
     TAX,  //Transfer Accumulator to Index X
     TAY,  //Transfer Accumulator to Index Y
     TSX,  //Transfer Stack Pointer to Index X
@@ -169,6 +171,7 @@ private:
     template<AddressModeFunction AddressMode> bool instruction_lda();
     template<AddressModeFunction AddressMode> bool instruction_ldx();
     template<AddressModeFunction AddressMode> bool instruction_ldy();
+    template<AddressModeFunction AddressMode> bool instruction_lax();
     template<AddressModeFunction AddressMode> bool instruction_lsr();
     template<AddressModeFunction AddressMode> bool instruction_nop();
     template<AddressModeFunction AddressMode> bool instruction_ora();
@@ -187,6 +190,7 @@ private:
     template<AddressModeFunction AddressMode> bool instruction_sta();
     template<AddressModeFunction AddressMode> bool instruction_stx();
     template<AddressModeFunction AddressMode> bool instruction_sty();
+    template<AddressModeFunction AddressMode> bool instruction_sax();
     template<AddressModeFunction AddressMode> bool instruction_tax();
     template<AddressModeFunction AddressMode> bool instruction_tay();
     template<AddressModeFunction AddressMode> bool instruction_tsx();
@@ -650,6 +654,14 @@ bool CPU::instruction_ldy()
 }
 
 template <CPU::AddressModeFunction AddressMode>
+bool CPU::instruction_lax()
+{
+    const auto extra_cycle = instruction_load_register<AddressMode>(register_x);
+    register_accumulator = register_x;
+    return extra_cycle;
+}
+
+template <CPU::AddressModeFunction AddressMode>
 bool CPU::instruction_lsr()
 {
     constexpr bool ignore_crossed_page_boundary = true;
@@ -916,6 +928,15 @@ bool CPU::instruction_sty()
     constexpr bool ignore_crossed_page_boundary = true;
     const bool crossed_page_boundary = std::invoke(AddressMode, *this);
     write_to_memory(address_absolute, register_y);
+    return crossed_page_boundary && !ignore_crossed_page_boundary;
+}
+
+template <CPU::AddressModeFunction AddressMode>
+bool CPU::instruction_sax()
+{
+    constexpr bool ignore_crossed_page_boundary = true;
+    const bool crossed_page_boundary = std::invoke(AddressMode, *this);
+    write_to_memory(address_absolute, register_accumulator & register_x);
     return crossed_page_boundary && !ignore_crossed_page_boundary;
 }
 
