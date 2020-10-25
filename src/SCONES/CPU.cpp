@@ -503,9 +503,9 @@ bool CPU::address_mode_indirect()
     //simulate bug
     if (pointer_low_byte == 0x00FF)
     {
-        std::uint16_t high_byte = read_from_memory((pointer_high_byte >> 8));
+        std::uint16_t high_byte = read_from_memory(pointer_high_byte);
         high_byte = high_byte << 8;
-        const std::uint16_t low_byte = read_from_memory(pointer_low_byte);
+        const std::uint16_t low_byte = read_from_memory(pointer);
         address_absolute = high_byte | low_byte;
     }
     else
