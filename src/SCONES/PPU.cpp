@@ -149,7 +149,7 @@ void PPU::sprite_rendering()
     PPURenderControlReg render_control;
     if (addBus)
     {
-        render_control.data = addBus->read(PPU_ADDRESS_STATUS_REG);
+        render_control.data = addBus->read(PPU_ADDRESS_MASK_REG);
     }
 
     // Fetch the pixel from the current tile and draw the
@@ -158,7 +158,7 @@ void PPU::sprite_rendering()
     {
         // Fetch the bits.
         PPUScrollReg scrollReg;
-        scrollReg.data = addBus->read(PPU_ADDRESS_VRAM_REG_1);
+        scrollReg.data = addBus->read(PPU_ADDRESS_SCROLL_REG);
 
         // Priority multiplexer needed here to determine which pixel is extracted.
         (*fb)(clock, scanline, palPalette[0x00]);
