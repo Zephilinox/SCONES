@@ -435,7 +435,7 @@ bool CPU::address_mode_zero_page_x()
     program_counter++;
     //we only need the first byte
     address_absolute = address_absolute & 0x00FF;
-    return true;
+    return false;
 }
 
 // Load a 16-bit address
