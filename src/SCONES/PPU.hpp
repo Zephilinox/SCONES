@@ -29,9 +29,9 @@ constexpr std::uint32_t PPU_TOTAL_SCANLINES_PER_FRAME = 262;
 // Ensure that state is easy to change.
 // Map out process and being render cycle implementation.
 
-
 // Register Data structures. (Makes data modification and lookup easier.)
-union PPUControlReg {
+union PPUControlReg
+{
     struct
     {
         std::uint8_t nametable_select : 2;
@@ -83,12 +83,11 @@ union PPUScrollReg
     std::uint8_t data = 0x0;
 };
 
-
 class PPU
 {
 public:
     PPU(Bus* bus, Framebuffer* fbuffer);
-    ~PPU(); 
+    ~PPU();
 
     void step();
     void create_palette();
@@ -96,6 +95,8 @@ public:
 private:
     // Internal functions
     void set_vblank(std::uint8_t value);
+    void sprite_evaluation();
+    void sprite_rendering();
 
 private:
     Bus* addBus = nullptr;
@@ -103,7 +104,7 @@ private:
     std::unique_ptr<std::uint8_t[]> vram;
 
     std::uint16_t patternDataRegister[2];
-    std::uint8_t  paletteAtributesRegister[2];
+    std::uint8_t paletteAtributesRegister[2];
 
     RGB palPalette[PPU_PAL_PALETTE_SIZE];
 

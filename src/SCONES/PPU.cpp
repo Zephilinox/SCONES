@@ -12,7 +12,6 @@ PPU::PPU(Bus* bus, Framebuffer* fbuffer)
 
 PPU::~PPU()
 {
-
 }
 
 void PPU::step()
@@ -20,17 +19,19 @@ void PPU::step()
     // Tick the PPU.
     clock++;
 
-
-    if (scanline == -1)
+    if (clock > 0)
     {
-        // Do some pre-fetch work here.
-    }
-
-    if (scanline == 241)
-    {
-        if (clock == 1)
+        if (scanline >= 241)
         {
-            set_vblank(0x1);
+            if (scanline == 241 && clock == 1)
+            {
+                set_vblank(0x1);
+            }
+        }
+        else
+        {
+            sprite_evaluation();
+            sprite_rendering();
         }
     }
 
@@ -55,17 +56,17 @@ void PPU::create_palette()
     palPalette[0x02] = RGB{ 8, 16, 144 };
     palPalette[0x03] = RGB{ 48, 0, 136 };
     palPalette[0x04] = RGB{ 68, 0, 100 };
-    palPalette[0x05] = RGB{ 92, 0, 48  };
-    palPalette[0x06] = RGB{ 84, 4,  0  };
-    palPalette[0x07] = RGB{ 60, 24, 0  };
-    palPalette[0x08] = RGB{ 32, 42, 0  };
-    palPalette[0x09] = RGB{ 8,  58, 0  };
-    palPalette[0x0A] = RGB{ 0,  64, 0  };
-    palPalette[0x0B] = RGB{ 0, 60,  0  };
-    palPalette[0x0C] = RGB{ 0, 50, 60  };
-    palPalette[0x0D] = RGB{ 0,  0,  0  };
-    palPalette[0x0E] = RGB{ 0,  0,  0  };
-    palPalette[0x0F] = RGB{ 0,  0,  0  };
+    palPalette[0x05] = RGB{ 92, 0, 48 };
+    palPalette[0x06] = RGB{ 84, 4, 0 };
+    palPalette[0x07] = RGB{ 60, 24, 0 };
+    palPalette[0x08] = RGB{ 32, 42, 0 };
+    palPalette[0x09] = RGB{ 8, 58, 0 };
+    palPalette[0x0A] = RGB{ 0, 64, 0 };
+    palPalette[0x0B] = RGB{ 0, 60, 0 };
+    palPalette[0x0C] = RGB{ 0, 50, 60 };
+    palPalette[0x0D] = RGB{ 0, 0, 0 };
+    palPalette[0x0E] = RGB{ 0, 0, 0 };
+    palPalette[0x0F] = RGB{ 0, 0, 0 };
 
     palPalette[0x10] = RGB{ 152, 150, 152 };
     palPalette[0x11] = RGB{ 8, 76, 196 };
@@ -83,7 +84,7 @@ void PPU::create_palette()
     palPalette[0x1D] = RGB{ 0, 0, 0 };
     palPalette[0x1E] = RGB{ 0, 0, 0 };
     palPalette[0x1F] = RGB{ 0, 0, 0 };
-    
+
     palPalette[0x20] = RGB{ 236, 238, 236 };
     palPalette[0x21] = RGB{ 76, 154, 236 };
     palPalette[0x22] = RGB{ 120, 124, 236 };
@@ -100,7 +101,7 @@ void PPU::create_palette()
     palPalette[0x2D] = RGB{ 60, 60, 60 };
     palPalette[0x2E] = RGB{ 0, 0, 0 };
     palPalette[0x2F] = RGB{ 0, 0, 0 };
-    
+
     palPalette[0x30] = RGB{ 236, 238, 236 };
     palPalette[0x31] = RGB{ 168, 204, 236 };
     palPalette[0x32] = RGB{ 188, 188, 236 };
@@ -129,5 +130,37 @@ void PPU::set_vblank(std::uint8_t value)
         status.data = addBus->read(PPU_ADDRESS_STATUS_REG);
         status.bits.vblank = (1u & value);
         addBus->write(PPU_ADDRESS_STATUS_REG, status.data);
+    }
+}
+
+void PPU::sprite_evaluation()
+{
+    if (scanline != 261)
+    {
+        // sprite evaluation does not occur here.
+
+    }
+}
+
+void PPU::sprite_rendering()
+{
+    // Sprite rendering occurs for each scanline.
+    // Fetch each pixel from the shift register every 8 cycles.
+    PPURenderControlReg render_control;
+    if (addBus)
+    {
+        render_control.data = addBus->read(PPU_ADDRESS_STATUS_REG);
+    }
+
+    // Fetch the pixel from the current tile and draw the
+    // sprite.
+    if (scanline != -1 && (render_control.bits.background_enable | render_control.bits.sprite_enable))
+    {
+        // Fetch the bits.
+        PPUScrollReg scrollReg;
+        scrollReg.data = addBus->read(PPU_ADDRESS_VRAM_REG_1);
+
+        // Priority multiplexer needed here to determine which pixel is extracted.
+        (*fb)(clock, scanline, palPalette[0x00]);
     }
 }
