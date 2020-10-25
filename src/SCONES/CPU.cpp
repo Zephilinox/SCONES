@@ -498,11 +498,12 @@ bool CPU::address_mode_indirect()
     pointer_high_byte = pointer_high_byte << 8;
 
     const std::uint16_t pointer = pointer_high_byte | pointer_low_byte;
+    spdlog::info("indirect pointer = {:04X}", pointer);
 
     //simulate bug
     if (pointer_low_byte == 0x00FF)
     {
-        std::uint16_t high_byte = read_from_memory(pointer_high_byte);
+        std::uint16_t high_byte = read_from_memory((pointer_high_byte >> 8));
         high_byte = high_byte << 8;
         const std::uint16_t low_byte = read_from_memory(pointer_low_byte);
         address_absolute = high_byte | low_byte;

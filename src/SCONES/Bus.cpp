@@ -53,7 +53,7 @@ std::uint8_t Bus::read(std::uint16_t address)
         {
             //cartridge space. PRG ROM, PRG RAM, and Mapper registers
             //todo
-            spdlog::warn("Accessing cartridge space but not mapped to loaded cartridge.");
+            //spdlog::warn("Accessing cartridge space but not mapped to loaded cartridge.");
             value = ram.get()[address];
         }
     }
@@ -103,7 +103,7 @@ void Bus::write(std::uint16_t address, std::uint8_t data)
         {
             //cartridge space. PRG ROM, PRG RAM, and Mapper registers
             //todo
-            spdlog::warn("Accessing cartridge space but not mapped to loaded cartridge.");
+            //spdlog::warn("Accessing cartridge space but not mapped to loaded cartridge.");
             ram.get()[address] = data;
         }
     }
