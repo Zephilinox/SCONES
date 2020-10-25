@@ -44,6 +44,7 @@ std::string instruction_type_to_string(InstructionType type)
         sorry(LDA);
         sorry(LDX);
         sorry(LDY);
+        sorry(LAX);
         sorry(LSR);
         sorry(NOP);
         sorry(ORA);
@@ -62,6 +63,7 @@ std::string instruction_type_to_string(InstructionType type)
         sorry(STA);
         sorry(STX);
         sorry(STY);
+        sorry(SAX);
         sorry(TAX);
         sorry(TAY);
         sorry(TSX);
@@ -87,6 +89,58 @@ constexpr CPU::InstructionTable CPU::generate_instruction_table() const
 
     //http://archive.6502.org/datasheets/rockwell_r650x_r651x.pdf
     // clang-format off
+    
+    //unofficial opcodes (used by nestest)
+    // NOP, LAX, SAX, SBC, DCP, ISB, SLO, RLA, SRE, RRA
+    instruction_table[0x04] = Instruction{ InstructionType::NOP, &CPU::instruction_nop<&CPU::address_mode_zero_page>,     2, 3 };
+    instruction_table[0x0c] = Instruction{ InstructionType::NOP, &CPU::instruction_nop<&CPU::address_mode_absolute>,      3, 4 };
+
+    instruction_table[0x14] = Instruction{ InstructionType::NOP, &CPU::instruction_nop<&CPU::address_mode_zero_page_x>,   3, 4 };
+    instruction_table[0x1A] = Instruction{ InstructionType::NOP, &CPU::instruction_nop<&CPU::address_mode_accumulator>,   1, 2 };
+    instruction_table[0x1C] = Instruction{ InstructionType::NOP, &CPU::instruction_nop<&CPU::address_mode_absolute_x>,    3, 4 };
+
+    instruction_table[0x34] = Instruction{ InstructionType::NOP, &CPU::instruction_nop<&CPU::address_mode_zero_page_x>,   3, 4 };
+    instruction_table[0x3A] = Instruction{ InstructionType::NOP, &CPU::instruction_nop<&CPU::address_mode_accumulator>,   1, 2 };
+    instruction_table[0x3C] = Instruction{ InstructionType::NOP, &CPU::instruction_nop<&CPU::address_mode_absolute_x>,    3, 4 };
+
+    instruction_table[0x44] = Instruction{ InstructionType::NOP, &CPU::instruction_nop<&CPU::address_mode_zero_page>,     2, 3 };
+
+    instruction_table[0x54] = Instruction{ InstructionType::NOP, &CPU::instruction_nop<&CPU::address_mode_zero_page_x>,   3, 4 };
+    instruction_table[0x5A] = Instruction{ InstructionType::NOP, &CPU::instruction_nop<&CPU::address_mode_accumulator>,   1, 2 };
+    instruction_table[0x5C] = Instruction{ InstructionType::NOP, &CPU::instruction_nop<&CPU::address_mode_absolute_x>,    3, 4 };
+
+    instruction_table[0x64] = Instruction{ InstructionType::NOP, &CPU::instruction_nop<&CPU::address_mode_zero_page>,     2, 3 };
+
+    instruction_table[0x74] = Instruction{ InstructionType::NOP, &CPU::instruction_nop<&CPU::address_mode_zero_page_x>,   3, 4 };
+    instruction_table[0x7A] = Instruction{ InstructionType::NOP, &CPU::instruction_nop<&CPU::address_mode_accumulator>,   1, 2 };
+    instruction_table[0x7C] = Instruction{ InstructionType::NOP, &CPU::instruction_nop<&CPU::address_mode_absolute_x>,    3, 4 };
+
+    instruction_table[0x80] = Instruction{ InstructionType::NOP, &CPU::instruction_nop<&CPU::address_mode_immidiate>,     1, 2 };
+    instruction_table[0x83] = Instruction{ InstructionType::SAX, &CPU::instruction_sax<&CPU::address_mode_indirect_x>,    2, 6 };
+    instruction_table[0x87] = Instruction{ InstructionType::SAX, &CPU::instruction_sax<&CPU::address_mode_zero_page>,     2, 3 };
+    instruction_table[0x8F] = Instruction{ InstructionType::SAX, &CPU::instruction_sax<&CPU::address_mode_absolute>,      3, 4 };
+
+    instruction_table[0x97] = Instruction{ InstructionType::SAX, &CPU::instruction_sax<&CPU::address_mode_zero_page_y>,   2, 4 };
+    
+    instruction_table[0xA3] = Instruction{ InstructionType::LAX, &CPU::instruction_lax<&CPU::address_mode_indirect_x>,    2, 6 };
+    instruction_table[0xA7] = Instruction{ InstructionType::LAX, &CPU::instruction_lax<&CPU::address_mode_zero_page>,     2, 3 };
+    instruction_table[0xAF] = Instruction{ InstructionType::LAX, &CPU::instruction_lax<&CPU::address_mode_absolute >,     2, 4 };
+    
+    instruction_table[0xB3] = Instruction{ InstructionType::LAX, &CPU::instruction_lax<&CPU::address_mode_indirect_y>,    2, 5 };
+    instruction_table[0xB7] = Instruction{ InstructionType::LAX, &CPU::instruction_lax<&CPU::address_mode_zero_page_y>,   2, 4 };
+    instruction_table[0xBF] = Instruction{ InstructionType::LAX, &CPU::instruction_lax<&CPU::address_mode_absolute_y>,    2, 4 };
+
+    instruction_table[0xD4] = Instruction{ InstructionType::NOP, &CPU::instruction_nop<&CPU::address_mode_zero_page_x>,   3, 4 };
+    instruction_table[0xDA] = Instruction{ InstructionType::NOP, &CPU::instruction_nop<&CPU::address_mode_accumulator>,   1, 2 };
+    instruction_table[0xDC] = Instruction{ InstructionType::NOP, &CPU::instruction_nop<&CPU::address_mode_absolute_x>,    3, 4 };
+    
+    instruction_table[0xEB] = Instruction{ InstructionType::SBC, &CPU::instruction_sbc<&CPU::address_mode_immidiate>,     2, 2 };
+
+    instruction_table[0xF4] = Instruction{ InstructionType::NOP, &CPU::instruction_nop<&CPU::address_mode_zero_page_x>,   3, 4 };
+    instruction_table[0xFA] = Instruction{ InstructionType::NOP, &CPU::instruction_nop<&CPU::address_mode_accumulator>,   1, 2 };
+    instruction_table[0xFC] = Instruction{ InstructionType::NOP, &CPU::instruction_nop<&CPU::address_mode_absolute_x>,    3, 4 };
+
+    //official opcodes
     instruction_table[0x00] = Instruction{ InstructionType::BRK, &CPU::instruction_brk<&CPU::address_mode_implied>,       1, 7 };
     instruction_table[0x01] = Instruction{ InstructionType::ORA, &CPU::instruction_ora<&CPU::address_mode_indirect_x>,    2, 6 };
     instruction_table[0x05] = Instruction{ InstructionType::ORA, &CPU::instruction_ora<&CPU::address_mode_zero_page>,     2, 3 };
