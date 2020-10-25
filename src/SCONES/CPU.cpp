@@ -512,7 +512,7 @@ bool CPU::address_mode_indirect()
     {
         std::uint16_t high_byte = read_from_memory(pointer + 1);
         high_byte = high_byte << 8;
-        const std::uint16_t low_byte = read_from_memory(pointer_low_byte);
+        const std::uint16_t low_byte = read_from_memory(pointer);
         address_absolute = high_byte | low_byte;
     }
 
