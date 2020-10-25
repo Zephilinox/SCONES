@@ -134,12 +134,24 @@ void PPU::create_palette()
 void PPU::bus_write(std::uint16_t address, std::uint8_t data)
 {
     // TODO - Rework registers here.
+    switch (address)
+    {
+    default:
+        data = 0;
+        break;
+    }
 }
 
 std::uint8_t PPU::bus_read(std::uint16_t address)
 {
     // TODO - rework registers here.
-    std::uint8_t data;
+    std::uint8_t data = 0;
+    switch (address)
+    {
+    default:
+        data = 0;
+        break;
+    }
     return data;
 }
 
@@ -161,7 +173,6 @@ void PPU::sprite_evaluation()
     if (scanline != 261)
     {
         // sprite evaluation does not occur here.
-
     }
 }
 

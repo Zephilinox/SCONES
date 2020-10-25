@@ -90,23 +90,29 @@ public:
     ~PPU();
 
     void step();
-    void create_palette();
     bool nmi_set() const { return nmi; }
     void nmi_reset() { nmi = false; }
 
     void bus_write(std::uint16_t address, std::uint8_t data);
     std::uint8_t bus_read(std::uint16_t address);
 
-private :
+private:
     // Internal functions
     void set_vblank(std::uint8_t value);
     void sprite_evaluation();
     void sprite_rendering();
+    void create_palette();
 
 private:
     Bus* addBus = nullptr;
     Framebuffer* fb = nullptr;
     std::unique_ptr<std::uint8_t[]> vram;
+
+    // Internal CPU mapped registers.
+    PPUControlReg PPUCTRL;
+    PPURenderControlReg PPUMASK;
+    PPUStatusReg PPUSTATUS;
+    PPUScrollReg PPUSCROLL;
 
     std::uint16_t patternDataRegister[2];
     std::uint8_t paletteAtributesRegister[2];
