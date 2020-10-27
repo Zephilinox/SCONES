@@ -1,5 +1,8 @@
 #include "Renderer.hpp"
 
+//SELF
+#include "Texture.hpp"
+
 using namespace paperbag;
 
 Renderer::Renderer(Window* w)
@@ -22,4 +25,16 @@ Renderer::~Renderer()
 SDL_GLContext& Renderer::get_context()
 {
     return context;
+}
+
+std::unique_ptr<Texture> Renderer::make_texture(std::vector<Pixel> p, unsigned int w, unsigned int h) const
+{
+    auto texture = std::make_unique<Texture>();
+    texture->load(std::move(p), w, h);
+    return texture;
+}
+
+void Renderer::end()
+{
+    //deal with rendering textures etc. does the actual drawing
 }

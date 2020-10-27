@@ -8,16 +8,34 @@
 
 using namespace paperbag;
 
+constexpr int size = 512;
+
+std::vector<Pixel> make_texture()
+{
+    std::vector<Pixel> pixels;
+    pixels.resize(size * size);
+    for (int i = 0; i < size * size; ++i)
+    {
+        //rand() is slow, performance will be better for real :)
+        std::uint8_t r = std::rand() % 255;
+        std::uint8_t g = std::rand() % 255;
+        std::uint8_t b = std::rand() % 255;
+        pixels[i] = Pixel{ r, g, b, 255 };
+    }
+
+    return pixels;
+}
+
 NotAGame::NotAGame()
     : window({"SCONES - Emulator"})
     , renderer(&window)
     , gui(&window, &renderer)
+    , texture(renderer.make_texture(make_texture(), size, size))
 {
 }
 
 int NotAGame::run()
 {
-
     while (!done)
     {
         input();
@@ -82,10 +100,14 @@ void NotAGame::update()
     // 3. Show another simple window.
     if (show_another_window)
     {
+        texture->update([](std::vector<Pixel>& pixels) { pixels = make_texture(); });
+
         ImGui::Begin("Another Window", &show_another_window); // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
         ImGui::Text("Hello from another window!");
         if (ImGui::Button("Close Me"))
             show_another_window = false;
+
+        ImGui::Image((void*)(intptr_t)texture->get_opengl_texture_id(), ImVec2(texture->get_width(), texture->get_height()));
         ImGui::End();
     }
 }
@@ -94,5 +116,6 @@ void NotAGame::render()
 {
     window.clear(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
     gui.render();
-    window.render();
+    renderer.end();
+    window.end();
 }
