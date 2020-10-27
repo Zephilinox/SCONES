@@ -4,7 +4,7 @@
 
 PPU::PPU(Bus* bus, Framebuffer* fbuffer)
     : addBus(bus)
-    , vram(std::make_unique<std::uint8_t[]>(PPU_MAX_ADDRESSABLE_MEMORY))
+    , oam(std::make_unique<std::uint8_t[]>(PPU_MAX_OAM_REG_SIZE))
     , fb(fbuffer)
 {
     create_palette();
@@ -24,26 +24,7 @@ void PPU::step()
     {
         if (clock == 1 && scanline == -1)
         {
-            set_vblank(0x0);
-        }
-
-        if (scanline >= 241)
-        {
-            if (scanline == 241 && clock == 1)
-            {
-                set_vblank(0x1);
-                if (addBus)
-                {
-                    PPUControlReg status;
-                    status.data = addBus->read(PPU_ADDRESS_PPUCTRL_REG);
-                    nmi = static_cast<bool>(status.bits.nmi_enable);
-                }
-            }
-        }
-        else
-        {
-            sprite_evaluation();
-            sprite_rendering();
+            PPUSTATUS.bits.vblank = 0;
         }
     }
 
@@ -131,70 +112,98 @@ void PPU::create_palette()
     palPalette[0x3F] = RGB{ 0, 0, 0 };
 }
 
+void PPU::ppu_data_reg_write(std::uint8_t data)
+{
+}
+
+void PPU::ppu_scroll_reg_write(std::uint8_t data)
+{
+
+}
+
+void PPU::ppu_address_reg_write(std::uint8_t data)
+{
+}
+
+void PPU::ppu_data_status_reg_write(std::uint8_t data)
+{
+    // TODO - Write to the PPU 16-bit register.
+    
+}
+
+void PPU::ppu_address_status_reg_read(std::uint8_t& data)
+{
+    data = PPUSTATUS.data;
+    PPUSTATUS.bits.vblank = 0;
+    address_latch = 0;
+}
+
+void PPU::ppu_data_reg_read(std::uint8_t& data)
+{
+    
+}
+
+void PPU::ppu_address_reg_read(std::uint8_t& data)
+{
+
+}
+
+void PPU::swap_buffers()
+{
+    // These registers take two cyctes to write to during a PPU cycle.
+    // By double buffering we can easily represent the two cycles.
+    // The initial backbuffer write is the first cycle.
+    // This swap is the second.
+    // Ensures syncronisation for timing without having to block the parent thread.
+    PPUSCROLL[PPU_SCROLL_BUFFER_FRONT] = PPUSCROLL[PPU_SCROLL_BUFFER_BACK];
+    PPUADDR[PPU_SCROLL_BUFFER_FRONT] = PPUADDR[PPU_SCROLL_BUFFER_BACK];
+}
+
 void PPU::bus_write(std::uint16_t address, std::uint8_t data)
 {
     // TODO - Rework registers here.
     switch (address)
     {
-    default:
-        data = 0;
+    case PPU_ADDRESS_PPUCTRL_REG:
+        // TODO - Implement control write.
+        break;
+    case PPU_ADDRESS_MASK_REG:
+        PPUMASK.data = data;
+    case PPU_ADDRESS_STATUS_REG: // Not writable.
+        break;
+    case PPU_ADDRESS_SCROLL_REG:
+        ppu_scroll_reg_write(data);
+        break;
+    case PPU_ADDRESS_ADDR_REG:
+        ppu_address_reg_write(data);
+        break;
+    case PPU_ADDRESS_DATA_REG:
+        ppu_data_reg_write(data);
+        break;
+    default: // Dont do anything.
         break;
     }
 }
 
 std::uint8_t PPU::bus_read(std::uint16_t address)
 {
-    // TODO - rework registers here.
     std::uint8_t data = 0;
     switch (address)
     {
+    case PPU_ADDRESS_PPUCTRL_REG: // Not readable.
+        break;
+    case PPU_ADDRESS_MASK_REG: // Not readable.
+        break;
+    case PPU_ADDRESS_STATUS_REG:
+        ppu_address_status_reg_read(data);
+        break;
+    case PPU_ADDRESS_ADDR_REG:
+        ppu_address_reg_read(data);
+        break;
     default:
         data = 0;
         break;
     }
+
     return data;
-}
-
-void PPU::set_vblank(std::uint8_t value)
-{
-    // Set VBlank interval (Signals were not rendering to CPU).
-    // PPU does not access memory at this point.
-    if (addBus)
-    {
-        PPUStatusReg status;
-        status.data = addBus->read(PPU_ADDRESS_STATUS_REG);
-        status.bits.vblank = (1u & value);
-        addBus->write(PPU_ADDRESS_STATUS_REG, status.data);
-    }
-}
-
-void PPU::sprite_evaluation()
-{
-    if (scanline != 261)
-    {
-        // sprite evaluation does not occur here.
-    }
-}
-
-void PPU::sprite_rendering()
-{
-    // Sprite rendering occurs for each scanline.
-    // Fetch each pixel from the shift register every 8 cycles.
-    PPURenderControlReg render_control;
-    if (addBus)
-    {
-        render_control.data = addBus->read(PPU_ADDRESS_MASK_REG);
-    }
-
-    // Fetch the pixel from the current tile and draw the
-    // sprite.
-    if (scanline != -1 && (render_control.bits.background_enable | render_control.bits.sprite_enable))
-    {
-        // Fetch the bits.
-        PPUScrollReg scrollReg;
-        scrollReg.data = addBus->read(PPU_ADDRESS_SCROLL_REG);
-
-        // Priority multiplexer needed here to determine which pixel is extracted.
-        (*fb)(clock, scanline, palPalette[0x00]);
-    }
 }
