@@ -118,6 +118,8 @@ public:
 
     void connect_cartridge_ppu_bus(Cartridge* cart) { bus_cart = cart; }
 
+    void get_pallete_contents(Framebuffer* fb);
+
 private:
     // Internal functions.
     void create_palette();

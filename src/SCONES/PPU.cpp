@@ -22,6 +22,12 @@ void PPU::step()
     // Tick the PPU.
     clock++;
 
+    if (scanline == 241)
+    {
+        PPUSTATUS.bits.vblank = 1;
+        nmi = (PPUCTRL.bits.nmi_enable ? 1 : 0);
+    }
+
     if (clock > 0)
     {
         if (clock == 1 && scanline == -1)
@@ -267,4 +273,9 @@ std::uint8_t PPU::bus_read(std::uint16_t address)
     }
 
     return data;
+}
+
+void PPU::get_pallete_contents(Framebuffer* fb)
+{
+    // TODO - Write the contents of the pallete memory here. 
 }
