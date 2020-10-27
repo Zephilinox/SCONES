@@ -63,6 +63,7 @@ SET(Runner_INCLUDES
     "Paperbag/Renderer.hpp"
     "Paperbag/GUI.hpp"
     "Paperbag/Texture.hpp"
+    "Paperbag/Pixel.hpp"
 )
 
 SET(Runner_SOURCES
@@ -92,6 +93,8 @@ endif()
 #            "${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/scone.bmp"
 #)
 #add_dependencies(Runner copy_runner_resources)
+
+add_dependencies(Runner gl3w)
 
 set_target_properties(Runner PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}")
 message(STATUS ${gl3w_SOURCE_DIR})

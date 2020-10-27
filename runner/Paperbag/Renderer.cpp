@@ -33,7 +33,7 @@ uniform sampler2D ourTexture;
 
 void main()
 {
-    FragColor = texture(ourTexture, TexCoord);
+    FragColor = vec4(texture(ourTexture, TexCoord));
 }
 )FRAGMENT";
 
@@ -48,32 +48,7 @@ Renderer::Renderer(Window* w)
     if (err)
         throw(fmt::format("Failed to initialize OpenGL loader!\n"));
 
-    //todo: regen when rendering new texture? I think this only works for one
-    glGenBuffers(1, &VAO);
-    glGenBuffers(1, &VBO);
-    glGenBuffers(1, &EBO);
-
-    glBindVertexArray(VAO);
-
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, Texture::vertices.size(), Texture::vertices.data(), GL_STATIC_DRAW);
-
-    glBindBuffer(GL_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ARRAY_BUFFER, Texture::indices.size(), Texture::indices.data(), GL_STATIC_DRAW);
-
-    // position attribute
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
-    // color attribute
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
-    // texture coord attribute
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-    glEnableVertexAttribArray(2);
-
     shader = std::make_unique<Shader>(vertex_shader, fragment_shader);
-    //todo: move to end() if we have multiple that can switch
-    shader->use();
 }
 
 Renderer::~Renderer()
@@ -110,12 +85,52 @@ void Renderer::end()
         assert(false);
     }
 
+    shader->use();
+    shader->setInt("texture1", 0);
+
     for (auto* texture : textures)
     {
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, texture->get_opengl_texture_id());
+
+        //todo: regen when rendering new texture? I think this only works for one
+        magic_function();
+        glGenVertexArrays(1, &VAO);
+        glGenBuffers(1, &VBO);
+        glGenBuffers(1, &EBO);
+
+        magic_function();
         glBindVertexArray(VAO);
-        glDrawElements(GL_TRIANGLES, 2, GL_UNSIGNED_INT, nullptr);
+        magic_function();
+
+        glBindBuffer(GL_ARRAY_BUFFER, VBO);
+        glBufferData(GL_ARRAY_BUFFER, Texture::vertices.size() * sizeof(float), Texture::vertices.data(), GL_STATIC_DRAW);
+
+        magic_function();
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, Texture::indices.size() * sizeof(GLuint), Texture::indices.data(), GL_STATIC_DRAW);
+
+        magic_function();
+        // position attribute
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+        glEnableVertexAttribArray(0);
+        magic_function();
+        // color attribute
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+        glEnableVertexAttribArray(1);
+        magic_function();
+        // texture coord attribute
+        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+        glEnableVertexAttribArray(2);
+        magic_function();
+
+        magic_function();
+        glActiveTexture(GL_TEXTURE0);
+        magic_function();
+        glBindTexture(GL_TEXTURE_2D, texture->get_opengl_texture_id());
+        magic_function();
+        glBindVertexArray(VAO);
+        magic_function();
+      
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
     }
 
     first_frame = false;

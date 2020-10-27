@@ -39,6 +39,9 @@ public:
     void update(std::function<void(std::vector<Pixel>& pixels)> updater);
     unsigned int get_opengl_texture_id() const;
 
+    [[nodiscard]] unsigned int get_width() const;
+    [[nodiscard]] unsigned int get_height() const;
+
 private:
     unsigned int width = 0;
     unsigned int height = 0;

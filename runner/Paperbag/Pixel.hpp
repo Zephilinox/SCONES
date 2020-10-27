@@ -4,9 +4,9 @@ namespace paperbag
 {
     struct Pixel
     {
-        int r = 0;
-        int g = 0;
-        int b = 0;
-        int a = 0;
+        std::uint8_t r = 0;
+        std::uint8_t g = 0;
+        std::uint8_t b = 0;
+        std::uint8_t a = 0;
     };
 }

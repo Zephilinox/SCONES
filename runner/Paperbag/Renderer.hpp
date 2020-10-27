@@ -9,6 +9,7 @@
 #include "Window.hpp"
 #include "Pixel.hpp"
 #include "Texture.hpp"
+#include "RandomCrap.hpp"
 
 namespace paperbag
 {
@@ -32,9 +33,9 @@ private:
     Window* window = nullptr;
     SDL_GLContext context = nullptr;
 
-    unsigned int VBO;
-    unsigned int VAO;
-    unsigned int EBO;
+    GLuint VBO;
+    GLuint VAO;
+    GLuint EBO;
 
     bool first_frame = true;
     unsigned int texture_count_last_frame = 0;
@@ -73,6 +74,11 @@ private:
         void use()
         {
             glUseProgram(ID);
+        }
+        
+        void setInt(const std::string& name, int value) const
+        {
+            glUniform1i(glGetUniformLocation(ID, name.c_str()), value);
         }
 
         unsigned int ID;

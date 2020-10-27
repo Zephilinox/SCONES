@@ -8,11 +8,21 @@
 
 using namespace paperbag;
 
+std::vector<Pixel> make_texture()
+{
+    std::vector<Pixel> pixels;
+    pixels.resize(512 * 512);
+    for (int i = 0; i < 512 * 512; ++i)
+        pixels[i] = Pixel{ static_cast<std::uint8_t>(std::rand() % 255), 0, 0, 255 };
+
+    return pixels;
+}
+
 NotAGame::NotAGame()
     : window({"SCONES - Emulator"})
     , renderer(&window)
     , gui(&window, &renderer)
-    , texture(renderer.make_texture({}, 128, 128))
+    , texture(renderer.make_texture(make_texture(), 512, 512))
 {
 }
 
@@ -86,6 +96,8 @@ void NotAGame::update()
         ImGui::Text("Hello from another window!");
         if (ImGui::Button("Close Me"))
             show_another_window = false;
+
+        ImGui::Image((void*)(intptr_t)texture->get_opengl_texture_id(), ImVec2(texture->get_width(), texture->get_height()));
         ImGui::End();
     }
 }
@@ -94,7 +106,7 @@ void NotAGame::render()
 {
     window.clear(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
     gui.render();
-    renderer.render(*texture.get());
+    //renderer.render(*texture.get());
     renderer.end();
     window.end();
 }
