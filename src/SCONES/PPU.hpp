@@ -89,6 +89,22 @@ union PPUScrollReg
     std::uint8_t data = 0x0;
 };
 
+// Credit to user loopy for working this out.
+// Stores information for drawing the background.
+union VRAMReg
+{
+    struct
+    {
+        std::uint16_t course_x_scroll : 5;
+        std::uint16_t course_y_scroll : 5;
+        std::uint16_t nametable_select : 2;
+        std::uint16_t fine_y_scroll : 3;
+        std::uint16_t unused : 1;
+    } bits;
+
+    std::uint16_t data;
+};
+
 class PPU
 {
 public:
@@ -116,11 +132,6 @@ private:
     void ppu_data_reg_read(std::uint8_t& data);
     void ppu_address_reg_read(std::uint8_t& data);
 
-    void invert_latch_bit() { address_latch == 0x0 ? address_latch = 0x8 : address_latch = 0x0; }
-
-    // Swap buffers every cycle.
-    void swap_buffers();
-
 private:
     Bus* addBus = nullptr;
     Framebuffer* fb = nullptr;
@@ -130,18 +141,16 @@ private:
     PPUControlReg PPUCTRL;
     PPURenderControlReg PPUMASK;
     PPUStatusReg PPUSTATUS;
-    std::uint8_t PPUDATA;
-
-    // Buffered registers (Due to multiple cycles).
-    // Write to backbuffer then swap after reading. (Alllows operation to be deffered.)
-    PPUScrollReg PPUSCROLL[PPU_SCROLL_BUFFER_COUNT];
-    std::uint8_t PPUADDR[PPU_SCROLL_BUFFER_COUNT];
 
     // Specifies whether to write high or low bytes in 16bit address.
+    // NESDEV refers to this as a write toggle.
     std::uint8_t address_latch = 0x0;
 
-    std::uint16_t patternDataRegister[2];
-    std::uint8_t paletteAtributesRegister[2];
+    // Used to draw VRAM to the screen based on set camera positions.
+    VRAMReg vram_rag;
+    VRAMReg tvram_reg;
+    std::uint8_t fine_x_scroll;
+    std::uint8_t write_toggle = 0x0;
 
     RGB palPalette[PPU_PAL_PALETTE_SIZE];
 

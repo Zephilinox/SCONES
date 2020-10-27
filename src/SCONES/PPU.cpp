@@ -114,49 +114,59 @@ void PPU::create_palette()
 
 void PPU::ppu_data_reg_write(std::uint8_t data)
 {
+    // Writes data to current VRAM address.
+    vram_rag.data += (PPUCTRL.bits.increment_mode ? 32 : 1);
 }
 
 void PPU::ppu_scroll_reg_write(std::uint8_t data)
 {
-
+    if (address_latch == 0x0)
+    {
+        fine_x_scroll = (data & 0x7);
+        tvram_reg.bits.course_x_scroll = (data >> 3);
+    }
+    else
+    {
+        tvram_reg.bits.fine_y_scroll = (data & 0x7);
+        tvram_reg.bits.course_y_scroll = (data >> 3);
+    }
+    address_latch = !address_latch;
 }
 
 void PPU::ppu_address_reg_write(std::uint8_t data)
 {
+    // Here we write to either the low or high portion of the address with our data.
+    tvram_reg.data = (tvram_reg.data & (address_latch == 0x0 ? 0x00FF : 0xFF00)) | (data << (address_latch & 0x8));
+    
+    // Once full register has been written we swap the tram register to the VRAM register.
+    // Simulates the two write operations for the register that occur due to the 8bit bus.
+    if (address_latch)
+    {
+        vram_rag = tvram_reg;
+    }
+    address_latch = !address_latch;
 }
 
 void PPU::ppu_data_status_reg_write(std::uint8_t data)
 {
     // TODO - Write to the PPU 16-bit register.
-    
 }
 
 void PPU::ppu_address_status_reg_read(std::uint8_t& data)
 {
     data = PPUSTATUS.data;
     PPUSTATUS.bits.vblank = 0;
-    address_latch = 0;
+    address_latch = 0x0;
 }
 
 void PPU::ppu_data_reg_read(std::uint8_t& data)
 {
-    
+    // Reads data from current VRAM address.
+    vram_rag.data += (PPUCTRL.bits.increment_mode ? 32 : 1);
 }
 
 void PPU::ppu_address_reg_read(std::uint8_t& data)
 {
-
-}
-
-void PPU::swap_buffers()
-{
-    // These registers take two cyctes to write to during a PPU cycle.
-    // By double buffering we can easily represent the two cycles.
-    // The initial backbuffer write is the first cycle.
-    // This swap is the second.
-    // Ensures syncronisation for timing without having to block the parent thread.
-    PPUSCROLL[PPU_SCROLL_BUFFER_FRONT] = PPUSCROLL[PPU_SCROLL_BUFFER_BACK];
-    PPUADDR[PPU_SCROLL_BUFFER_FRONT] = PPUADDR[PPU_SCROLL_BUFFER_BACK];
 }
 
 void PPU::bus_write(std::uint16_t address, std::uint8_t data)
@@ -165,7 +175,7 @@ void PPU::bus_write(std::uint16_t address, std::uint8_t data)
     switch (address)
     {
     case PPU_ADDRESS_PPUCTRL_REG:
-        // TODO - Implement control write.
+        PPUCTRL.data = data;
         break;
     case PPU_ADDRESS_MASK_REG:
         PPUMASK.data = data;
@@ -197,8 +207,10 @@ std::uint8_t PPU::bus_read(std::uint16_t address)
     case PPU_ADDRESS_STATUS_REG:
         ppu_address_status_reg_read(data);
         break;
-    case PPU_ADDRESS_ADDR_REG:
-        ppu_address_reg_read(data);
+    case PPU_ADDRESS_ADDR_REG: // Not readable.
+        break;
+    case PPU_ADDRESS_DATA_REG:
+        ppu_data_reg_read(data);
         break;
     default:
         data = 0;
