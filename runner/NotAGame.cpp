@@ -12,12 +12,12 @@ NotAGame::NotAGame()
     : window({"SCONES - Emulator"})
     , renderer(&window)
     , gui(&window, &renderer)
+    , texture(renderer.make_texture({}, 128, 128))
 {
 }
 
 int NotAGame::run()
 {
-
     while (!done)
     {
         input();
@@ -94,5 +94,7 @@ void NotAGame::render()
 {
     window.clear(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
     gui.render();
-    window.render();
+    renderer.render(*texture.get());
+    renderer.end();
+    window.end();
 }

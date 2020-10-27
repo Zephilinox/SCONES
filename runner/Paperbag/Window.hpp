@@ -34,7 +34,7 @@ public:
     Window(Settings settings);
     ~Window();
 
-    void render();
+    void end();
     void clear(float r, float g, float b, float a);
 
     SDL_Window* get_sdl_handle() const;

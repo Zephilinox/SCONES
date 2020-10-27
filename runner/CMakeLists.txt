@@ -62,6 +62,7 @@ SET(Runner_INCLUDES
     "Paperbag/Window.hpp"
     "Paperbag/Renderer.hpp"
     "Paperbag/GUI.hpp"
+    "Paperbag/Texture.hpp"
 )
 
 SET(Runner_SOURCES
@@ -71,6 +72,7 @@ SET(Runner_SOURCES
     "Paperbag/Window.cpp"
     "Paperbag/Renderer.cpp"
     "Paperbag/GUI.cpp"
+    "Paperbag/Texture.cpp"
 )
 
 add_executable(Runner ${Runner_INCLUDES} ${Runner_SOURCES})

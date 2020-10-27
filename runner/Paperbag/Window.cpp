@@ -31,7 +31,7 @@ Window::~Window()
     SDL_Quit();
 }
 
-void Window::render()
+void Window::end()
 {
     SDL_GL_SwapWindow(sdl_window);
 }
