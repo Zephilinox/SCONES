@@ -56,11 +56,21 @@ message(STATUS "############ Done")
 project("Runner")
 
 SET(Runner_INCLUDES
+    "NotAGame.hpp"
 
+    "Paperbag/RandomCrap.hpp"
+    "Paperbag/Window.hpp"
+    "Paperbag/Renderer.hpp"
+    "Paperbag/GUI.hpp"
 )
 
 SET(Runner_SOURCES
     "main.cpp"
+    "NotAGame.cpp"
+
+    "Paperbag/Window.cpp"
+    "Paperbag/Renderer.cpp"
+    "Paperbag/GUI.cpp"
 )
 
 add_executable(Runner ${Runner_INCLUDES} ${Runner_SOURCES})
@@ -74,18 +84,18 @@ if (WIN32)
     add_dependencies(Runner copy_sdl2_dlls)
 endif()
 
-add_custom_target(copy_runner_resources
-    COMMAND ${CMAKE_COMMAND} -E copy
-            "${CMAKE_CURRENT_SOURCE_DIR}/scone.bmp"
-            "${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/scone.bmp"
-)
-add_dependencies(Runner copy_runner_resources)
-
-add_dependencies(Runner gl3w)
+#add_custom_target(copy_runner_resources
+#    COMMAND ${CMAKE_COMMAND} -E copy
+#            "${CMAKE_CURRENT_SOURCE_DIR}/scone.bmp"
+#            "${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/scone.bmp"
+#)
+#add_dependencies(Runner copy_runner_resources)
 
 set_target_properties(Runner PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}")
 message(STATUS ${gl3w_SOURCE_DIR})
 target_link_libraries(Runner SCONES SDL2::Main OpenGL::GL IMGUI gl3w)
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${Runner_INCLUDES} ${Runner_SOURCES})
-set_property(TARGET SCONES PROPERTY CXX_STANDARD 17)
-set_property(TARGET SCONES PROPERTY CXX_EXTENSIONS OFF)
+set_property(TARGET Runner PROPERTY CXX_STANDARD 17)
+set_property(TARGET Runner PROPERTY CXX_STANDARD_REQUIRD ON)
+set_property(TARGET Runner PROPERTY CXX_EXTENSIONS OFF)
+set_property(TARGET Runner PROPERTY VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/resources")
