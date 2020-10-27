@@ -1,3 +1,6 @@
+//STD
+#include <ctime>
+
 //LIBS
 #include <SDL.h>
 
@@ -6,6 +9,7 @@
 
 int main(int, char**)
 {
+    std::srand(std::time(nullptr));
     NotAGame game;
     return game.run();
 }
