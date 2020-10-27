@@ -8,6 +8,7 @@
 class Bus;
 
 constexpr std::uint32_t PPU_MAX_ADDRESSABLE_MEMORY = 16 * 1024;
+constexpr std::uint32_t PPU_VRAM_SIZE = 2 * 1024;
 constexpr std::uint16_t PPU_MAX_OAM_REG_SIZE = 256;
 constexpr std::uint32_t PPU_PAL_PALETTE_SIZE = 0x40;
 
@@ -30,10 +31,6 @@ constexpr std::uint32_t PPU_TOTAL_SCANLINES_PER_FRAME = 262;
 constexpr std::uint32_t PPU_SCROLL_BUFFER_COUNT = 2;
 constexpr std::uint32_t PPU_SCROLL_BUFFER_FRONT = 0;
 constexpr std::uint32_t PPU_SCROLL_BUFFER_BACK = 1;
-
-// MEGA TODO - Define data structures for the Status registers based on PPU notes.
-// Ensure that state is easy to change.
-// Map out process and being render cycle implementation.
 
 // Register Data structures. (Makes data modification and lookup easier.)
 union PPUControlReg
@@ -118,6 +115,8 @@ public:
     void bus_write(std::uint16_t address, std::uint8_t data);
     std::uint8_t bus_read(std::uint16_t address);
 
+    void connect_cartridge_ppu_bus(Cartridge* cart) { bus_cart = cart; }
+
 private:
     // Internal functions.
     void create_palette();
@@ -130,12 +129,17 @@ private:
 
     void ppu_address_status_reg_read(std::uint8_t& data);
     void ppu_data_reg_read(std::uint8_t& data);
-    void ppu_address_reg_read(std::uint8_t& data);
+
+    // PPU Memory R/W
+    std::uint8_t ppu_read(std::uint16_t address);
+    void ppu_write(std::uint16_t address, std::uint8_t data);
 
 private:
     Bus* addBus = nullptr;
     Framebuffer* fb = nullptr;
-    std::unique_ptr<std::uint8_t[]> oam;
+    std::unique_ptr<std::uint8_t[]> oam;  // PPU OAM
+    std::unique_ptr<std::uint8_t[]> vram; // PPU VRAM
+    Cartridge* bus_cart = nullptr;        // Cartridge connected to PPU bus.
 
     // Internal CPU mapped registers.
     PPUControlReg PPUCTRL;
