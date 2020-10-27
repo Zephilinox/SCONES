@@ -6,6 +6,7 @@ PPU::PPU(Bus* bus, Framebuffer* fbuffer)
     : addBus(bus)
     , oam(std::make_unique<std::uint8_t[]>(PPU_MAX_OAM_REG_SIZE))
     , vram(std::make_unique<std::uint8_t[]>(PPU_VRAM_SIZE))
+    , pallete_ram(std::make_unique<std::uint8_t[]>(PPU_PALLETE_COUNT))
     , fb(fbuffer)
 {
     create_palette();
@@ -116,6 +117,7 @@ void PPU::create_palette()
 void PPU::ppu_data_reg_write(std::uint8_t data)
 {
     // Writes data to current VRAM address.
+    ppu_write(vram_rag.data, data);
     vram_rag.data += (PPUCTRL.bits.increment_mode ? 32 : 1);
 }
 
@@ -148,11 +150,6 @@ void PPU::ppu_address_reg_write(std::uint8_t data)
     address_latch = !address_latch;
 }
 
-void PPU::ppu_data_status_reg_write(std::uint8_t data)
-{
-    // TODO - Write to the PPU 16-bit register.
-}
-
 void PPU::ppu_address_status_reg_read(std::uint8_t& data)
 {
     data = PPUSTATUS.data;
@@ -163,6 +160,7 @@ void PPU::ppu_address_status_reg_read(std::uint8_t& data)
 void PPU::ppu_data_reg_read(std::uint8_t& data)
 {
     // Reads data from current VRAM address.
+    data = bus_read(vram_rag.data);
     vram_rag.data += (PPUCTRL.bits.increment_mode ? 32 : 1);
 }
 
@@ -171,7 +169,10 @@ std::uint8_t PPU::ppu_read(std::uint16_t address)
     std::uint8_t data = 0x0;
     if (address <= 0x1FFF)
     {
-        // TODO - Fetch data from the cartridge based on mapper.
+        if (bus_cart)
+        {
+            // TODO - Fetch data from the cartridge based on mapper.
+        }
     }
     else if (address >= 0x2000 && address <= 0x3EFF)
     {
@@ -185,7 +186,8 @@ std::uint8_t PPU::ppu_read(std::uint16_t address)
         // Reads palette indexes.
         // Therefore we will return the index from our colour palette.
         // The calling routiene can then use this number to get the RGB value.
-        data = ((address - 0x3F00) % 0x0020);
+        auto adrr = ((address - 0x3F00) % 0x0020);
+        pallete_ram[adrr] = data;
     }
 
     return data;
@@ -195,7 +197,10 @@ void PPU::ppu_write(std::uint16_t address, std::uint8_t data)
 {
     if (address <= 0x1FFF)
     {
-        // TODO - Add memory write using a mapper.
+        if (bus_cart)
+        {
+            // TODO - Fetch data from the cartridge based on mapper.
+        }
     }
     else if (address >= 0x2000 && address <= 0x3EFF)
     {
@@ -208,7 +213,8 @@ void PPU::ppu_write(std::uint16_t address, std::uint8_t data)
         // Reads palette indexes.
         // Therefore we will return the index from our colour palette.
         // The calling routiene can then use this number to get the RGB value.
-        data = ((address - 0x3F00) % 0x0020);
+        auto adrr = ((address - 0x3F00) % 0x0020);
+        pallete_ram[adrr] = data;
     }
 }
 
@@ -231,7 +237,7 @@ void PPU::bus_write(std::uint16_t address, std::uint8_t data)
         ppu_address_reg_write(data);
         break;
     case PPU_ADDRESS_DATA_REG:
-        ppu_data_reg_write(data);
+        bus_write(address, data);
         break;
     default: // Dont do anything.
         break;

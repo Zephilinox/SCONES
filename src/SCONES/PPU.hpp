@@ -9,6 +9,7 @@ class Bus;
 
 constexpr std::uint32_t PPU_MAX_ADDRESSABLE_MEMORY = 16 * 1024;
 constexpr std::uint32_t PPU_VRAM_SIZE = 2 * 1024;
+constexpr std::uint32_t PPU_PALLETE_COUNT = 0x20;
 constexpr std::uint16_t PPU_MAX_OAM_REG_SIZE = 256;
 constexpr std::uint32_t PPU_PAL_PALETTE_SIZE = 0x40;
 
@@ -125,7 +126,6 @@ private:
     void ppu_data_reg_write(std::uint8_t data);
     void ppu_scroll_reg_write(std::uint8_t data);
     void ppu_address_reg_write(std::uint8_t data);
-    void ppu_data_status_reg_write(std::uint8_t data);
 
     void ppu_address_status_reg_read(std::uint8_t& data);
     void ppu_data_reg_read(std::uint8_t& data);
@@ -139,7 +139,8 @@ private:
     Framebuffer* fb = nullptr;
     std::unique_ptr<std::uint8_t[]> oam;  // PPU OAM
     std::unique_ptr<std::uint8_t[]> vram; // PPU VRAM
-    Cartridge* bus_cart = nullptr;        // Cartridge connected to PPU bus.
+    std::unique_ptr<std::uint8_t[]> pallete_ram; // PPU pallete ram.
+    Cartridge* bus_cart = nullptr; // Cartridge connected to PPU bus.
 
     // Internal CPU mapped registers.
     PPUControlReg PPUCTRL;
