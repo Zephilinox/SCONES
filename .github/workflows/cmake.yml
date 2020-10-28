@@ -19,6 +19,10 @@ jobs:
         shell: bash
         run: sudo apt-get install libsdl2-dev
 
+      -name: install gl3w
+        shell: bash
+        run: python3 ${{runner.workspace}}\_deps\gl3w-src\gl3w_gen.py
+
       - name: Configure CMake
         working-directory: ${{runner.workspace}}/build
         shell: bash
