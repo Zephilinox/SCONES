@@ -10,13 +10,6 @@
 #include <spdlog/spdlog.h>
 #include <glad/glad.h>
 
-#if defined(IMGUI_IMPL_OPENGL_LOADER_GL3W)
-#include <GL/gl3w.h> // Initialize with gl3wInit()
-constexpr bool opengl_loader_gl3w = true;
-#else
-constexpr bool opengl_loader_gl3w = false;
-#endif
-
 namespace paperbag
 {
     
