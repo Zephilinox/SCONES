@@ -6,9 +6,6 @@ using namespace paperbag;
 Window::Window(Settings s)
     : settings(std::move(s))
 {
-    if constexpr (!opengl_loader_gl3w)
-        throw("GL3W issue");
-
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_GAMECONTROLLER) != 0)
         throw(fmt::format("Error: {}\n", SDL_GetError()));
 

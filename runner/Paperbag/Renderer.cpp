@@ -11,9 +11,8 @@ Renderer::Renderer(Window* w)
     context = SDL_GL_CreateContext(window->get_sdl_handle());
     SDL_GL_MakeCurrent(window->get_sdl_handle(), context);
     SDL_GL_SetSwapInterval(1);
-
-    bool err = gl3wInit() != 0;
-    if (err)
+    
+    if (!gladLoadGL())
         throw(fmt::format("Failed to initialize OpenGL loader!\n"));
 }
 
