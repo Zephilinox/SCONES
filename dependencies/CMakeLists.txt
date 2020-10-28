@@ -52,3 +52,5 @@ if (NOT find_sdl2_POPULATED)
     FetchContent_Populate(find_sdl2)
 endif()
 message(STATUS "############ Done")
+
+add_subdirectory(glad/)

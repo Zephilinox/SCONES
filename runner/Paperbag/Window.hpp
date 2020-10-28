@@ -4,18 +4,11 @@
 #include <string>
 
 //LIBS
-#include <GL/gl3w.h>
 #include <SDL.h>
 #include <backends/imgui_impl_sdl.h>
 #include <backends/imgui_impl_opengl3.h>
 #include <spdlog/spdlog.h>
-
-#if defined(IMGUI_IMPL_OPENGL_LOADER_GL3W)
-#include <GL/gl3w.h> // Initialize with gl3wInit()
-constexpr bool opengl_loader_gl3w = true;
-#else
-constexpr bool opengl_loader_gl3w = false;
-#endif
+#include <glad/glad.h>
 
 namespace paperbag
 {

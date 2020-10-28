@@ -2,7 +2,7 @@
 
 //LIBS
 #include <GL/GL.h>
-#include <GL/gl3w.h>
+#include <glad/glad.h>
 #include <spdlog/spdlog.h>
 
 namespace paperbag
