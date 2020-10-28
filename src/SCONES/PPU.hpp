@@ -140,6 +140,8 @@ private:
     void increment_x();
     void increment_y();
 
+    bool render_enable() { return (PPUMASK.bits.sprite_enable | PPUMASK.bits.background_enable); }
+
 private:
     Bus* addBus = nullptr;
     Framebuffer* fb = nullptr;

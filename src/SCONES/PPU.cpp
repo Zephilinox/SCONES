@@ -39,8 +39,11 @@ void PPU::step()
         {
             increment_y();
         }
-        
-        if (clock == 257 && PPU)
+
+        if (clock == 257 && render_enable())
+        {
+            vram_rag.bits.course_x_scroll = tvram_reg.bits.course_x_scroll;
+        }
     }
 
     if (clock >= PPU_SCANLINE_CYCLE_COUNT)
