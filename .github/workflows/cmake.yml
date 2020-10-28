@@ -17,7 +17,7 @@ jobs:
 
       - name: install SDL2
         shell: bash
-        run: sudo apt-get install libsdl2-2.0
+        run: sudo apt-get install libsdl2-dev
 
       - name: Configure CMake
         working-directory: ${{runner.workspace}}/build
