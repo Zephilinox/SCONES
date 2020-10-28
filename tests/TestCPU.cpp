@@ -17,8 +17,6 @@ TEST_CASE("CPU Nestest")
     REQUIRE(cartridge.loadFromFile("nestest.nes"));
 
     Bus bus;
-    bus.write(0x8000, cartridge.getROM().data(), cartridge.getROM().size());
-    bus.write(0xC000, cartridge.getROM().data(), cartridge.getROM().size());
     bus.insert_cartridge(std::move(cartridge));
 
     CPU cpu(&bus);
