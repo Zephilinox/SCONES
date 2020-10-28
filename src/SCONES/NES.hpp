@@ -15,7 +15,11 @@ public:
     void tick();  // Update the processor clocks for the NES.
     void reset(); // Reset our NES console.
 
+    bool insert_cartridge(const std::string& path);
+
     [[nodiscard]] std::uint32_t get_clock() const { return clock; }
+    [[nodiscard]] Framebuffer* get_framebuffer() const { return fb.get(); }
+    [[nodiscard]] bool frame_ready() const { return clock % 89342; }
 
 private:
     // NES components.

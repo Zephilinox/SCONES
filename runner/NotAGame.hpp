@@ -3,7 +3,8 @@
 //STD
 
 //LIBS
-#include "IMGUI/imgui.h"
+#include <IMGUI/imgui.h>
+#include <SCONES/NES.hpp>
 
 //SELF
 #include "Paperbag/Window.hpp"
@@ -22,13 +23,21 @@ private:
     void update();
     void render();
 
+    NES nes;
+
     paperbag::Window window;
     paperbag::Renderer renderer;
     paperbag::GUI gui;
 
     bool done = false;
     bool show_demo_window = false;
-    bool show_another_window = true;
+
+    bool show_nes_screen = true;
+    bool pause_nes_when_not_active = true;
+    bool update_nes_screen_every_cycle = false;
+
+    std::string cartridge_path;
+
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
     std::unique_ptr<paperbag::Texture> texture;
 };
