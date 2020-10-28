@@ -21,7 +21,7 @@ jobs:
 
       - name: install gl3w
         shell: bash
-        run: python3 ${{runner.workspace}}\_deps\gl3w-src\gl3w_gen.py
+        run: python3 ${{runner.workspace}}/_deps/gl3w-src/gl3w_gen.py
 
       - name: Configure CMake
         working-directory: ${{runner.workspace}}/build
