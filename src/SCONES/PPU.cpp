@@ -34,6 +34,13 @@ void PPU::step()
         {
             PPUSTATUS.bits.vblank = 0;
         }
+
+        if (clock == 256)
+        {
+            increment_y();
+        }
+        
+        if (clock == 257 && PPU)
     }
 
     if (clock >= PPU_SCANLINE_CYCLE_COUNT)
@@ -224,6 +231,45 @@ void PPU::ppu_write(std::uint16_t address, std::uint8_t data)
     }
 }
 
+void PPU::increment_x()
+{
+    if (vram_rag.bits.course_x_scroll == 31)
+    {
+        vram_rag.bits.course_x_scroll = 0;
+        vram_rag.bits.nametable_select = 0x1;
+    }
+    else
+    {
+        vram_rag.bits.course_x_scroll++;
+    }
+}
+
+void PPU::increment_y()
+{
+    if (vram_rag.bits.fine_y_scroll < 7)
+    {
+        vram_rag.bits.fine_y_scroll++;
+    }
+    else
+    {
+        vram_rag.bits.fine_y_scroll = 0;
+        if (vram_rag.bits.course_y_scroll == 29)
+        {
+            vram_rag.bits.course_y_scroll = 0;
+            vram_rag.bits.nametable_select = 0x2;
+        }
+        else if (vram_rag.bits.course_y_scroll == 31)
+        {
+            // Nametable is not switched.
+            vram_rag.bits.course_y_scroll = 0;
+        }
+        else
+        {
+            vram_rag.bits.course_y_scroll++;
+        }
+    }
+}
+
 void PPU::bus_write(std::uint16_t address, std::uint8_t data)
 {
     // TODO - Rework registers here.
@@ -243,7 +289,7 @@ void PPU::bus_write(std::uint16_t address, std::uint8_t data)
         ppu_address_reg_write(data);
         break;
     case PPU_ADDRESS_DATA_REG:
-        bus_write(address, data);
+        ppu_write(address, data);
         break;
     default: // Dont do anything.
         break;
@@ -277,5 +323,5 @@ std::uint8_t PPU::bus_read(std::uint16_t address)
 
 void PPU::get_pallete_contents(Framebuffer* fb)
 {
-    // TODO - Write the contents of the pallete memory here. 
+    // TODO - Write the contents of the pallete memory here.
 }

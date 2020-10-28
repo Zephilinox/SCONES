@@ -136,13 +136,17 @@ private:
     std::uint8_t ppu_read(std::uint16_t address);
     void ppu_write(std::uint16_t address, std::uint8_t data);
 
+    // VRAM Register increments
+    void increment_x();
+    void increment_y();
+
 private:
     Bus* addBus = nullptr;
     Framebuffer* fb = nullptr;
-    std::unique_ptr<std::uint8_t[]> oam;  // PPU OAM
-    std::unique_ptr<std::uint8_t[]> vram; // PPU VRAM
+    std::unique_ptr<std::uint8_t[]> oam;         // PPU OAM
+    std::unique_ptr<std::uint8_t[]> vram;        // PPU VRAM
     std::unique_ptr<std::uint8_t[]> pallete_ram; // PPU pallete ram.
-    Cartridge* bus_cart = nullptr; // Cartridge connected to PPU bus.
+    Cartridge* bus_cart = nullptr;               // Cartridge connected to PPU bus.
 
     // Internal CPU mapped registers.
     PPUControlReg PPUCTRL;
