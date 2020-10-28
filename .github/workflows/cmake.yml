@@ -15,6 +15,10 @@ jobs:
       - name: Create Build Environment
         run: cmake -E make_directory ${{runner.workspace}}/build
 
+      - name: install Clang 6.0
+        shell: bash
+        run: sudo apt-get install -y clang-6.0
+
       - name: install SDL2
         shell: bash
         run: sudo apt-get install libsdl2-2.0
@@ -22,7 +26,7 @@ jobs:
       - name: Configure CMake
         working-directory: ${{runner.workspace}}/build
         shell: bash
-        run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+        run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCAMKE_CC=/usr/bin/clang -D_CMAKE_TOOLCHAIN_PREFIX=llvm-6.0
 
       - name: build
         working-directory: ${{runner.workspace}}/build
