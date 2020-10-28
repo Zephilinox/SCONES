@@ -15,6 +15,10 @@ jobs:
       - name: Create Build Environment
         run: cmake -E make_directory ${{runner.workspace}}/build
 
+      - name: install SDL2
+        shell: bash
+        run: sudo apt-get install libsdl2-2.0
+
       - name: Configure CMake
         working-directory: ${{runner.workspace}}/build
         shell: bash
