@@ -18,5 +18,18 @@ void NES::tick()
 
 void NES::reset()
 {
-	// TODO - Call Reset Signals on our NES.
+    // TODO - Call Reset Signals on our NES.
+    cpu6502->reset();
+}
+
+bool NES::insert_cartridge(const std::string& path)
+{
+    Cartridge cartridge;
+    const auto result = cartridge.loadFromFile(path.c_str());
+    if (!result)
+        return result;
+
+    addressBus.insert_cartridge(std::move(cartridge));
+    reset();
+    return result;
 }
