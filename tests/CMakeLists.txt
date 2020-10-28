@@ -14,3 +14,6 @@ set_property(TARGET Tests PROPERTY VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_CURREN
 
 target_link_libraries(Tests PUBLIC SCONES doctest)
 target_include_directories(Tests PUBLIC ${SCONES_BINARY_DIR}/dependencies/doctest-src/doctest)
+
+enable_testing()
+add_test(Tests Release ${CMAKE_CURRENT_SOURCE_DIR}/resources)
