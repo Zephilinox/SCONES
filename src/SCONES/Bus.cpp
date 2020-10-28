@@ -12,19 +12,25 @@ Bus::Bus()
 {
 }
 
-void Bus::insert_cartridge(Cartridge&& cartridge)
+void Bus::insert_cartridge(Cartridge&& c)
 {
-    this->cartridge = std::move(cartridge);
+    cartridge = std::move(c);
 }
 
-std::uint8_t Bus::read(std::uint16_t address)
+std::uint8_t Bus::cpu_read(std::uint16_t address)
 {
     //todo: peak-only read which doesn't allow for the read to cause side-effects in the system. Used for debugging
     spdlog::trace("[BUS] read from {:#x}", address);
 
     std::uint8_t value = 0;
 
-    if (address <= ADDRESS_CPU_RAM_UPPER_MIRROR) //lower 13 bits (8kb)
+    const auto cartridge_read = cartridge.cpu_read(address);
+
+    if (cartridge_read.handled_by_cartridge)
+    {
+        value = cartridge_read.data;
+    }
+    else if (address <= ADDRESS_CPU_RAM_UPPER_MIRROR) //lower 13 bits (8kb)
     {
         //8kb (2kb mirror) internal RAM
         //only the lower 11 bits (2kb) matter, the upper 5 bits are ignored, causing 2kb to mirror to 8kb
@@ -57,22 +63,22 @@ std::uint8_t Bus::read(std::uint16_t address)
     }
     else
     {
-        //cartridge space. PRG ROM, PRG RAM, and Mapper registers
-        //todo
-        //spdlog::warn("Accessing cartridge space but not mapped to loaded cartridge.");
-        const auto relevant_address = address - ADDRESS_APU_IO_DISABLED_REGISTER_UPPER - 1;
-        value = (*memory_cartridge)[relevant_address];
+        spdlog::error("Read accessed cartridge space but the cartridge did not handle the operation");
     }
 
     spdlog::trace("[BUS] read from {:#x} -> {:#x}", address, value);
     return value;
 }
 
-void Bus::write(std::uint16_t address, std::uint8_t data)
+void Bus::cpu_write(std::uint16_t address, std::uint8_t data)
 {
     spdlog::trace("[BUS] write {:#x} to {:#x}", data, address);
 
-    if (address <= ADDRESS_CPU_RAM_UPPER_MIRROR) //lower 13 bits (8kb)
+    if (cartridge.cpu_write(address, data))
+    {
+        
+    }
+    else if (address <= ADDRESS_CPU_RAM_UPPER_MIRROR) //lower 13 bits (8kb)
     {
         //8kb (2kb mirror) internal RAM
         //only the lower 11 bits (2kb) matter, the upper 5 bits are ignored, causing 2kb to mirror to 8kb
@@ -105,17 +111,13 @@ void Bus::write(std::uint16_t address, std::uint8_t data)
     }
     else
     {
-        //cartridge space. PRG ROM, PRG RAM, and Mapper registers
-        //todo
-        //spdlog::warn("Accessing cartridge space but not mapped to loaded cartridge.");
-        const auto relevant_address = address - ADDRESS_APU_IO_DISABLED_REGISTER_UPPER - 1;
-        (*memory_cartridge)[relevant_address] = data;
+        spdlog::error("Write accessed cartridge space but the cartridge did not handle the operation");
     }
 }
 
-void Bus::write(std::uint16_t address, const std::uint8_t* data_start, std::size_t data_size)
+void Bus::cpu_write(std::uint16_t address, const std::uint8_t* data_start, std::size_t data_size)
 {
     assert(static_cast<int>(address) + data_size - 1 <= 0xFFFF);
     for (int i = 0; i < data_size; ++i)
-        write(address + i, data_start[i]);
+        cpu_write(address + i, data_start[i]);
 }

@@ -649,10 +649,10 @@ void CPU::set_flag_false(StatusRegisterFlags flag)
 
 std::uint8_t CPU::read_from_memory(std::uint16_t address) const
 {
-    return bus->read(address);
+    return bus->cpu_read(address);
 }
 
 void CPU::write_to_memory(std::uint16_t address, std::uint8_t data) const
 {
-    bus->write(address, data);
+    bus->cpu_write(address, data);
 }
