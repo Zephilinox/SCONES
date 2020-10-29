@@ -32,13 +32,3 @@ jobs:
         working-directory: ${{runner.workspace}}/build
         shell: bash
         run: cmake --build . --config $BUILD_TYPE
-
-      - name: build tests
-        working-directory: ${{runner.workspace}}/build
-        shell: bash
-        run: cmake --build Tests --config $BUILD_TYPE
-
-      - name: test
-        working-directory: ${{runner.workspace}}/build
-        shell: bash
-        run: ctest -C $BUILD_TYPE
