@@ -20,6 +20,9 @@ public:
     [[nodiscard]] std::uint32_t get_clock() const { return clock; }
     [[nodiscard]] Framebuffer* get_framebuffer() const { return fb.get(); }
     [[nodiscard]] bool frame_ready() const { return clock % 89342; }
+    [[nodiscard]] Bus& get_bus() { return addressBus; }
+    [[nodiscard]] CPU& get_cpu() { return *cpu6502; }
+    [[nodiscard]] PPU& get_ppu() { return *ppu2C02; }
 
 private:
     // NES components.

@@ -35,8 +35,10 @@ private:
     bool show_nes_screen = true;
     bool pause_nes_when_not_active = true;
     bool update_nes_screen_every_cycle = false;
+    bool show_nes_cpu_memory_editor = true;
 
-    std::string cartridge_path;
+    std::string cartridge_path = "../../tests/resources/nestest.nes";
+    std::string program_counter_value = "0xC000";
 
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
     std::unique_ptr<paperbag::Texture> texture;

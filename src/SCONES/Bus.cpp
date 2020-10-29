@@ -121,3 +121,8 @@ void Bus::cpu_write(std::uint16_t address, const std::uint8_t* data_start, std::
     for (int i = 0; i < data_size; ++i)
         cpu_write(address + i, data_start[i]);
 }
+
+std::array<std::uint8_t, ADDRESS_CPU_RAM_SIZE>& Bus::get_cpu_ram() const
+{
+    return *memory_cpu_ram;
+}
