@@ -118,9 +118,16 @@ public:
     void step();
     [[nodiscard]] bool last_instruction_complete() const;
     void set_program_counter(std::uint16_t address) { program_counter = address; }
-    std::uint8_t get_opcode() const { return opcode; }
-    std::uint16_t get_program_counter() const { return program_counter; }
-    std::uint16_t get_clock() const { return clock_count; }
+    [[nodiscard]] std::uint8_t get_opcode() const { return opcode; }
+    [[nodiscard]] std::uint16_t get_program_counter() const { return program_counter; }
+    [[nodiscard]] std::uint8_t get_register_accumulator() const { return register_accumulator; }
+    [[nodiscard]] std::uint8_t get_register_x() const { return register_x; }
+    [[nodiscard]] std::uint8_t get_register_y() const { return register_y; }
+    [[nodiscard]] std::uint8_t get_stack_pointer() const { return stack_pointer; }
+    [[nodiscard]] std::uint8_t get_processor_status() const { return register_status; }
+    [[nodiscard]] std::uint8_t get_fetched() const { return fetched; }
+    [[nodiscard]] std::uint16_t get_absolute_address() const { return address_absolute; }
+    [[nodiscard]] std::uint32_t get_clock() const { return clock_count; }
 
     static constexpr std::uint16_t stack_address = 0x0100;
 

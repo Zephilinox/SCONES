@@ -36,6 +36,8 @@ public:
     void cpu_write(std::uint16_t address, std::uint8_t data);
     void cpu_write(std::uint16_t address, const std::uint8_t* data_start, std::size_t data_size);
 
+    std::array<std::uint8_t, ADDRESS_CPU_RAM_SIZE>& get_cpu_ram() const;
+
 private:
     std::unique_ptr<std::array<std::uint8_t, ADDRESS_CPU_RAM_SIZE>> memory_cpu_ram;
     std::unique_ptr<std::array<std::uint8_t, ADDRESS_PPU_REGISTER_SIZE>> memory_ppu_register;

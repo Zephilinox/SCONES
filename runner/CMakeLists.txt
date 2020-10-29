@@ -51,6 +51,7 @@ SET(Runner_INCLUDES
     "Paperbag/GUI.hpp"
     "Paperbag/Texture.hpp"
     "Paperbag/Pixel.hpp"
+    "Paperbag/Screens/MemoryEditor.hpp"
 )
 
 SET(Runner_SOURCES

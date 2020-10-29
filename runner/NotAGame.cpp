@@ -5,6 +5,7 @@
 //LIBS
 
 //SELF
+#include "Paperbag/Screens/MemoryEditor.hpp"
 
 using namespace paperbag;
 
@@ -32,8 +33,6 @@ NotAGame::NotAGame()
     , gui(&window, &renderer)
     , texture(renderer.make_texture(make_texture(), size, size))
 {
-    cartridge_path.resize(1024);
-    cartridge_path = "../../tests/resources/nestest.nes";
 }
 
 int NotAGame::run()
@@ -79,6 +78,7 @@ void NotAGame::update()
         ImGui::Begin("Settings");
 
         ImGui::Checkbox("Demo Window", &show_demo_window); // Edit bools storing our window open/close state
+        ImGui::Checkbox("NES CPU Memory Editor", &show_nes_cpu_memory_editor);
         ImGui::Checkbox("NES Screen", &show_nes_screen);
         ImGui::Checkbox("NES Screen - Pause when not active", &pause_nes_when_not_active);
         ImGui::Checkbox("NES Screen - Update every cycle", &update_nes_screen_every_cycle);
@@ -99,6 +99,40 @@ void NotAGame::update()
 
         if (ImGui::Button("NES Reset"))
             nes.reset();
+
+        {
+            auto op = fmt::format("NES CPU OP = {:02X}", nes.get_cpu().get_opcode());
+            auto pc = fmt::format("NES CPU PC = {:04X}", nes.get_cpu().get_program_counter());
+            auto a = fmt::format("NES CPU A = {:02X}", nes.get_cpu().get_register_accumulator());
+            auto x = fmt::format("NES CPU X = {:02X}", nes.get_cpu().get_register_x());
+            auto y = fmt::format("NES CPU Y = {:02X}", nes.get_cpu().get_register_y());
+            auto p = fmt::format("NES CPU P = {:02X}", nes.get_cpu().get_processor_status());
+            auto sp = fmt::format("NES CPU SP = {:02X}", nes.get_cpu().get_stack_pointer());
+            auto abs = fmt::format("NES CPU ABS = {:04X}", nes.get_cpu().get_absolute_address());
+            auto f = fmt::format("NES CPU F = {:02X}", nes.get_cpu().get_fetched());
+
+            ImGui::Text(op.c_str());
+            ImGui::Text(pc.c_str());
+            ImGui::Text(a.c_str());
+            ImGui::Text(x.c_str());
+            ImGui::Text(y.c_str());
+            ImGui::Text(p.c_str());
+            ImGui::Text(sp.c_str());
+            ImGui::Text(abs.c_str());
+            ImGui::Text(f.c_str());
+        }
+
+        buffer = program_counter_value;
+        buffer.resize(1024);
+        ImGui::InputText("Program Counter", buffer.data(), buffer.size());
+        program_counter_value = buffer;
+
+        if (ImGui::Button("NES CPU Set Program Counter"))
+        {
+            int pc;
+            sscanf(program_counter_value.c_str(), "%x", &pc);
+            nes.get_cpu().set_program_counter(pc);
+        }
 
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
         ImGui::End();
@@ -125,6 +159,17 @@ void NotAGame::update()
         }
 
         ImGui::Image((void*)(intptr_t)texture->get_opengl_texture_id(), ImVec2(texture->get_width(), texture->get_height()));
+        ImGui::End();
+    }
+
+    if (show_nes_cpu_memory_editor)
+    {
+        static MemoryEditor memory_editor;
+
+        ImGui::Begin("MyWindow", &show_nes_cpu_memory_editor);
+        auto* data = nes.get_bus().get_cpu_ram().data();
+        auto size = nes.get_bus().get_cpu_ram().size() * sizeof(std::uint8_t);
+        memory_editor.DrawContents(data, size);
         ImGui::End();
     }
 }
