@@ -38,20 +38,20 @@ jobs:
         run: cmake --build . --config $BUILD_TYPE
 
 
-    build-emscripten:
-      runs-on: ubuntu-latest
-      steps:
-        - uses: actions/checkout@v2
+  build-emscripten:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
 
-        - name: install Emscipten
-          run: |
-            wget -q https://github.com/emscripten-core/emsdk/archive/master.tar.gz
-            tar -xvf master.tar.gz
-            emsdk-master/emsdk update
-            emsdk-master/emsdk install latest
-            emsdk-master/emsdk activate latest
+      - name: install Emscipten
+        run: |
+          wget -q https://github.com/emscripten-core/emsdk/archive/master.tar.gz
+          tar -xvf master.tar.gz
+          emsdk-master/emsdk update
+          emsdk-master/emsdk install latest
+          emsdk-master/emsdk activate latest
 
-        - name: Build
-          run: |
-            pushd emsdk-master
-            source ./emsdk_env.sh
+      - name: Build
+        run: |
+          pushd emsdk-master
+          source ./emsdk_env.sh
