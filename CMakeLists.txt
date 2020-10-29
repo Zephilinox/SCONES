@@ -11,3 +11,6 @@ add_subdirectory("dependencies")
 add_subdirectory("src")
 add_subdirectory("tests")
 add_subdirectory("runner")
+
+enable_testing()
+add_test(Tests Release ${CMAKE_CURRENT_SOURCE_DIR}/resources)
