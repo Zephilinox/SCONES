@@ -19,6 +19,10 @@ jobs:
         shell: bash
         run: sudo apt-get install libsdl2-dev
 
+      - name: install mesa-common-dev
+        shell: bash
+        run: sudo apt install mesa-common-dev
+
       - name: Configure CMake
         working-directory: ${{runner.workspace}}/build
         shell: bash
