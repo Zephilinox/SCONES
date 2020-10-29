@@ -79,6 +79,10 @@ void NotAGame::update()
 
         ImGui::Checkbox("Demo Window", &show_demo_window); // Edit bools storing our window open/close state
         ImGui::Checkbox("NES CPU Memory Editor", &show_nes_cpu_memory_editor);
+        ImGui::Checkbox("NES CPU - Update per instruction, not cycle", &update_nes_per_instruction);
+        ImGui::InputInt("Nes CPU - Updates per frame", &nes_updates_per_frame, 1, 10);
+        if (nes_updates_per_frame < 1)
+            nes_updates_per_frame = 1;
         ImGui::Checkbox("NES Screen", &show_nes_screen);
         ImGui::Checkbox("NES Screen - Pause when not active", &pause_nes_when_not_active);
         ImGui::Checkbox("NES Screen - Update every cycle", &update_nes_screen_every_cycle);
@@ -150,7 +154,22 @@ void NotAGame::update()
             }
             else
             {
-                nes.tick();
+                for (int i = 0; i < nes_updates_per_frame; ++i)
+                {
+                    if (update_nes_per_instruction)
+                    {
+                        std::uint8_t last_op = nes.get_cpu().get_opcode();
+                        while (last_op == nes.get_cpu().get_opcode())
+                        {
+                            last_op = nes.get_cpu().get_opcode();
+                            nes.tick();
+                        } 
+                    }
+                    else
+                    {
+                        nes.tick();
+                    }
+                }
             }
 
             texture->update([](std::vector<Pixel>& pixels) {
@@ -166,7 +185,7 @@ void NotAGame::update()
     {
         static MemoryEditor memory_editor;
 
-        ImGui::Begin("MyWindow", &show_nes_cpu_memory_editor);
+        ImGui::Begin("CPU Memory Editor", &show_nes_cpu_memory_editor);
         auto* data = nes.get_bus().get_cpu_ram().data();
         auto size = nes.get_bus().get_cpu_ram().size() * sizeof(std::uint8_t);
         memory_editor.DrawContents(data, size);
