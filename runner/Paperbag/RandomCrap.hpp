@@ -1,7 +1,7 @@
 #pragma once
 
 //LIBS
-#include <GL/GL.h>
+#include <GL/gl.h>
 #include <glad/glad.h>
 #include <spdlog/spdlog.h>
 

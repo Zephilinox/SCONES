@@ -1,5 +1,7 @@
 #include "Framebuffer.hpp"
 
+#include <cstring>
+
 Framebuffer::Framebuffer(int x, int y)
     : w(x), h(y)
 {
