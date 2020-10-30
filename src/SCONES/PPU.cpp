@@ -13,38 +13,172 @@ PPU::PPU(Bus* bus, Framebuffer* fbuffer)
     addBus->connect_ppu(this);
 }
 
-PPU::~PPU()
+
+void PPU::update_shifters()
 {
+    if (PPUMASK.bits.background_enable)
+    {
+        background_shifter_pattern_low <<= 1;
+        background_shifter_pattern_high <<= 1;
+
+        background_shifter_attribute_low <<= 1;
+        background_shifter_attribute_high <<= 1;
+    }
+
+    const bool dunno = clock >= 1 && clock < 258;
+    if (PPUMASK.bits.sprite_enable && clock)
+    {
+        for (int i = 0; i < sprite_count; ++i)
+        {
+            auto& sprite = sprites_this_scanline[i];
+            const bool sprite_on_screen = sprite.position_x > 0;
+
+            if (sprite_on_screen)
+            {
+                sprite.position_x--;
+            }
+            else
+            {
+                sprite_shifter_pattern_low[i] <<= 1;
+                sprite_shifter_pattern_high[i] <<= 1;
+            }
+        }
+    }
+}
+
+void PPU::fetch_tiles_and_sprite()
+{
+    update_shifters();
+
+    const int state = ((clock - 1) % 8);
+
+    const bool fetch_next_background_tile_id = state == 0;
+    if (fetch_next_background_tile_id)
+    {
+        //todo:
+        return;
+    }
+
+    const bool fetch_next_background_tile_attribute = state == 2;
+    if (fetch_next_background_tile_attribute)
+    {
+        //todo:
+        return;
+    }
+
+    const bool fetch_next_background_tile_lsb = state == 4;
+    if (fetch_next_background_tile_lsb)
+    {
+        //todo:
+        return;
+    }
+
+    const bool fetch_next_background_tile_msb = state == 6;
+    if (fetch_next_background_tile_msb)
+    {
+        //todo:
+        return;
+    }
+
+    const bool next_horizontal_tile = state == 7;
+    if (next_horizontal_tile)
+    {
+        increment_x();
+        return;
+    }
+}
+
+void PPU::visible_scanlines()
+{
+    //scanline -1 is not visible
+
+    const bool start_of_new_frame = scanline == -1 && clock == 1;
+    if (start_of_new_frame)
+    {
+        PPUSTATUS.bits.vblank = 0;
+        PPUSTATUS.bits.sprite_overflow = 0;
+        PPUSTATUS.bits.sprite_0_hit = 0;
+        sprite_shifter_pattern_low.fill(0);
+        sprite_shifter_pattern_high.fill(0);
+        return;
+    }
+
+    const bool skip_cycle_due_to_odd_frame = scanline == 0 && clock == 0 && odd_frame && render_enable();
+    if (skip_cycle_due_to_odd_frame)
+    {
+        clock = 1;
+        return;
+    }
+
+    const bool fetching_tiles_and_sprites = (clock >= 2 && clock < 258) || (clock >= 321 && clock < 338);
+    if (fetching_tiles_and_sprites)
+        fetch_tiles_and_sprite();
+
+    const bool penultimate_visible_pixel = clock == 256;
+    if (penultimate_visible_pixel)
+        increment_y();
+
+    const bool final_visible_pixel = clock == 257;
+    if (final_visible_pixel)
+    {
+        //todo: background shift
+        increment_x();
+    }
+
+    const bool end_of_scanline = clock == 338 || clock == 340;
+    if (end_of_scanline)
+    {
+        //todo
+    }
+
+    const bool end_of_vertical_blank = scanline == -1 && clock >= 280 && clock < 305;
+    if (end_of_vertical_blank)
+    {
+        //todo:
+    }
+
+    const bool sprite_rendering = clock == 257 && scanline >= 0;
+    if (sprite_rendering)
+    {
+        //todo
+    }
+
+    const bool last_clock_of_scanline = clock == 340;
+    if (last_clock_of_scanline)
+    {
+        //todo
+    }
 }
 
 void PPU::step()
 {
     // Tick the PPU.
+    //todo: right place to do the increment?
     clock++;
 
-    if (scanline == 241)
+    const bool scanlines_are_visible = scanline >= -1 && scanline < 240;
+    if (scanlines_are_visible)
+        visible_scanlines();
+
+    const bool post_render_scanline = scanline == 240;
+    if (post_render_scanline)
     {
-        PPUSTATUS.bits.vblank = 1;
-        nmi = (PPUCTRL.bits.nmi_enable ? 1 : 0);
+        //do nothing
     }
 
-    if (clock > 0)
+    const bool vertical_blank_scanline = scanline >= 241 && scanline < 261;
+    if (vertical_blank_scanline)
     {
-        if (clock == 1 && scanline == -1)
+        const bool end_of_frame = scanline == 241 && clock == 1;
+        if (end_of_frame)
         {
-            PPUSTATUS.bits.vblank = 0;
-        }
-
-        if (clock == 256)
-        {
-            increment_y();
-        }
-
-        if (clock == 257 && render_enable())
-        {
-            vram_rag.bits.course_x_scroll = tvram_reg.bits.course_x_scroll;
+            PPUSTATUS.bits.vblank = 1;
+            if (PPUCTRL.bits.nmi_enable)
+                nmi = true;
         }
     }
+
+    //todo: combine background and pixel data and stuff
 
     if (clock >= PPU_SCANLINE_CYCLE_COUNT)
     {
@@ -54,6 +188,7 @@ void PPU::step()
         {
             scanline = -1;
             frameready = true;
+            odd_frame = !odd_frame;
         }
     }
 }

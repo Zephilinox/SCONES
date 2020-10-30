@@ -1,8 +1,13 @@
 #pragma once
 
+//STD
 #include <cstdint>
 #include <memory>
+#include <array>
 
+//LIBS
+
+//SELF
 #include "Framebuffer.hpp"
 
 class Bus;
@@ -107,7 +112,6 @@ class PPU
 {
 public:
     PPU(Bus* bus, Framebuffer* fbuffer);
-    ~PPU();
 
     void step();
     bool nmi_set() const { return nmi; }
@@ -141,8 +145,10 @@ private:
     void increment_y();
 
     bool render_enable() { return (PPUMASK.bits.sprite_enable | PPUMASK.bits.background_enable); }
+    void visible_scanlines();
+    void fetch_tiles_and_sprite();
+    void update_shifters();
 
-private:
     Bus* addBus = nullptr;
     Framebuffer* fb = nullptr;
     std::unique_ptr<std::uint8_t[]> oam;         // PPU OAM
@@ -170,7 +176,36 @@ private:
     std::uint32_t clock = 0;
     std::int16_t scanline = -1;
     bool frameready = false;
+    bool odd_frame = false;
 
     // NMI interrupt flag.
     bool nmi = false;
+
+    //sprites
+    struct SpriteData
+    {
+        std::uint8_t position_x;
+        std::uint8_t position_y;
+        std::uint8_t id;
+        std::uint8_t attribute;
+    };
+    std::array<SpriteData, 8> sprites_this_scanline;
+    std::uint8_t sprite_count{};
+    std::array<std::uint8_t, 8> sprite_shifter_pattern_low{};
+    std::array<std::uint8_t, 8> sprite_shifter_pattern_high{};
+
+    //sprite flags
+    bool sprite_zero_hit_possible = false;
+    bool sprite_zero_being_rendered = false;
+
+    //backgrounds
+    std::uint8_t background_next_tile_id = 0;
+    std::uint8_t background_next_tile_attribute = 0;
+    std::uint8_t background_next_tile_lsb = 0;
+    std::uint8_t background_next_tile_msb = 0;
+    std::uint16_t background_shifter_pattern_low = 0;
+    std::uint16_t background_shifter_pattern_high = 0;
+    std::uint16_t background_shifter_attribute_low = 0;
+    std::uint16_t background_shifter_attribute_high = 0;
+
 };
