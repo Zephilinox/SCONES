@@ -19,14 +19,14 @@ constexpr std::uint16_t PPU_MAX_OAM_REG_SIZE = 256;
 constexpr std::uint32_t PPU_PAL_PALETTE_SIZE = 0x40;
 
 // PPU I/O Addresses
-constexpr std::uint8_t PPU_ADDRESS_PPUCTRL_REG = 0x2000;
-constexpr std::uint8_t PPU_ADDRESS_MASK_REG = 0x2001;
-constexpr std::uint8_t PPU_ADDRESS_STATUS_REG = 0x2002;
-constexpr std::uint8_t PPU_ADDRESS_OAM_ADDR_REG = 0x2003;
-constexpr std::uint8_t PPU_ADDRESS_OAM_DATA_REG = 0x2004;
-constexpr std::uint8_t PPU_ADDRESS_SCROLL_REG = 0x2005;
-constexpr std::uint8_t PPU_ADDRESS_ADDR_REG = 0x2006;
-constexpr std::uint8_t PPU_ADDRESS_DATA_REG = 0x2007;
+constexpr std::uint8_t PPU_ADDRESS_PPUCTRL_REG = 0x0000;
+constexpr std::uint8_t PPU_ADDRESS_MASK_REG = 0x0001;
+constexpr std::uint8_t PPU_ADDRESS_STATUS_REG = 0x0002;
+constexpr std::uint8_t PPU_ADDRESS_OAM_ADDR_REG = 0x0003;
+constexpr std::uint8_t PPU_ADDRESS_OAM_DATA_REG = 0x0004;
+constexpr std::uint8_t PPU_ADDRESS_SCROLL_REG = 0x0005;
+constexpr std::uint8_t PPU_ADDRESS_ADDR_REG = 0x0006;
+constexpr std::uint8_t PPU_ADDRESS_DATA_REG = 0x0007;
 constexpr std::uint8_t PPU_ADDRESS_OAMDMA_REG = 0x4014;
 
 // PPU Rendering constants.
