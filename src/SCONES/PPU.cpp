@@ -114,15 +114,24 @@ void PPU::visible_scanlines()
     if (fetching_tiles_and_sprites)
         fetch_tiles_and_sprite();
 
-    const bool penultimate_visible_pixel = clock == 256;
+    const bool penultimate_visible_pixel = (clock == 256) && render_enable();
     if (penultimate_visible_pixel)
         increment_y();
 
-    const bool final_visible_pixel = clock == 257;
+    const bool final_visible_pixel = (clock == 257) && render_enable();
     if (final_visible_pixel)
     {
         //todo: background shift
-        increment_x();
+        // Performs horizontal data bits copy from temp VRAM to proper VRAM.
+        vram_rag.bits.course_x_scroll = tvram_reg.bits.course_x_scroll;
+        vram_rag.bits.nametable_select = tvram_reg.bits.nametable_select;
+    }
+
+    const bool increment_horizontal_position = (!((clock < 328) && (clock > 256))) && render_enable();
+    if (increment_horizontal_position)
+    {
+        if ((clock % 8) == 0)
+            increment_x();
     }
 
     const bool end_of_scanline = clock == 338 || clock == 340;
@@ -174,6 +183,14 @@ void PPU::step()
             if (PPUCTRL.bits.nmi_enable)
                 nmi = true;
         }
+    }
+
+    const bool pre_render_scanline_vert_copy = (scanline == 262) && render_enable() && (clock >= 280 && clock <= 304);
+    if (pre_render_scanline_vert_copy)
+    {
+        vram_rag.bits.course_y_scroll = tvram_reg.bits.course_y_scroll;
+        vram_rag.bits.fine_y_scroll = tvram_reg.bits.fine_y_scroll;
+        vram_rag.bits.nametable_select = vram_rag.bits.nametable_select;
     }
 
     //todo: combine background and pixel data and stuff
@@ -375,7 +392,7 @@ void PPU::increment_x()
     if (vram_rag.bits.course_x_scroll == 31)
     {
         vram_rag.bits.course_x_scroll = 0;
-        vram_rag.bits.nametable_select = 0x1;
+        vram_rag.bits.nametable_select |= 0x1;
     }
     else
     {
@@ -395,7 +412,7 @@ void PPU::increment_y()
         if (vram_rag.bits.course_y_scroll == 29)
         {
             vram_rag.bits.course_y_scroll = 0;
-            vram_rag.bits.nametable_select = 0x2;
+            vram_rag.bits.nametable_select |= 0x2;
         }
         else if (vram_rag.bits.course_y_scroll == 31)
         {
