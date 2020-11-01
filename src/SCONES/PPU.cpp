@@ -110,7 +110,7 @@ void PPU::visible_scanlines()
         return;
     }
 
-    const bool fetching_tiles_and_sprites = (clock >= 2 && clock < 258) || (clock >= 321 && clock < 338);
+    const bool fetching_tiles_and_sprites = (clock >= 2 && clock < 258) || (clock >= 321 && clock < 338) && render_enable();
     if (fetching_tiles_and_sprites)
         fetch_tiles_and_sprite();
 
