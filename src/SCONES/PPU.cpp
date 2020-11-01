@@ -127,13 +127,6 @@ void PPU::visible_scanlines()
         vram_rag.bits.nametable_select = tvram_reg.bits.nametable_select;
     }
 
-    const bool increment_horizontal_position = (!((clock < 328) && (clock > 256))) && render_enable();
-    if (increment_horizontal_position)
-    {
-        if ((clock % 8) == 0)
-            increment_x();
-    }
-
     const bool end_of_scanline = clock == 338 || clock == 340;
     if (end_of_scanline)
     {
