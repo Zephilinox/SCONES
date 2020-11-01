@@ -153,8 +153,6 @@ void PPU::visible_scanlines()
 void PPU::step()
 {
     // Tick the PPU.
-    //todo: right place to do the increment?
-    clock++;
 
     const bool scanlines_are_visible = scanline >= -1 && scanline < 240;
     if (scanlines_are_visible)
@@ -180,6 +178,9 @@ void PPU::step()
 
     //todo: combine background and pixel data and stuff
 
+
+    //todo: right place to do the increment?
+    clock++;
     if (clock >= PPU_SCANLINE_CYCLE_COUNT)
     {
         clock = 0;

@@ -81,17 +81,6 @@ union PPUStatusReg
     std::uint8_t data = 0x0;
 };
 
-union PPUScrollReg
-{
-    struct
-    {
-        std::uint8_t scroll_position_x : 4;
-        std::uint8_t scroll_position_y : 4;
-    } bits;
-
-    std::uint8_t data = 0x0;
-};
-
 // Credit to user loopy for working this out.
 // Stores information for drawing the background.
 union VRAMReg
