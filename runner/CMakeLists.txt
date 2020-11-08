@@ -16,7 +16,7 @@ FetchContent_Declare(imgui)
 if (NOT imgui_POPULATED)
     FetchContent_Populate(imgui
         GIT_REPOSITORY https://github.com/ocornut/imgui
-        GIT_TAG        455c21df7100a4727dd6e4c8e69249b7de21d24c
+        GIT_TAG        origin/docking
         GIT_SHALLOW    TRUE
         GIT_STRATEGY   CHECKOUT
         SOURCE_DIR "${CMAKE_CURRENT_BINARY_DIR}/IMGUI/IMGUI"
