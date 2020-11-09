@@ -12,6 +12,10 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - name: get submodules
+        shell: bash
+        run: git submodule update --init --recursive
+
       - name: Create Build Environment
         run: cmake -E make_directory ${{runner.workspace}}/build
 
@@ -32,3 +36,22 @@ jobs:
         working-directory: ${{runner.workspace}}/build
         shell: bash
         run: cmake --build . --config $BUILD_TYPE
+
+
+  build-emscripten:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: install Emscipten
+        run: |
+          wget -q https://github.com/emscripten-core/emsdk/archive/master.tar.gz
+          tar -xvf master.tar.gz
+          emsdk-master/emsdk update
+          emsdk-master/emsdk install latest
+          emsdk-master/emsdk activate latest
+
+      - name: Build
+        run: |
+          pushd emsdk-master
+          source ./emsdk_env.sh
