@@ -333,7 +333,7 @@ std::uint8_t PPU::ppu_read(std::uint16_t address)
     {
         if (bus_cart)
         {
-            // TODO - Fetch data from the cartridge based on mapper.
+            bus_cart->ppu_read(address);
         }
     }
     else if (address >= 0x2000 && address <= 0x3EFF)
@@ -361,7 +361,7 @@ void PPU::ppu_write(std::uint16_t address, std::uint8_t data)
     {
         if (bus_cart)
         {
-            // TODO - Fetch data from the cartridge based on mapper.
+            bus_cart->ppu_write(address, data);
         }
     }
     else if (address >= 0x2000 && address <= 0x3EFF)

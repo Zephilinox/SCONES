@@ -11,7 +11,7 @@ using namespace paperbag;
 
 constexpr int size = 512;
 
-std::vector<Pixel> make_texture()
+std::vector<Pixel> make_texture(int w, int h)
 {
     std::vector<Pixel> pixels;
     pixels.resize(size * size);
@@ -31,7 +31,9 @@ NotAGame::NotAGame()
     : window({"SCONES - Emulator"})
     , renderer(&window)
     , gui(&window, &renderer)
-    , texture(renderer.make_texture(make_texture(), size, size))
+    , texture(renderer.make_texture(make_texture(size, size), size, size))
+    , fb_texture(renderer.make_texture(make_texture(nes.get_framebuffer()->get_width(), nes.get_framebuffer()->get_height()),
+        nes.get_framebuffer()->get_width(), nes.get_framebuffer()->get_height()))
 {
 }
 
@@ -173,11 +175,25 @@ void NotAGame::update()
             }
 
             texture->update([](std::vector<Pixel>& pixels) {
-                pixels = make_texture();
+                pixels = make_texture(size, size);
+            });
+            fb_texture->update([&](std::vector<Pixel>& pixels) {
+                Framebuffer* fb = nes.get_framebuffer();
+                for (int y = 0; y < fb->get_height(); y++)
+                {
+                    for (int x = 0; x < fb->get_width(); x++) 
+                    {
+                        pixels[x + (y * fb->get_width())] = Pixel{
+                            (*fb)(x, y).r, (*fb)(x, y).g, (*fb)(x, y).b, 255 
+                        };
+                    }
+                }
             });
         }
 
         ImGui::Image((void*)(intptr_t)texture->get_opengl_texture_id(), ImVec2(texture->get_width(), texture->get_height()));
+        ImGui::Text("PPU Framebuffer:");
+        ImGui::Image((void*)(intptr_t)fb_texture->get_opengl_texture_id(), ImVec2(fb_texture->get_width(), fb_texture->get_height()));
         ImGui::End();
     }
 

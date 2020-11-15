@@ -18,6 +18,9 @@ public:
     RGB operator()(int x, int y);
     void operator()(int x, int y, RGB col);
 
+    int get_width() const { return w; }
+    int get_height() const { return h; }
+
 private:
     std::unique_ptr<std::uint8_t[]> data;
     int w, h; 

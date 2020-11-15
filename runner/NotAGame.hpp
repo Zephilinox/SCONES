@@ -45,4 +45,5 @@ private:
 
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
     std::unique_ptr<paperbag::Texture> texture;
+    std::unique_ptr<paperbag::Texture> fb_texture;
 };
