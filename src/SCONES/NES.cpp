@@ -5,6 +5,7 @@ NES::NES()
     , fb(std::make_unique<Framebuffer>(256, 240))
     , ppu2C02(std::make_unique<PPU>(&addressBus, fb.get()))
 {
+    addressBus.connect_ppu(ppu2C02.get());
 }
 
 void NES::tick()
