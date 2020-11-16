@@ -48,6 +48,8 @@ SET(Runner_INCLUDES
     "Paperbag/RandomCrap.hpp"
     "Paperbag/Window.hpp"
     "Paperbag/Renderer.hpp"
+    "Paperbag/Renderer/Shader/Shader.hpp"
+    "Paperbag/Renderer/Shader/Uniform.hpp"
     "Paperbag/GUI.hpp"
     "Paperbag/Texture.hpp"
     "Paperbag/Pixel.hpp"
@@ -60,6 +62,7 @@ SET(Runner_SOURCES
 
     "Paperbag/Window.cpp"
     "Paperbag/Renderer.cpp"
+    "Paperbag/Renderer/Shader/Shader.cpp"
     "Paperbag/GUI.cpp"
     "Paperbag/Texture.cpp"
 )
