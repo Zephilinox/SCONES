@@ -46,7 +46,10 @@ std::uint8_t Bus::cpu_read(std::uint16_t address)
         {
             value = ppu->bus_read(relevant_address);
         }
-        spdlog::warn("Reading ppu register space but not mapped to component");
+        else
+        {
+            spdlog::error("PPU not mapped to address bus. Address fetch failed.");
+        }
     }
     else if (address <= ADDRESS_APU_IO_REGISTER_UPPER)
     {
@@ -97,7 +100,10 @@ void Bus::cpu_write(std::uint16_t address, std::uint8_t data)
         {
             ppu->bus_write(relevant_address, data);
         }
-        spdlog::warn("Writing ppu register space but not mapped to component");
+        else
+        {
+            spdlog::error("PPU not mapped to address bus. Address write failed.");
+        }
     }
     else if (address <= ADDRESS_APU_IO_REGISTER_UPPER)
     {

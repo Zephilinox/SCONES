@@ -19,6 +19,7 @@ public:
 
     [[nodiscard]] std::uint32_t get_clock() const { return clock; }
     [[nodiscard]] Framebuffer* get_framebuffer() const { return fb.get(); }
+    [[nodiscard]] const Framebuffer* get_debug_framebuffer();
     [[nodiscard]] bool frame_ready() const { return clock % 89342; }
     [[nodiscard]] Bus& get_bus() { return addressBus; }
     [[nodiscard]] CPU& get_cpu() { return *cpu6502; }
@@ -35,4 +36,5 @@ private:
 
     // display framebuffer.
     std::unique_ptr<Framebuffer> fb;
+    Framebuffer patternTableView = Framebuffer(256, 256);
 };

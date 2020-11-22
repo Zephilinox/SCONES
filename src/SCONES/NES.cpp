@@ -41,3 +41,9 @@ bool NES::insert_cartridge(const std::string& path)
     reset();
     return result;
 }
+
+const Framebuffer* NES::get_debug_framebuffer()
+{
+    ppu2C02->get_pallete_contents(&patternTableView);
+    return const_cast<Framebuffer*>(&patternTableView);
+}

@@ -15,7 +15,8 @@ struct RGB
 class Framebuffer {
 public:
     Framebuffer(int w, int h);
-    RGB operator()(int x, int y);
+    Framebuffer(const Framebuffer& obj);
+    RGB operator()(int x, int y) const;
     void operator()(int x, int y, RGB col);
 
     int get_width() const { return w; }

@@ -32,8 +32,8 @@ NotAGame::NotAGame()
     , renderer(&window)
     , gui(&window, &renderer)
     , texture(renderer.make_texture(make_texture(size, size), size, size))
-    , fb_texture(renderer.make_texture(make_texture(nes.get_framebuffer()->get_width(), nes.get_framebuffer()->get_height()),
-        nes.get_framebuffer()->get_width(), nes.get_framebuffer()->get_height()))
+    , fb_texture(renderer.make_texture(make_texture(nes.get_debug_framebuffer()->get_width(), nes.get_debug_framebuffer()->get_height()),
+        nes.get_debug_framebuffer()->get_width(), nes.get_debug_framebuffer()->get_height()))
 {
 }
 
@@ -178,7 +178,7 @@ void NotAGame::update()
                 pixels = make_texture(size, size);
             });
             fb_texture->update([&](std::vector<Pixel>& pixels) {
-                Framebuffer* fb = nes.get_framebuffer();
+                const Framebuffer* fb = nes.get_debug_framebuffer();
                 for (int y = 0; y < fb->get_height(); y++)
                 {
                     for (int x = 0; x < fb->get_width(); x++) 
@@ -189,6 +189,7 @@ void NotAGame::update()
                     }
                 }
             });
+
         }
 
         ImGui::Image((void*)(intptr_t)texture->get_opengl_texture_id(), ImVec2(texture->get_width(), texture->get_height()));

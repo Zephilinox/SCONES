@@ -10,7 +10,6 @@ PPU::PPU(Bus* bus, Framebuffer* fbuffer)
     , fb(fbuffer)
 {
     create_palette();
-    addBus->connect_ppu(this);
 }
 
 
@@ -44,6 +43,11 @@ void PPU::update_shifters()
             }
         }
     }
+}
+
+RGB PPU::get_pallete_colour(uint8_t pallete, uint8_t pixel)
+{
+    return palPalette[ppu_read(0x3F00 + (pallete << 2) + pixel)];
 }
 
 void PPU::fetch_tiles_and_sprite()
@@ -349,7 +353,7 @@ std::uint8_t PPU::ppu_read(std::uint16_t address)
         // Therefore we will return the index from our colour palette.
         // The calling routiene can then use this number to get the RGB value.
         auto adrr = ((address - 0x3F00) % 0x0020);
-        pallete_ram[adrr] = data;
+        data = pallete_ram[adrr];
     }
 
     return data;
@@ -471,6 +475,36 @@ std::uint8_t PPU::bus_read(std::uint16_t address)
 }
 
 void PPU::get_pallete_contents(Framebuffer* fb)
-{
-    // TODO - Write the contents of the pallete memory here.
+{    
+    // Pattern tables define the layout in a tile and are comprised of two planes. 
+    // These planes are combined together in order to aquire a colour from the current active pallete.
+    // Each tile is an 8x8 set of pixels. Hence each bit represents a pixel.
+    for (uint16_t tileY = 0; tileY < 16; tileY++)
+    {
+        for (uint16_t tileX = 0; tileX < 16; tileX++)
+        {
+            // Get the corrisponding pattern table.
+            std::uint8_t address = (tileY * 256) + (tileX * 16);
+            
+            // Go through bit string and aquire pattern table bits.
+            for (uint16_t row = 0; row < 8; row++)
+            {
+                uint8_t lowTileBit = ppu_read(address + row);
+                uint8_t highTileBit = ppu_read(address + row + 8);
+
+                for (uint16_t col = 0; col < 8; col++)
+                {
+                    // Determine the pixel here.
+                    uint8_t colourBit = (lowTileBit & 0x01) + (highTileBit & 0x01);
+
+                    lowTileBit >>= 1;
+                    highTileBit >>= 1; 
+
+                    (*fb)(tileX * 8 + (7 - col),
+                          tileY * 8 + row,
+                          get_pallete_colour(0, colourBit));
+                }
+            }
+        }
+    }
 }

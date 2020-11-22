@@ -1,5 +1,6 @@
 #include "Framebuffer.hpp"
 
+#include <algorithm>
 #include <cstring>
 
 Framebuffer::Framebuffer(int x, int y)
@@ -10,10 +11,17 @@ Framebuffer::Framebuffer(int x, int y)
     std::fill_n(data.get(), total_bytes, 0);
 }
 
-RGB Framebuffer::operator()(int x, int y)
+Framebuffer::Framebuffer(const Framebuffer& obj)
+{
+    this->w = obj.w;
+    this->h = obj.h;
+    this->data = std::make_unique<std::uint8_t[]>(*obj.data.get());
+}
+
+RGB Framebuffer::operator()(int x, int y) const
 {
     int idx = (w * y) + x;
-    if (idx > 0 && idx > w * h)
+    if (idx > 0 && idx < (w * h))
     {
         RGB col{ data[idx], data[idx + 1], data[idx + 2] };
         return col;
@@ -25,7 +33,7 @@ RGB Framebuffer::operator()(int x, int y)
 void Framebuffer::operator()(int x, int y, RGB col)
 {
     int idx = (w * y) + x;
-    if (idx > 0 && idx > w * h)
+    if (idx > 0 && idx < (w * h))
     {
         memcpy(&data.get()[idx], &col, sizeof(RGB));
     }

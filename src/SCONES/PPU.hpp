@@ -138,6 +138,8 @@ private:
     void fetch_tiles_and_sprite();
     void update_shifters();
 
+    RGB get_pallete_colour(uint8_t pallete, uint8_t pixel);
+
     Bus* addBus = nullptr;
     Framebuffer* fb = nullptr;
     std::unique_ptr<std::uint8_t[]> oam;         // PPU OAM
