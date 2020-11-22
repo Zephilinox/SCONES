@@ -155,6 +155,7 @@ private:
     // Specifies whether to write high or low bytes in 16bit address.
     // NESDEV refers to this as a write toggle.
     std::uint8_t address_latch = 0x0;
+    std::uint8_t ppu_data_buffer = 0x0;
 
     // Used to draw VRAM to the screen based on set camera positions.
     VRAMReg vram_rag;

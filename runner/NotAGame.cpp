@@ -177,18 +177,20 @@ void NotAGame::update()
             texture->update([](std::vector<Pixel>& pixels) {
                 pixels = make_texture(size, size);
             });
-            fb_texture->update([&](std::vector<Pixel>& pixels) {
-                const Framebuffer* fb = nes.get_debug_framebuffer();
-                for (int y = 0; y < fb->get_height(); y++)
-                {
-                    for (int x = 0; x < fb->get_width(); x++) 
+            if (update_nes_screen_every_cycle) {
+                fb_texture->update([&](std::vector<Pixel>& pixels) {
+                    const Framebuffer* fb = nes.get_debug_framebuffer();
+                    for (int y = 0; y < fb->get_height(); y++)
                     {
-                        pixels[x + (y * fb->get_width())] = Pixel{
-                            (*fb)(x, y).r, (*fb)(x, y).g, (*fb)(x, y).b, 255 
-                        };
+                        for (int x = 0; x < fb->get_width(); x++)
+                        {
+                            pixels[x + (y * fb->get_width())] = Pixel{
+                                (*fb)(x, y).r, (*fb)(x, y).g, (*fb)(x, y).b, 255
+                            };
+                        }
                     }
-                }
-            });
+                });
+            }
 
         }
 

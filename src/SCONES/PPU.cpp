@@ -304,16 +304,20 @@ void PPU::ppu_scroll_reg_write(std::uint8_t data)
 
 void PPU::ppu_address_reg_write(std::uint8_t data)
 {
-    // Here we write to either the low or high portion of the address with our data.
-    tvram_reg.data = (tvram_reg.data & (address_latch == 0x0 ? 0x00FF : 0xFF00)) | (data << (address_latch & 0x8));
-
-    // Once full register has been written we swap the tram register to the VRAM register.
-    // Simulates the two write operations for the register that occur due to the 8bit bus.
-    if (address_latch)
+    if (address_latch == 0)
     {
-        vram_rag = tvram_reg;
+        tvram_reg.data = (tvram_reg.data & 0x0FF) | data;
+        address_latch = 1;
     }
-    address_latch = !address_latch;
+    else
+    {
+        // Once full register has been written we swap the tram register to the VRAM register.
+        // Simulates the two write operations for the register that occur due to the 8bit bus.
+        tvram_reg.data = (tvram_reg.data & 0xFF00) | (data << 8);
+        vram_rag = tvram_reg;
+        address_latch = 0;
+    }
+
 }
 
 void PPU::ppu_address_status_reg_read(std::uint8_t& data)
@@ -326,7 +330,10 @@ void PPU::ppu_address_status_reg_read(std::uint8_t& data)
 void PPU::ppu_data_reg_read(std::uint8_t& data)
 {
     // Reads data from current VRAM address.
-    data = ppu_read(vram_rag.data);
+    data = ppu_data_buffer; 
+    ppu_data_buffer = ppu_read(vram_rag.data);
+    if (vram_rag.data >= 0x3F00)
+        data = ppu_data_buffer;
     vram_rag.data += (PPUCTRL.bits.increment_mode ? 32 : 1);
 }
 
@@ -337,7 +344,8 @@ std::uint8_t PPU::ppu_read(std::uint16_t address)
     {
         if (bus_cart)
         {
-            bus_cart->ppu_read(address);
+            auto cartData = bus_cart->ppu_read(address);
+            data = cartData.data;
         }
     }
     else if (address >= 0x2000 && address <= 0x3EFF)
@@ -490,7 +498,7 @@ void PPU::get_pallete_contents(Framebuffer* fb)
             for (uint16_t row = 0; row < 8; row++)
             {
                 uint8_t lowTileBit = ppu_read(address + row);
-                uint8_t highTileBit = ppu_read(address + row + 8);
+                uint8_t highTileBit = ppu_read(address + row + 0x8);
 
                 for (uint16_t col = 0; col < 8; col++)
                 {

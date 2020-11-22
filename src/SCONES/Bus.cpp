@@ -15,6 +15,7 @@ Bus::Bus()
 void Bus::insert_cartridge(Cartridge&& c)
 {
     cartridge = std::move(c);
+    ppu->connect_cartridge_ppu_bus(&cartridge);
 }
 
 std::uint8_t Bus::cpu_read(std::uint16_t address)
