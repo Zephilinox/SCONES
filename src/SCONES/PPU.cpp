@@ -326,7 +326,7 @@ void PPU::ppu_address_status_reg_read(std::uint8_t& data)
 void PPU::ppu_data_reg_read(std::uint8_t& data)
 {
     // Reads data from current VRAM address.
-    data = bus_read(vram_rag.data);
+    data = ppu_read(vram_rag.data);
     vram_rag.data += (PPUCTRL.bits.increment_mode ? 32 : 1);
 }
 
@@ -442,7 +442,7 @@ void PPU::bus_write(std::uint16_t address, std::uint8_t data)
         ppu_address_reg_write(data);
         break;
     case PPU_ADDRESS_DATA_REG:
-        ppu_write(address, data);
+        ppu_data_reg_write(data);
         break;
     default: // Dont do anything.
         break;

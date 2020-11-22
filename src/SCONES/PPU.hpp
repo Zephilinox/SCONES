@@ -119,11 +119,11 @@ private:
 
     // Register R/W event functions.
     void ppu_data_reg_write(std::uint8_t data);
+    void ppu_data_reg_read(std::uint8_t& data);
+
     void ppu_scroll_reg_write(std::uint8_t data);
     void ppu_address_reg_write(std::uint8_t data);
-
     void ppu_address_status_reg_read(std::uint8_t& data);
-    void ppu_data_reg_read(std::uint8_t& data);
 
     // PPU Memory R/W
     std::uint8_t ppu_read(std::uint16_t address);
