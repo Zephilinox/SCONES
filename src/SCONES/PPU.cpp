@@ -5,6 +5,7 @@
 PPU::PPU(Bus* bus, Framebuffer* fbuffer)
     : addBus(bus)
     , oam(std::make_unique<std::uint8_t[]>(PPU_MAX_OAM_REG_SIZE))
+    , chrRam(std::make_unique<std::uint8_t[]>(PPU_CHR_RAM_SIZE))
     , vram(std::make_unique<std::uint8_t[]>(PPU_VRAM_SIZE))
     , pallete_ram(std::make_unique<std::uint8_t[]>(PPU_PALLETE_COUNT))
     , fb(fbuffer)
@@ -345,7 +346,14 @@ std::uint8_t PPU::ppu_read(std::uint16_t address)
         if (bus_cart)
         {
             auto cartData = bus_cart->ppu_read(address);
-            data = cartData.data;
+            if (cartData.handled_by_cartridge)
+            {
+                data = cartData.data;
+            }
+            else
+            {
+                data = chrRam[address];
+            }
         }
     }
     else if (address >= 0x2000 && address <= 0x3EFF)
@@ -360,7 +368,23 @@ std::uint8_t PPU::ppu_read(std::uint16_t address)
         // Reads palette indexes.
         // Therefore we will return the index from our colour palette.
         // The calling routiene can then use this number to get the RGB value.
-        auto adrr = ((address - 0x3F00) % 0x0020);
+        auto adrr = (address &= 0x001F);
+        if (address == 0x0010)
+        {
+            adrr = 0x0000;
+        }
+        if (address == 0x0014)
+        {
+            adrr = 0x0004;
+        }
+        if (address == 0x0018)
+        {
+            adrr = 0x0008;
+        }
+        if (address == 0x001C)
+        {
+            adrr = 0x000C;
+        }
         data = pallete_ram[adrr];
     }
 
@@ -373,7 +397,10 @@ void PPU::ppu_write(std::uint16_t address, std::uint8_t data)
     {
         if (bus_cart)
         {
-            bus_cart->ppu_write(address, data);
+            if (!bus_cart->ppu_write(address, data))
+            {
+                chrRam[address] = data;
+            }
         }
     }
     else if (address >= 0x2000 && address <= 0x3EFF)
@@ -382,12 +409,29 @@ void PPU::ppu_write(std::uint16_t address, std::uint8_t data)
         auto add_rel = address - base_add;
         vram[add_rel] = data;
     }
-    else
+    else if (address >= 0x3F00)
     {
         // Reads palette indexes.
         // Therefore we will return the index from our colour palette.
         // The calling routiene can then use this number to get the RGB value.
-        auto adrr = ((address - 0x3F00) % 0x0020);
+        auto adrr = (address &= 0x001F);
+        if (address == 0x0010)
+        {
+            adrr = 0x0000;
+        }
+        if (address == 0x0014)
+        {
+            adrr = 0x0004;
+        }
+        if (address == 0x0018)
+        {
+            adrr = 0x0008;
+        }
+        if (address == 0x001C)
+        {
+            adrr = 0x000C;
+        }
+
         pallete_ram[adrr] = data;
     }
 }
@@ -515,4 +559,19 @@ void PPU::get_pallete_contents(Framebuffer* fb)
             }
         }
     }
+}
+
+std::uint8_t* PPU::get_vram(uint32_t& vram_size)
+{
+    vram_size = PPU_VRAM_SIZE;
+    return pallete_ram.get();
+}
+
+void PPU::reset()
+{
+    PPUCTRL.data = 0;
+    PPUMASK.data = 0;
+    PPUSTATUS.bits.sprite_overflow = 0;
+    PPUSTATUS.bits.sprite_0_hit = 0;
+    address_latch = 0x0;
 }

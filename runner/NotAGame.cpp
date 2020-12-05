@@ -210,6 +210,18 @@ void NotAGame::update()
         memory_editor.DrawContents(data, size);
         ImGui::End();
     }
+
+    // PPU Memory Editor
+    {
+        static MemoryEditor memory_editor;
+        uint32_t memorySize = 0;
+
+        ImGui::Begin("PPU Memory Editor", &show_nes_cpu_memory_editor);
+        auto* data = nes.get_ppu().get_vram(memorySize);
+        auto size = memorySize * sizeof(std::uint8_t);
+        memory_editor.DrawContents(data, size);
+        ImGui::End();
+    }
 }
 
 void NotAGame::render()

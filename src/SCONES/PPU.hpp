@@ -17,6 +17,7 @@ constexpr std::uint32_t PPU_VRAM_SIZE = 2 * 1024;
 constexpr std::uint32_t PPU_PALLETE_COUNT = 0x20;
 constexpr std::uint16_t PPU_MAX_OAM_REG_SIZE = 256;
 constexpr std::uint32_t PPU_PAL_PALETTE_SIZE = 0x40;
+constexpr std::uint32_t PPU_CHR_RAM_SIZE = 0x2000;
 
 // PPU I/O Addresses
 constexpr std::uint8_t PPU_ADDRESS_PPUCTRL_REG = 0x0000;
@@ -112,6 +113,9 @@ public:
     void connect_cartridge_ppu_bus(Cartridge* cart) { bus_cart = cart; }
 
     void get_pallete_contents(Framebuffer* fb);
+    std::uint8_t* get_vram(uint32_t& vram_size);
+
+    void reset();
 
 private:
     // Internal functions.
@@ -143,6 +147,7 @@ private:
     Bus* addBus = nullptr;
     Framebuffer* fb = nullptr;
     std::unique_ptr<std::uint8_t[]> oam;         // PPU OAM
+    std::unique_ptr<std::uint8_t[]> chrRam;      // CHR-RAM (Internal cartridge pattern memory.)
     std::unique_ptr<std::uint8_t[]> vram;        // PPU VRAM
     std::unique_ptr<std::uint8_t[]> pallete_ram; // PPU pallete ram.
     Cartridge* bus_cart = nullptr;               // Cartridge connected to PPU bus.
