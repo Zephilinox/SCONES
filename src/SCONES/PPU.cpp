@@ -536,7 +536,7 @@ void PPU::get_pallete_contents(Framebuffer* fb)
         for (uint16_t tileX = 0; tileX < 16; tileX++)
         {
             // Get the corrisponding pattern table.
-            std::uint8_t address = (tileY * 256) + (tileX * 16);
+            std::uint16_t address = (tileY * 256) + (tileX * 16);
             
             // Go through bit string and aquire pattern table bits.
             for (uint16_t row = 0; row < 8; row++)
@@ -563,8 +563,8 @@ void PPU::get_pallete_contents(Framebuffer* fb)
 
 std::uint8_t* PPU::get_vram(uint32_t& vram_size)
 {
-    vram_size = PPU_VRAM_SIZE;
-    return pallete_ram.get();
+    vram_size = PPU_CHR_RAM_SIZE;
+    return chrRam.get();
 }
 
 void PPU::reset()

@@ -29,6 +29,7 @@ void NES::reset()
     // TODO - Call Reset Signals on our NES.
     ppu2C02->reset();
     cpu6502->reset();
+    addressBus.reset();
     clock = 0;
 }
 

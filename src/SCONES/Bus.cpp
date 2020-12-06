@@ -139,3 +139,8 @@ std::array<std::uint8_t, ADDRESS_CPU_RAM_SIZE>& Bus::get_cpu_ram() const
 {
     return *memory_cpu_ram;
 }
+
+void Bus::reset()
+{
+    memory_cpu_ram.get()->fill(0x0);
+}

@@ -40,6 +40,8 @@ public:
 
     std::array<std::uint8_t, ADDRESS_CPU_RAM_SIZE>& get_cpu_ram() const;
 
+    void reset();
+
 private:
     std::unique_ptr<std::array<std::uint8_t, ADDRESS_CPU_RAM_SIZE>> memory_cpu_ram;
     std::unique_ptr<std::array<std::uint8_t, ADDRESS_PPU_REGISTER_SIZE>> memory_ppu_register;
